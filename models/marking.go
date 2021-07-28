@@ -102,3 +102,59 @@ func initMarkingModels() {
 		log.Println(err)
 	}
 }
+
+func (t *Topic) GetTopic(id int64) error {
+	has, err := x.Where(builder.Eq{"question_id": id}).Get(t)
+	if !has || err != nil {
+		log.Println("could not find topic")
+	}
+	return err
+}
+
+func (st *SubTopic) GetSubTopic(id int64) error {
+	has, err := x.Where(builder.Eq{"question_detail_id": id}).Get(st)
+	if !has || err != nil {
+		log.Println("could not find SubTopic")
+	}
+	return err
+}
+
+func (t *TestPaper) GetTestPaper(id int64) error {
+	has, err := x.Where(builder.Eq{"test_id": id}).Get(t)
+	if !has || err != nil {
+		log.Println("could not find test paper")
+	}
+	return err
+}
+
+func (t *TestPaperInfo) GetTestPaperInfo(id int64) error {
+	has, err := x.Where(builder.Eq{"test_detail_id": id}).Get(t)
+	if !has || err != nil {
+		log.Println("could not find test paper info")
+	}
+	return err
+}
+
+func (u *UnderCorrectedPaper) GetUnderCorrectedPaper(id int64) error {
+	has, err := x.Where(builder.Eq{"user_id": id}).Get(u)
+	if !has || err != nil {
+		log.Println("could not find under corrected paper")
+	}
+	return err
+}
+
+func (u *PaperDistribution) GetPaperDistribution(id int64) error {
+	has, err := x.Where(builder.Eq{"user_id": id}).Get(u)
+	if !has || err != nil {
+		log.Println("could not find paper distribution")
+	}
+	return err
+}
+
+func (s *ScoreRecord) GetTopic(id int64) error {
+	has, err := x.Where(builder.Eq{"Question_id": id}).Get(s)
+	if !has || err != nil {
+		log.Println("could not find user")
+	}
+	return err
+}
