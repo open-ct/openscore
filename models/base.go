@@ -26,5 +26,6 @@ func init() {
 	}
 	x.ShowSQL(true)
 	initMarkingModels()
+	initUserModels()
 
 }
