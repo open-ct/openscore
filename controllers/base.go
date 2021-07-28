@@ -26,11 +26,15 @@ import (
 	"openscore/auth"
 	"openscore/util"
 
-	beego "github.com/beego/beego/v2/adapter"
+	beego "github.com/beego/beego/v2/server/web"
 	// "github.com/astaxie/beego"
 )
 
 type ApiController struct {
+	beego.Controller
+}
+
+type TestPaperApiController struct {
 	beego.Controller
 }
 

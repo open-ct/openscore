@@ -11,7 +11,7 @@ import (
 // struct : Topic(大题)
 // comment: must capitalize the first letter of the field in Topic
 type Topic struct {
-	Question_id    int64  `xorm:"id pk"`
+	Question_id    int64  `xorm:"pk"`
 	Question_name  string `xorm:"varchar(50)"`
 	Subject_name   string `xorm:"varchar(50)"`
 	Standard_error int64
@@ -22,7 +22,7 @@ type Topic struct {
 }
 
 type SubTopic struct {
-	Question_detail_id    int64 `xorm:"id pk" `
+	Question_detail_id    int64 `xorm:"pk" `
 	Question_detail_name  string
 	Question_id           int64
 	Question_detail_score int64
@@ -97,7 +97,7 @@ type PaperDistribution struct {
 }
 
 func initMarkingModels() {
-	err := x.Sync2(new(Topic), new(SubTopic), new(TestPaper), new(TestPaperInfo))
+	err := x.Sync2(new(Topic), new(SubTopic), new(TestPaper), new(TestPaperInfo), new(ScoreRecord), new(UnderCorrectedPaper), new(PaperDistribution))
 	if err != nil {
 		log.Println(err)
 	}
@@ -107,6 +107,22 @@ func (t *Topic) GetTopic(id int64) error {
 	has, err := x.Where(builder.Eq{"question_id": id}).Get(t)
 	if !has || err != nil {
 		log.Println("could not find topic")
+	}
+	return err
+}
+
+func GetSubTopicsByQuestionId(id int64, st *[]SubTopic) error {
+	err := x.Where("question_id = ?", id).Find(st)
+	if err != nil {
+		log.Println("could not find any SubTopic")
+	}
+	return err
+}
+
+func (t *TestPaperInfo) GetTestPaperInfoByTestIdAndQuestionDetailId(testId int64, questionDetailId int64) error {
+	has, err := x.Where("question_detail_id = ? and test_id = ?", questionDetailId, testId).Get(t)
+	if !has || err != nil {
+		log.Println("could not specific info")
 	}
 	return err
 }
