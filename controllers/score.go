@@ -7,11 +7,8 @@ import (
 	"strconv"
 )
 
-type testStruct struct {
-	Name string
-}
-
 func (c *TestPaperApiController) Display() {
+	defer c.ServeJSON()
 	var requestBody map[string]interface{}
 	json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
 
@@ -43,5 +40,25 @@ func (c *TestPaperApiController) Display() {
 	data["picSrcs"] = picSrcs
 	resp := Response{"10000", "OK", data}
 	c.Data["json"] = resp
-	c.ServeJSON()
+}
+
+func (c *TestPaperApiController) List() {
+	defer c.ServeJSON()
+	var requestBody map[string]interface{}
+	json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+
+	log.Println(requestBody["userId"])
+	userIdstr := requestBody["userId"].(string)
+
+	userId, err := strconv.ParseInt(userIdstr, 10, 64)
+	if err != nil {
+		log.Println("parse userId fail")
+	}
+	var papers []models.UnderCorrectedPaper
+	models.GetDistributedPaperByUserId(userId, &papers)
+	data := make(map[string]interface{})
+	data["papers"] = papers
+	resp := Response{"10000", "OK", data}
+	c.Data["json"] = resp
+
 }

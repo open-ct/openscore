@@ -20,6 +20,7 @@ func init() {
 	beego.Router("/api/logout", &controllers.ApiController{}, "post:Logout")
 	beego.Router("/api/get-account", &controllers.ApiController{}, "get:GetAccount")
 	beego.Router("/openct/marking/score/test/display", &controllers.TestPaperApiController{}, "post:Display")
+	beego.Router("/openct/marking/score/test/list", &controllers.TestPaperApiController{}, "post:List")
 
 	// beego.Router("/api/get-users", &controllers.ApiController{}, "GET:GetUsers")
 }

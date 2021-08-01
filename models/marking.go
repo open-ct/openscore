@@ -119,6 +119,14 @@ func GetSubTopicsByQuestionId(id int64, st *[]SubTopic) error {
 	return err
 }
 
+func GetDistributedPaperByUserId(id int64, up *[]UnderCorrectedPaper) error {
+	err := x.Where("user_id = ?", id).Find(up)
+	if err != nil {
+		log.Println("could not find any paper")
+	}
+	return err
+}
+
 func (t *TestPaperInfo) GetTestPaperInfoByTestIdAndQuestionDetailId(testId int64, questionDetailId int64) error {
 	has, err := x.Where("question_detail_id = ? and test_id = ?", questionDetailId, testId).Get(t)
 	if !has || err != nil {
