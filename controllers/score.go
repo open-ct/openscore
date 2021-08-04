@@ -5,6 +5,7 @@ import (
 	"log"
 	"openscore/models"
 	"strconv"
+	"strings"
 )
 
 func (c *TestPaperApiController) Display() {
@@ -47,7 +48,6 @@ func (c *TestPaperApiController) List() {
 	var requestBody map[string]interface{}
 	json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
 
-	log.Println(requestBody["userId"])
 	userIdstr := requestBody["userId"].(string)
 
 	userId, err := strconv.ParseInt(userIdstr, 10, 64)
@@ -61,4 +61,25 @@ func (c *TestPaperApiController) List() {
 	resp := Response{"10000", "OK", data}
 	c.Data["json"] = resp
 
+}
+
+func (c *TestPaperApiController) Point() {
+	defer c.ServeJSON()
+	var requestBody map[string]interface{}
+	json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	userIdstr := requestBody["userId"].(string)
+	scoresstr := requestBody["scores"].(string)
+	testIdstr := requestBody["testId"].(string)
+	userId, _ := strconv.ParseInt(userIdstr, 10, 64)
+	scores := strings.Split(scoresstr, "-")
+	testIds := strings.Split(testIdstr, "-")
+	for i := 0; i < len(testIds); i++ {
+		var test models.TestPaperInfo
+		id, _ := strconv.ParseInt(testIds[i], 10, 64)
+		test.GetTestPaperInfo(id)
+		test.Examiner_first_id = userId
+		score, _ := strconv.ParseInt(scores[i], 10, 64)
+		test.Examiner_first_score = score
+
+	}
 }

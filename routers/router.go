@@ -21,6 +21,7 @@ func init() {
 	beego.Router("/api/get-account", &controllers.ApiController{}, "get:GetAccount")
 	beego.Router("/openct/marking/score/test/display", &controllers.TestPaperApiController{}, "post:Display")
 	beego.Router("/openct/marking/score/test/list", &controllers.TestPaperApiController{}, "post:List")
+	beego.Router("/openct/marking/score/test/point", &controllers.TestPaperApiController{}, "post:Point")
 
 	// beego.Router("/api/get-users", &controllers.ApiController{}, "GET:GetUsers")
 }

@@ -182,3 +182,10 @@ func (s *ScoreRecord) GetTopic(id int64) error {
 	}
 	return err
 }
+
+func (t *TestPaperInfo) Update() error {
+	code, err := x.Where(builder.Eq{"test_detail_id": t.Test_detail_id}).Update(t)
+	if code == 0 || err != nil {
+		log.Println("update test paper info fail")
+	}
+}
