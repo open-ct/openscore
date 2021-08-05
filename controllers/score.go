@@ -73,13 +73,32 @@ func (c *TestPaperApiController) Point() {
 	userId, _ := strconv.ParseInt(userIdstr, 10, 64)
 	scores := strings.Split(scoresstr, "-")
 	testIds := strings.Split(testIdstr, "-")
+	var testInfo models.TestPaperInfo
+	var test models.TestPaper
+	var sum int64
 	for i := 0; i < len(testIds); i++ {
-		var test models.TestPaperInfo
+		var underTest models.UnderCorrectedPaper
 		id, _ := strconv.ParseInt(testIds[i], 10, 64)
-		test.GetTestPaperInfo(id)
-		test.Examiner_first_id = userId
+		testInfo.GetTestPaperInfo(id)
+		underTest.GetUnderCorrectedPaper(id)
+		underTest.Delete()
+		testInfo.Examiner_first_id = userId
 		score, _ := strconv.ParseInt(scores[i], 10, 64)
-		test.Examiner_first_score = score
-
+		sum += score
+		testInfo.Examiner_first_score = score
+		testInfo.Final_score = score
 	}
+	test.GetTestPaper(testInfo.Test_id)
+	test.Examiner_first_id = userId
+	test.Examiner_first_score = sum
+	test.Final_score = sum
+	test.Update()
+
+	var record models.ScoreRecord
+	record.Score = sum
+	record.Test_id = testInfo.Test_id
+	record.Test_record_type = 1
+	record.User_id = userId
+	record.Save()
 }
+
