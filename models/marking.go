@@ -48,6 +48,8 @@ type TestPaper struct {
 	Final_score                int64
 	Problem_type               int64
 	Pratice_error              int64
+	Answer_test_id             int64
+	Example_test_id            int64
 }
 
 type TestPaperInfo struct {
@@ -70,6 +72,7 @@ type TestPaperInfo struct {
 }
 
 type UnderCorrectedPaper struct {
+	UnderCorrected_id  int64
 	User_id            int64
 	Test_id            int64
 	Question_id        int64
@@ -78,21 +81,21 @@ type UnderCorrectedPaper struct {
 
 type ScoreRecord struct {
 	Record_id        int64
+	Question_id      int64
 	Test_id          int64
-	Tser_id          int64
+	User_id          int64
 	Score_time       int64
 	Score            int64
-	Self_score       int64
 	Test_record_type int64
 	Score_type       int64
+	Problem_finish   int64
 }
 
 type PaperDistribution struct {
+	Distribution_id          int64
 	User_id                  int64
 	Question_id              int64
 	Test_distribution_number int64
-	Test_success_number      int64
-	Test_remaining_number    int64
 	PaperType                int64
 }
 
@@ -121,6 +124,14 @@ func GetSubTopicsByQuestionId(id int64, st *[]SubTopic) error {
 
 func GetDistributedPaperByUserId(id int64, up *[]UnderCorrectedPaper) error {
 	err := x.Where("user_id = ?", id).Find(up)
+	if err != nil {
+		log.Println("could not find any paper")
+	}
+	return err
+}
+
+func GetTestInfoListByTestId(id int64, as *[]TestPaperInfo) error {
+	err := x.Where("test_id = ?", id).Find(as)
 	if err != nil {
 		log.Println("could not find any paper")
 	}
@@ -160,9 +171,17 @@ func (t *TestPaperInfo) GetTestPaperInfo(id int64) error {
 }
 
 func (u *UnderCorrectedPaper) GetUnderCorrectedPaper(id int64) error {
-	has, err := x.Where(builder.Eq{"user_id": id}).Get(u)
+	has, err := x.Where(builder.Eq{"test_id": id}).Get(u)
 	if !has || err != nil {
 		log.Println("could not find under corrected paper")
+	}
+	return err
+}
+
+func (u *UnderCorrectedPaper) Delete() error {
+	code, err := x.Where(builder.Eq{"test_id": u.Test_id}).Delete(u)
+	if code == 0 || err != nil {
+		log.Println("delete fail")
 	}
 	return err
 }
@@ -188,4 +207,29 @@ func (t *TestPaperInfo) Update() error {
 	if code == 0 || err != nil {
 		log.Println("update test paper info fail")
 	}
+	return err
+}
+
+func (t *TestPaper) Update() error {
+	code, err := x.Where(builder.Eq{"test_detail_id": t.Test_id}).Update(t)
+	if code == 0 || err != nil {
+		log.Println("update test paper info fail")
+	}
+	return err
+}
+
+func (r *ScoreRecord) Save() error {
+	code, err := x.Insert(r)
+	if code == 0 || err != nil {
+		log.Println("insert record fail")
+	}
+	return err
+}
+
+func (u *UnderCorrectedPaper) Save() error {
+	code, err := x.Insert(u)
+	if code == 0 || err != nil {
+		log.Println("insert paper fail")
+	}
+	return err
 }
