@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        let authConfig = {
+  serverUrl: "http://localhost:8000", // your Casdoor URL, like the official one: https://door.casbin.com
+  clientId: "9162cb3914b3f1559e9e", // your Casdoor OAuth Client ID
+  appName: "application_1", // your Casdoor application name, like: "app-built-in"
+  organizationName: "built-in", // your Casdoor organization name, like: "built-in"
+}
+function getAuthorizeUrl() {
+  const redirectUri = `${window.location.origin}/callback`;
+  const scope = "read";
+  const state = authConfig.appName;
+  return `${trim(authConfig.serverUrl)}/login/oauth/authorize?client_id=${authConfig.clientId}&response_type=code&redirect_uri=${redirectUri}&scope=${scope}&state=${state}`;
+}
+        window.localtion.href = getAuthorizeUrl(); 
+    </script>
+</body>
+</html>
