@@ -221,10 +221,14 @@ func (c *TestPaperApiController) ExampleDeatil() {
 	testId, _ := strconv.ParseInt(testIdstr, 10, 64)
 	var test models.TestPaper
 	test.GetTestPaper(testId)
+	var exampleTest models.TestPaper
+	//??
+	exampleTest.GetTestPaperByQuestionIdAndQuestionStatus(test.Question_id, 3)
+
 	var topic models.Topic
-	topic.GetTopic(test.Question_id)
+	topic.GetTopic(exampleTest.Question_id)
 	var tests []models.TestPaperInfo
-	models.GetTestInfoListByTestId(testId, &tests)
+	models.GetTestInfoListByTestId(exampleTest.Test_id, &tests)
 	data := make(map[string]interface{})
 	data["questionName"] = topic.Question_name
 	data["test"] = tests
@@ -242,8 +246,11 @@ func (c *TestPaperApiController) ExampleList() {
 	testId, _ := strconv.ParseInt(testIdstr, 10, 64)
 	var testPaper models.TestPaper
 	testPaper.GetTestPaper(testId)
+	var exampleTest models.TestPaper
+	//??
+	exampleTest.GetTestPaperByQuestionIdAndQuestionStatus(testPaper.Question_id, 3)
 	data := make(map[string]interface{})
-	data["exampleTestId"] = testPaper.Example_test_id
+	data["exampleTestId"] = exampleTest.Test_id
 	resp := Response{"10000", "ok", data}
 	c.Data["json"] = resp
 
