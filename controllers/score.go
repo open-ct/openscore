@@ -3,9 +3,11 @@ package controllers
 import (
 	"encoding/json"
 	"log"
+	"math"
 	"openscore/models"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func (c *TestPaperApiController) Display() {
@@ -25,8 +27,8 @@ func (c *TestPaperApiController) Display() {
 	var topic models.Topic
 	var subTopic []models.SubTopic
 	testPaper.GetTestPaper(testId)
-	topic.GetTopic(testPaper.Question_id)
-	models.GetSubTopicsByQuestionId(testPaper.Question_id, &subTopic)
+	// topic.GetTopic(testPaper.Question_id)
+	models.GetSubTopicsByTestId(testPaper.Test_id, &subTopic)
 	var picSrcs []string
 	for i := 0; i < len(subTopic); i++ {
 		var testPaperInfo models.TestPaperInfo
