@@ -74,33 +74,92 @@ func (c *TestPaperApiController) Point() {
 	testIdstr := requestBody["testId"].(string)
 	userId, _ := strconv.ParseInt(userIdstr, 10, 64)
 	scores := strings.Split(scoresstr, "-")
-	testIds := strings.Split(testIdstr, "-")
-	var testInfo models.TestPaperInfo
+	testId, _ := strconv.ParseInt(testIdstr, 10, 64)
+	var scoreArr []int64
+	var sum int64 = 0
+	for _, i := range scores {
+		j, err := strconv.ParseInt(i, 10, 64)
+		sum += j
+		if err != nil {
+			panic(err)
+		}
+		scoreArr = append(scoreArr, j)
+	}
+
 	var test models.TestPaper
-	var sum int64
-	for i := 0; i < len(testIds); i++ {
-		var underTest models.UnderCorrectedPaper
-		id, _ := strconv.ParseInt(testIds[i], 10, 64)
-		testInfo.GetTestPaperInfo(id)
-		underTest.GetUnderCorrectedPaper(id)
+	var topic models.Topic
+	test.GetTestPaper(testId)
+	topic.GetTopic(test.Question_id)
+	var testInfos []models.TestPaperInfo
+	models.GetTestInfoListByTestId(testId, &testInfos)
+
+	var underTest models.UnderCorrectedPaper
+	underTest.GetUnderCorrectedPaper(testId)
+	underTest.Delete()
+
+	final := false
+
+	if underTest.Test_question_type == 1 {
+		test.Examiner_first_id = userId
+		test.Examiner_first_score = sum
+		final = true
+	} else if underTest.Test_question_type == 2 && test.Examiner_first_id == -1 {
+		test.Examiner_first_id = userId
+		test.Examiner_first_score = sum
+	} else if underTest.Test_question_type == 2 && test.Examiner_second_id == -1 {
+		test.Examiner_second_id = userId
+		test.Examiner_second_score = sum
+		if math.Abs(float64(test.Examiner_second_score)-float64(test.Examiner_first_score)) <= float64(topic.Standard_error) {
+			final = true
+		}
+	} else if underTest.Test_question_type == 4 || underTest.Test_question_type == 5 {
+		test.Leader_id = userId
+		test.Leader_score = sum
+		final = true
+	} else {
+		test.Examiner_third_id = userId
+		test.Examiner_third_score = sum
+	}
+	if final {
+		test.Final_score = sum
 		underTest.Delete()
-		testInfo.Examiner_first_id = userId
+	} else {
+		newUnderTest := underTest
+		underTest.Delete()
+		newUnderTest.Test_question_type += 1
+		newUnderTest.Save()
+	}
+	test.Update()
+	for i := 0; i < len(scores); i++ {
 		score, _ := strconv.ParseInt(scores[i], 10, 64)
 		sum += score
-		testInfo.Examiner_first_score = score
-		testInfo.Final_score = score
+		if underTest.Test_question_type == 1 {
+			testInfos[i].Examiner_first_id = userId
+			testInfos[i].Examiner_first_score = score
+		} else if underTest.Test_question_type == 2 && testInfos[i].Examiner_first_id == -1 {
+			testInfos[i].Examiner_first_id = userId
+			testInfos[i].Examiner_first_score = score
+		} else if underTest.Test_question_type == 2 && testInfos[i].Examiner_second_id == -1 {
+			testInfos[i].Examiner_second_id = userId
+			testInfos[i].Examiner_second_score = score
+		} else if underTest.Test_question_type == 4 || underTest.Test_question_type == 5 {
+			testInfos[i].Leader_id = userId
+			testInfos[i].Leader_score = score
+		} else {
+			testInfos[i].Examiner_second_id = userId
+			testInfos[i].Examiner_second_score = score
+		}
+		if final {
+			testInfos[i].Final_score = score
+		}
 	}
-	test.GetTestPaper(testInfo.Test_id)
-	test.Examiner_first_id = userId
-	test.Examiner_first_score = sum
-	test.Final_score = sum
-	test.Update()
 
 	var record models.ScoreRecord
 	record.Score = sum
-	record.Test_id = testInfo.Test_id
+	record.Test_id = testId
 	record.Test_record_type = 1
 	record.User_id = userId
+	record.Score_time = time.Now()
 	record.Save()
 }
 
