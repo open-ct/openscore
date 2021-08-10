@@ -201,9 +201,11 @@ func (c *TestPaperApiController) Answer() {
 	testId, _ := strconv.ParseInt(testIdstr, 10, 64)
 	var test models.TestPaper
 	test.GetTestPaper(testId)
-	keyId := test.Answer_test_id
+	var answerTest models.TestPaper
+	answerTest.GetTestPaperByQuestionIdAndQuestionStatus(test.Question_id, 3)
+
 	var as []models.TestPaperInfo
-	models.GetTestInfoListByTestId(keyId, &as)
+	models.GetTestInfoListByTestId(answerTest.Test_id, &as)
 	data := make(map[string]interface{})
 	data["keyTest"] = as
 	resp := Response{"10000", "ok", data}
