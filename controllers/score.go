@@ -180,9 +180,10 @@ func (c *TestPaperApiController) Problem() {
 	test.Problem_type = problemType
 	test.Update()
 	record.Test_record_type = 5
-	record.Score_type = 1
 	record.Test_id = testId
 	record.User_id = userId
+	record.Question_id = test.Question_id
+	record.Test_record_type = 5
 	record.Save()
 	underTest.GetUnderCorrectedPaper(testId)
 	var newUnderTest = underTest
