@@ -103,6 +103,7 @@ export default class index extends Component {
                 this.setState({
                     account: res.data,
                 });
+                localStorage.setItem("account", JSON.stringify(this.state.account))
             })
     }
 
@@ -114,6 +115,7 @@ export default class index extends Component {
 
         AccountBackend.logout()
             .then((res) => {
+                localStorage.setItem("account", "")
                 if (res.status === 'ok') {
                     this.setState({
                         account: null

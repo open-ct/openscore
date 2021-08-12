@@ -4,6 +4,8 @@ import { Modal, Dropdown, Button, message, Space, Tooltip, Select, Radio, Input 
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import './index.less'
 
+import Marking from "../../api/marking";
+
 export default class index extends Component {
   // state = { warningVisible: false };
   // showModal = () => {
@@ -17,17 +19,59 @@ export default class index extends Component {
   //     warningVisible: false,
   //   });
   // };
-  state = { 
+  userId = "d9da41a2-27f7-4709-8c59-52198d2a8e7a"
+  state = {
     problemVisible: false,
-    problemValue: 1, 
+    problemValue: 1,
+    papers: [],
+    currentPaper: {},
+    currentPaperNum: 0,
+    testLength: 0
   };
+
+  componentDidMount() {
+    // 总试卷获取 
+    Marking.testList({ userId: this.userId})
+      .then((res) => {
+        if (res.data.status == "10000") {
+          console.log(res)
+          this.setState(
+            {
+              papers: res.data.data.papers,
+              testLength: res.data.data.papers.length
+            }
+          )
+          this.getCurrentPaper();
+        }
+      })
+      .catch((e) => {
+        console.log(e)
+      })
+  }
+  // 当前试卷
+  getCurrentPaper() {
+    Marking.testDisplay({userId: this.userId,testId: this.state.papers[this.state.currentPaperNum].Test_id})
+    .then((res) => {
+      if (res.data.status == "10000") {
+        this.setState({
+          currentPaper: this.res.data.data
+        })
+      }
+    })
+    .catch((e) => {
+      console.log(e)
+    })
+  }
+
   render() {
 
     return (
       <DocumentTitle title="阅卷系统-评卷">
         <div className="mark-tasks-page" data-component="mark-tasks-page">
           <div className="mark-paper">
-
+            {
+              
+            }
           </div>
           <div className="mark-score">
             {
@@ -157,7 +201,7 @@ export default class index extends Component {
             <Radio value={3}>其他错误</Radio>
           </Space>
         </Radio.Group>
-        <Input placeholder="请输入问题" style={{ marginTop : 10}} />
+        <Input placeholder="请输入问题" style={{ marginTop: 10 }} />
       </Modal>
     )
   }
