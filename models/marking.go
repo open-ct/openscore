@@ -33,19 +33,19 @@ type TestPaper struct {
 	Question_id                int64
 	Candidate                  string
 	Question_status            int64
-	Examiner_first_id          int64 `xorm:"default(0)"`
+	Examiner_first_id          string `xorm:"default('-1')"`
 	Examiner_first_score       int64
 	Examiner_first_self_score  int64
-	Examiner_second_id         int64 `xorm:"default(0)"`
+	Examiner_second_id         string `xorm:"default('-1')"`
 	Examiner_second_score      int64
 	Examiner_second_self_score int64
-	Examiner_third_id          int64 `xorm:"default(0)"`
+	Examiner_third_id          string `xorm:"default('-1')"`
 	Examiner_third_score       int64
 	Examiner_third_self_score  int64
-	Leader_id                  int64 `xorm:"default(0)"`
+	Leader_id                  string `xorm:"default('-1')"`
 	Leader_score               int64
 	Final_score                int64
-	Final_score_id             int64
+	Final_score_id             string
 	Pratice_error              int64
 	Answer_test_id             int64
 	Example_test_id            int64
@@ -56,24 +56,24 @@ type TestPaperInfo struct {
 	Question_detail_id         int64
 	Test_id                    int64
 	Pic_src                    string
-	Examiner_first_id          int64 `xorm:"default(0)"`
+	Examiner_first_id          string `xorm:"default('-1')"`
 	Examiner_first_score       int64
 	Examiner_first_self_score  int64
-	Examiner_second_id         int64 `xorm:"default(0)"`
+	Examiner_second_id         string `xorm:"default('-1')"`
 	Examiner_second_score      int64
 	Examiner_second_self_score int64
-	Examiner_third_id          int64 `xorm:"default(0)"`
+	Examiner_third_id          string `xorm:"default('-1')"`
 	Examiner_third_score       int64
 	Examiner_third_self_score  int64
-	Leader_id                  int64 `xorm:"default(0)"`
+	Leader_id                  string `xorm:"default('-1')"`
 	Leader_score               int64
 	Final_score                int64
-	Final_score_id             int64 `xorm:"default(0)"`
+	Final_score_id             string `xorm:"default('-1')"`
 }
 
 type UnderCorrectedPaper struct {
 	UnderCorrected_id  int64 `xorm:"pk autoincr"`
-	User_id            int64
+	User_id            string
 	Test_id            int64
 	Question_id        int64
 	Test_question_type int64
@@ -84,7 +84,7 @@ type ScoreRecord struct {
 	Record_id        int64 `xorm:"pk autoincr"`
 	Question_id      int64
 	Test_id          int64
-	User_id          int64
+	User_id          string
 	Score_time       time.Time
 	Score            int64
 	Test_record_type int64
@@ -93,7 +93,7 @@ type ScoreRecord struct {
 
 type PaperDistribution struct {
 	Distribution_id          int64 `xorm:"pk autoincr"`
-	User_id                  int64
+	User_id                  string
 	Question_id              int64
 	Test_distribution_number int64
 	PaperType                int64
@@ -197,7 +197,7 @@ func (t *TestPaperInfo) GetTestPaperInfo(id int64) error {
 	return err
 }
 
-func (u *UnderCorrectedPaper) GetUnderCorrectedPaper(userId int64, testId int64) error {
+func (u *UnderCorrectedPaper) GetUnderCorrectedPaper(userId string, testId int64) error {
 	has, err := x.Where(builder.Eq{"test_id": testId, "user_id": userId}).Get(u)
 	if !has || err != nil {
 		log.Println("could not find under corrected paper")
@@ -214,7 +214,7 @@ func (u *UnderCorrectedPaper) Delete() error {
 	return err
 }
 
-func (u *PaperDistribution) GetPaperDistribution(id int64) error {
+func (u *PaperDistribution) GetPaperDistribution(id string) error {
 	has, err := x.Where(builder.Eq{"user_id": id}).Get(u)
 	if !has || err != nil {
 		log.Println("could not find paper distribution")
@@ -274,7 +274,7 @@ func (u *UnderCorrectedPaper) IsDuplicate() (bool, error) {
 	return has, err
 }
 
-func GetLatestRecores(userId int64, records *[]ScoreRecord) error {
+func GetLatestRecores(userId string, records *[]ScoreRecord) error {
 	// x.QueryString("select top 10 * from scoreRecord where user_id = " + strconv.FormatInt(userId, 10) + " order by record_id desc")
 	err := x.Limit(10).Where(builder.Eq{"user_id": userId}).Desc("record_id").Find(records)
 	if err != nil {
