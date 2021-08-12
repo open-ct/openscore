@@ -40,6 +40,7 @@ class AuthCallback extends React.Component {
 
   login() {
     const params = new URLSearchParams(this.props.location.search);
+    console.log(params.get("code"))
     AccountBackend.login(params.get("code"), params.get("state"))
       .then((res) => {
         console.log(res)

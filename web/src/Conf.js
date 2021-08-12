@@ -23,7 +23,7 @@ export const DefaultProgramName = "talent2021";
 
 export const AuthConfig = {
   serverUrl: "http://localhost:8000",
-  clientId: "70e1935bf72eb360d0fa",
+  clientId: "9162cb3914b3f1559e9e",
   appName: "application_1",
   organizationName: "built-in",
 };

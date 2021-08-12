@@ -21,6 +21,7 @@ function getAuthorizeUrl() {
   return `${trim(authConfig.serverUrl)}/login/oauth/authorize?client_id=${authConfig.clientId}&response_type=code&redirect_uri=${redirectUri}&scope=${scope}&state=${state}`;
 }
         window.localtion.href = getAuthorizeUrl(); 
+        
     </script>
 </body>
 </html>
