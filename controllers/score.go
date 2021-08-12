@@ -73,7 +73,8 @@ func (c *TestPaperApiController) Point() {
 	scoresstr := requestBody["scores"].(string)
 	testIdstr := requestBody["testId"].(string)
 	testDetailIdstr := requestBody["testDetailId"].(string)
-	userId, _ := strconv.ParseInt(userIdstr, 10, 64)
+	// userId, _ := strconv.ParseInt(userIdstr, 10, 64)
+	userId := userIdstr
 	scores := strings.Split(scoresstr, "-")
 	testDetailIds := strings.Split(testDetailIdstr, "-")
 	testId, _ := strconv.ParseInt(testIdstr, 10, 64)
@@ -105,10 +106,10 @@ func (c *TestPaperApiController) Point() {
 		test.Examiner_first_id = userId
 		test.Examiner_first_score = sum
 		final = true
-	} else if topic.Score_type == 2 && test.Examiner_first_id == 0 {
+	} else if topic.Score_type == 2 && test.Examiner_first_id == "-1" {
 		test.Examiner_first_id = userId
 		test.Examiner_first_score = sum
-	} else if topic.Score_type == 2 && test.Examiner_second_id == 0 {
+	} else if topic.Score_type == 2 && test.Examiner_second_id == "-1" {
 		test.Examiner_second_id = userId
 		test.Examiner_second_score = sum
 		if math.Abs(float64(test.Examiner_second_score)-float64(test.Examiner_first_score)) <= float64(topic.Standard_error) {
@@ -118,7 +119,7 @@ func (c *TestPaperApiController) Point() {
 			final = true
 		} else {
 			newUnderTest := models.UnderCorrectedPaper{}
-			newUnderTest.User_id = 10000
+			newUnderTest.User_id = "10000"
 			newUnderTest.Test_question_type = 3
 			newUnderTest.Test_id = underTest.Test_id
 			newUnderTest.Question_id = underTest.Question_id
@@ -149,7 +150,7 @@ func (c *TestPaperApiController) Point() {
 			test.Question_status = 2
 
 			newUnderTest := models.UnderCorrectedPaper{}
-			newUnderTest.User_id = 10000
+			newUnderTest.User_id = "10000"
 			newUnderTest.Test_question_type = 4
 			newUnderTest.Test_id = underTest.Test_id
 			newUnderTest.Question_id = underTest.Question_id
@@ -179,10 +180,10 @@ func (c *TestPaperApiController) Point() {
 		if topic.Score_type == 1 {
 			tempTest.Examiner_first_id = userId
 			tempTest.Examiner_first_score = score
-		} else if topic.Score_type == 2 && tempTest.Examiner_first_id == 0 {
+		} else if topic.Score_type == 2 && tempTest.Examiner_first_id == "-1" {
 			tempTest.Examiner_first_id = userId
 			tempTest.Examiner_first_score = score
-		} else if topic.Score_type == 2 && tempTest.Examiner_second_id == 0 {
+		} else if topic.Score_type == 2 && tempTest.Examiner_second_id == "-1" {
 			tempTest.Examiner_second_id = userId
 			tempTest.Examiner_second_score = score
 			// if final{
@@ -219,7 +220,8 @@ func (c *TestPaperApiController) Problem() {
 	userIdstr := requestBody["userId"].(string)
 	problemTypestr := requestBody["problemType"].(string)
 	testIdstr := requestBody["testId"].(string)
-	userId, _ := strconv.ParseInt(userIdstr, 10, 64)
+	// userId, _ := strconv.ParseInt(userIdstr, 10, 64)
+	userId := userIdstr
 	testId, _ := strconv.ParseInt(testIdstr, 10, 64)
 	problemType, _ := strconv.ParseInt(problemTypestr, 10, 64)
 	var underTest models.UnderCorrectedPaper
@@ -229,7 +231,7 @@ func (c *TestPaperApiController) Problem() {
 	underTest.GetUnderCorrectedPaper(userId, testId)
 	var newUnderTest = underTest
 	underTest.Delete()
-	newUnderTest.User_id = 10000
+	newUnderTest.User_id = "10000"
 	newUnderTest.Test_question_type = 6
 	newUnderTest.Problem_type = problemType
 	has, _ := newUnderTest.IsDuplicate()
@@ -322,7 +324,8 @@ func (c *TestPaperApiController) Review() {
 	var requestBody map[string]interface{}
 	json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
 	userIdstr := requestBody["userId"].(string)
-	userId, _ := strconv.ParseInt(userIdstr, 10, 64)
+	// userId, _ := strconv.ParseInt(userIdstr, 10, 64)
+	userId := userIdstr
 	var records []models.ScoreRecord
 	models.GetLatestRecores(userId, &records)
 	data := make(map[string]interface{})
