@@ -29,17 +29,28 @@ func (c *TestPaperApiController) Display() {
 	testPaper.GetTestPaper(testId)
 	topic.GetTopic(testPaper.Question_id)
 	models.GetSubTopicsByTestId(testPaper.Question_id, &subTopic)
+	type subTopicRes struct {
+		Question_detail_id    int64
+		Question_detail_name  string
+		Question_id           int64
+		Question_detail_score int64
+		Test_detail_id        int64
+	}
 	var testInfoList []models.TestPaperInfo
+	var subTopics []subTopicRes
 	for i := 0; i < len(subTopic); i++ {
 		var testPaperInfo models.TestPaperInfo
-		testPaperInfo.GetTestPaperInfoByTestIdAndQuestionDetailId(subTopic[i].Question_id, subTopic[i].Question_detail_id)
+		testPaperInfo.GetTestPaperInfoByTestIdAndQuestionDetailId(testId, subTopic[i].Question_detail_id)
+		tempTopic := subTopicRes{subTopic[i].Question_detail_id, subTopic[i].Question_detail_name, subTopic[i].Question_id, subTopic[i].Question_detail_score, (testPaperInfo.Test_detail_id)}
+		subTopics = append(subTopics, tempTopic)
+		log.Println(subTopics)
 		testInfoList = append(testInfoList, testPaperInfo)
 	}
 	data := make(map[string]interface{})
 	data["questionId"] = testPaper.Question_id
 
 	data["questionName"] = topic.Question_name
-	data["subTopic"] = subTopic
+	data["subTopic"] = subTopics
 	data["picSrcs"] = testInfoList
 	resp := Response{"10000", "OK", data}
 	c.Data["json"] = resp

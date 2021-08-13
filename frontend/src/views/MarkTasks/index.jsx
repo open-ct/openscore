@@ -2,11 +2,15 @@ import React, { Component, useState } from 'react'
 import DocumentTitle from 'react-document-title'
 import { Modal, Dropdown, Button, message, Space, Tooltip, Select, Radio, Input } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
+import Zmage from 'react-zmage'
+
 import './index.less'
 
+import * as Util from "../../util/Util";
 import Marking from "../../api/marking";
-
+const { Option } = Select;
 export default class index extends Component {
+
   // state = { warningVisible: false };
   // showModal = () => {
   //   this.setState({
@@ -19,25 +23,31 @@ export default class index extends Component {
   //     warningVisible: false,
   //   });
   // };
-  userId = "d9da41a2-27f7-4709-8c59-52198d2a8e7a"
+  userId = "1"
   state = {
     problemVisible: false,
     problemValue: 1,
     papers: [],
     currentPaper: {},
     currentPaperNum: 0,
-    testLength: 0
+    testLength: 0,
+    selectId: [],
+    selectScore: []
   };
 
   componentDidMount() {
-    // 总试卷获取 
-    Marking.testList({ userId: this.userId})
+    console.log(Util.getRandom())
+    this.getAllPaper();
+  }
+  // 总试卷获取 
+  getAllPaper = () => {
+    Marking.testList({ userId: this.userId })
       .then((res) => {
         if (res.data.status == "10000") {
-          console.log(res)
+          let papers = [...res.data.data.papers]
           this.setState(
             {
-              papers: res.data.data.papers,
+              papers ,
               testLength: res.data.data.papers.length
             }
           )
@@ -49,20 +59,31 @@ export default class index extends Component {
       })
   }
   // 当前试卷
-  getCurrentPaper() {
-    Marking.testDisplay({userId: this.userId,testId: this.state.papers[this.state.currentPaperNum].Test_id})
-    .then((res) => {
-      if (res.data.status == "10000") {
-        this.setState({
-          currentPaper: this.res.data.data
-        })
-      }
-    })
-    .catch((e) => {
-      console.log(e)
-    })
+  getCurrentPaper = () => {
+    Marking.testDisplay({ userId: this.userId, testId: this.state.papers[0].Test_id.toString() })
+      .then((res) => {
+        if (res.data.status == "10000") {
+          let currentPaper = JSON.parse(JSON.stringify(res.data.data))
+          this.setState({
+            currentPaper
+          })
+        }
+      })
+      .catch((e) => {
+        console.log(e)
+      })
   }
+  // 阅卷区
+  showTest = () => {
+    let testPaper = null;
+    if (this.state.currentPaper.picSrcs != undefined) {
+      testPaper = this.state.currentPaper.picSrcs.map((item) => {
+        return <img src={item.Pic_src} alt="加载失败" className="test-question-img"/>
+      })
+    }
 
+    return testPaper
+  }
   render() {
 
     return (
@@ -70,7 +91,7 @@ export default class index extends Component {
         <div className="mark-tasks-page" data-component="mark-tasks-page">
           <div className="mark-paper">
             {
-              
+              this.showTest()
             }
           </div>
           <div className="mark-score">
@@ -85,28 +106,46 @@ export default class index extends Component {
       </DocumentTitle>
     )
   }
+  // 评分区
+  selectBox = (data) => {
+    let selectArr = [];
+    for (let i = 0; i <parseInt(data) +1; i++) {
+      let selectOpt = (
+        <Option key={i} value={i}>{i}</Option>
+      )
+      selectArr.push(selectOpt)
+    }
+    return selectArr
+  }
+  showSelect = () => {
+    let scoreSelect = null;
+    if (this.state.currentPaper.picSrcs != undefined) {
+      scoreSelect = this.state.currentPaper.subTopic.map((item,index) => {
+        return <div className="score-select">
+          {item.Question_detail_name}：<Select key={index}  placeholder="请选择分数" style={{ width: 120 }} onSelect={this.select.bind(this,item.Question_detail_id)}>
+            {
+              this.selectBox(item.Question_detail_score)
+            }
+          </Select>
+        </div>
+      })
+    }
 
-  handleChange = (value) => {
-    console.log(`selected ${value}`);
+    return scoreSelect
+  }
+  select = (item,value) => {
+      this.setState({
+        selectId :  [...this.state.selectId,item],
+        selectScore :  [...this.state.selectScore,value]
+      })   
   }
   renderScoreDropDown() {
-    const { Option } = Select;
+
     return (
       <div className="score-container">
-        <div className="score-select">
-          16题&nbsp;&nbsp;(3)&nbsp;&nbsp;：<Select placeholder="请选择分数" style={{ width: 120 }} onChange={this.handleChange}>
-            <Option value="0">0</Option>
-            <Option value="1">1</Option>
-            <Option value="2">2</Option>
-          </Select>
-        </div>
-        <div className="score-select">
-          17题&nbsp;&nbsp;(3)&nbsp;&nbsp;：<Select placeholder="请选择分数" style={{ width: 120 }} onChange={this.handleChange}>
-            <Option value="0">0</Option>
-            <Option value="1">1</Option>
-            <Option value="2">2</Option>
-          </Select>
-        </div>
+        {
+          this.showSelect()
+        }
       </div>
     );
   }
@@ -153,8 +192,27 @@ export default class index extends Component {
       okText: '确认',
       cancelText: '取消',
       onOk: () => {
+        let Qustion_detail_id = Util.getTextByJs(this.state.selectId);
+        let Question_detail_score = Util.getTextByJs(this.state.selectScore);
+        console.log()
         if (value == 1) {
-          console.log('1');
+          Marking.testPoint({ 
+            userId: this.userId, 
+            testId: this.state.papers[0].Test_id.toString(),
+            scores: Question_detail_score, 
+            testDetailId: Qustion_detail_id
+          })
+          .then((res) => {
+              this.setState({
+                selectId: [],
+                selectScore: []
+              })
+              this.getAllPaper();  
+              this.forceUpdate();          
+          })
+          .catch((e) => {
+            console.log(e)
+          })
         } else if (value == 3) {
           console.log('3')
         } else {
@@ -167,7 +225,22 @@ export default class index extends Component {
     });
   }
   handleOk = () => {
-    console.log('problem')
+    Marking.testProblem({ 
+      userId: this.userId, 
+      testId: this.state.papers[0].Test_id.toString(),
+      problemType: this.state.problemValue.toString()
+    })
+    .then((res) => {
+        this.setState({
+          selectId: [],
+          selectScore: []
+        })      
+        this.getAllPaper();  
+        this.forceUpdate();
+    })
+    .catch((e) => {
+      console.log(e)
+    })
     this.setState({
       problemVisible: false,
     });

@@ -30,7 +30,7 @@ const Marking = {
         return  axios.post('/marking/score/test/list', data)
     },
     testDisplay(data) {
-        return  axios.post('/marking/score/test/dispaly', data)
+        return  axios.post('/marking/score/test/display', data)
     },
     testPoint(data) {
         return  axios.post('/marking/score/test/point', data)
