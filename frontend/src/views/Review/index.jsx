@@ -3,75 +3,60 @@ import DocumentTitle from 'react-document-title'
 import { Table, Modal, Dropdown, Button, message, Space, Tooltip, Select, Radio, Input } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import './index.less'
+import Marking from "../../api/marking";
 
 export default class index extends Component {
+  userId = "1"
   state = {
-    reviewVisible : true
+    reviewVisible : true,
+    reviewList : []
+  }
+  componentDidMount() {
+    this.getReviewList();
+  }
+  getReviewList = () => {
+    Marking.testReview({ userId: this.userId})
+    .then((res) => {
+      if (res.data.status == "10000") {
+        let reviewList = []
+        for (let i = 0; i < res.data.data.records.length; i++) {
+          reviewList.push({
+            order: i+1,
+            test_id: res.data.data.records[i].Test_id,
+            score: res.data.data.records[i].Score
+          })
+        }
+        this.setState({
+          reviewList 
+        })
+      }
+    })
+    .catch((e) => {
+      console.log(e)
+    })
   }
   columns = [
     {
       title: '序号',
       dataIndex: 'order',
-      key: 'order',
-      render: text => <a>{text}</a>,
     },
     {
-      title: '1',
-      dataIndex: 'age',
-      key: 'age',
+      title: '试卷号',
+      dataIndex: 'test_id',
     },
     {
-      title: '2',
-      dataIndex: 'address',
-      key: 'address',
-    },
-    {
-      title: '3',
-      key: 'tags',
-      dataIndex: 'tags',
-    },
-    {
-      title: '4',
-      key: 'action',
-      render: (text, record) => (
-        <Space size="middle">
-          <a>Invite {record.name}</a>
-          <a>Delete</a>
-        </Space>
-      ),
+      title: '分数',
+      dataIndex: 'score',
     },
   ];
   
-  data = [
-    {
-      key: '1',
-      order: '试卷密号',
-      age: 32,
-      address: 'New York No. 1 Lake Park',
-      tags: ['nice', 'developer'],
-    },
-    {
-      key: '2',
-      order: '分数',
-      age: 42,
-      address: 'London No. 1 Lake Park',
-      tags: ['loser'],
-    },
-    {
-      key: '3',
-      order: 'Joe Black',
-      age: 32,
-      address: 'Sidney No. 1 Lake Park',
-      tags: ['cool', 'teacher'],
-    },
-  ];
   render() {
 
     return (
       <DocumentTitle title="阅卷系统-回评">
         <div className="answer-tasks-page" data-component="answer-tasks-page">
           <div className="answer-paper">
-
+            
           </div>
           <div className="answer-score">
 
@@ -85,14 +70,12 @@ export default class index extends Component {
 
   }
   handleOk = () => {
-    console.log('回评')
     this.setState({
       reviewVisible: false,
     });
   };
 
   handleCancel = () => {
-    console.log('Clicked cancel button');
     this.setState({
       reviewVisible: false,
     });
@@ -115,7 +98,7 @@ export default class index extends Component {
   }
   reviewTable() {
     return (
-      <Table columns={this.columns} dataSource={this.data} />
+      <Table columns={this.columns} dataSource={this.state.reviewList} />
     ) 
   }
 }

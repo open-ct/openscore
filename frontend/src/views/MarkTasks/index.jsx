@@ -36,7 +36,6 @@ export default class index extends Component {
   };
 
   componentDidMount() {
-    console.log(Util.getRandom())
     this.getAllPaper();
   }
   // 总试卷获取 
