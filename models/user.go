@@ -8,28 +8,21 @@ import (
 )
 
 type User struct {
-	User_id        int64
-	User_name      string
-	Examiner_count string
-	Password       string
-	Id_card        string
-	Address        string
-	Tel            string
-	Email          string
-	Login_time     time.Time
-	Exist_time     time.Time
-	Online_time    float64
-	Subject_name   string
-	Status         int64
-	UserType       int64
-	IsDistribute   int64
-}
-
-func initUserModels() {
-	err := x.Sync2(new(User))
-	if err != nil {
-		log.Println(err)
-	}
+	User_id        string    `json:"user_id" xorm:"pk"`
+	User_name      string    `json:"user_name"`
+	Examiner_count string    `json:"examiner_count"`
+	Password       string    `json:"password"`
+	Id_card        string    `json:"id_card"`
+	Address        string    `json:"address"`
+	Tel            string    `json:"tel"`
+	Email          string    `json:"email"`
+	Login_time     time.Time `json:"login_time"`
+	Exist_time     time.Time `json:"exist_time"`
+	Online_time    float64   `json:"online_time"`
+	Subject_name   string    `json:"subject_name"`
+	Status         int64     `json:"status"`
+	UserType       int64     `json:"userType"`
+	IsDistribute   int64     `json:"isDistribute"`
 }
 
 func (u *User) GetUser(id int64) error {
