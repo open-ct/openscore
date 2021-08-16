@@ -32,7 +32,8 @@ export default class index extends Component {
     currentPaperNum: 0,
     testLength: 0,
     selectId: [],
-    selectScore: []
+    selectScore: [],
+    subTopic: []
   };
 
   componentDidMount() {
@@ -62,9 +63,11 @@ export default class index extends Component {
     Marking.testDisplay({ userId: this.userId, testId: this.state.papers[0].Test_id.toString() })
       .then((res) => {
         if (res.data.status == "10000") {
-          let currentPaper = JSON.parse(JSON.stringify(res.data.data))
+          let currentPaper = res.data.data
+          let subTopic =res.data.data.subTopic
           this.setState({
-            currentPaper
+            currentPaper,
+            subTopic
           })
         }
       })
@@ -84,7 +87,6 @@ export default class index extends Component {
     return testPaper
   }
   render() {
-
     return (
       <DocumentTitle title="阅卷系统-评卷">
         <div className="mark-tasks-page" data-component="mark-tasks-page">
@@ -116,6 +118,7 @@ export default class index extends Component {
     }
     return selectArr
   }
+
   showSelect = () => {
     let scoreSelect = null;
     if (this.state.currentPaper.picSrcs != undefined) {
