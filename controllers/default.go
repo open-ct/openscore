@@ -9,6 +9,7 @@ package controllers
 
 import (
 	"fmt"
+	"log"
 	"openscore/auth"
 	"openscore/models"
 
@@ -57,6 +58,7 @@ func (c *ApiController) Login() {
 	if err != nil {
 		panic(err)
 	}
+	log.Println(claims)
 
 	claims.AccessToken = token.AccessToken
 	c.SetSessionUser(claims)

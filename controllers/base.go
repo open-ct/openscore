@@ -23,6 +23,7 @@
 package controllers
 
 import (
+	"log"
 	"openscore/auth"
 	"openscore/util"
 
@@ -43,6 +44,7 @@ func (c *ApiController) GetSessionUser() *auth.Claims {
 	if s == nil {
 		return nil
 	}
+	log.Println(s)
 
 	claims := &auth.Claims{}
 	err := util.JsonToStruct(s.(string), claims)

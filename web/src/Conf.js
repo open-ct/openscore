@@ -23,7 +23,8 @@ export const DefaultProgramName = "talent2021";
 
 export const AuthConfig = {
   serverUrl: "http://localhost:8000",
-  clientId: "70e1935bf72eb360d0fa",
+  // clientId: "70e1935bf72eb360d0fa",
+  clientId: "1e1b5a3bd4a6a284553a", // your Casdoor OAuth Client ID
   appName: "application_1",
   organizationName: "built-in",
 };
