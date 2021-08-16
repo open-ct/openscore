@@ -23,7 +23,7 @@ export default class index extends Component {
   getAllPaper = () => {
     Marking.testList({ userId: this.userId })
       .then((res) => {
-        if (res.data.status == "10000") {
+        if (res.data.status === "10000") {
           let papers = [...res.data.data.papers]
           this.setState(
             {
@@ -41,7 +41,7 @@ export default class index extends Component {
   getSampleList = () => {
     Marking.testExampleList({ userId: this.userId, testId: "1" })
       .then((res) => {
-        if (res.data.status == "10000") {
+        if (res.data.status === "10000") {
           let sampleList = []
           for (let i = 0; i< res.data.data.exampleTestId.length; i++) {
             sampleList.push({
@@ -87,7 +87,7 @@ export default class index extends Component {
 
   showTest = () => {
     let testPaper = null;
-    if (this.state.samplePaper != undefined || this.state.samplePaper != null) {
+    if (this.state.samplePaper !== undefined || this.state.samplePaper !== null) {
       testPaper = this.state.samplePaper.map((item) => {
         return <img src={item.Pic_src} alt="加载失败" className="test-question-img"/>
       })

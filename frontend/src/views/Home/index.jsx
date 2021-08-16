@@ -30,66 +30,93 @@ export default class index extends Component {
     };
     permissionList = [
         {
-          key: "mark-tasks",
-          userPermission: "阅卷员",
-          menu_name: "评卷",
-          menu_url: "/home/mark-tasks",
-          icon: "FormOutlined",
-          chidPermissions: [
-          ]
+            key: "mark-tasks",
+            userPermission: "阅卷员",
+            menu_name: "评卷",
+            menu_url: "/home/mark-tasks",
+            icon: "FormOutlined",
+            chidPermissions: [
+            ]
         },
         {
-          key: "answer",
-          userPermission: "阅卷员",
-          menu_name: "答案",
-          menu_url: "/home/answer",
-          icon: "CheckCircleOutlined",
-          menu_id: 1,
-          chidPermissions: [
-          ]
+            key: "answer",
+            userPermission: "阅卷员",
+            menu_name: "答案",
+            menu_url: "/home/answer",
+            icon: "CheckCircleOutlined",
+            menu_id: 1,
+            chidPermissions: [
+            ]
         },
         {
-          key: "sample",
-          userPermission: "阅卷员",
-          menu_name: "样卷",
-          menu_url: "/home/sample",
-          icon: "ProfileOutlined",
-          chidPermissions: [
-          ]
+            key: "sample",
+            userPermission: "阅卷员",
+            menu_name: "样卷",
+            menu_url: "/home/sample",
+            icon: "ProfileOutlined",
+            chidPermissions: [
+            ]
         },
         {
-          key: "review",
-          userPermission: "阅卷员",
-          menu_name: "回评",
-          menu_url: "/home/review",
-          icon: "HighlightOutlined",
-          chidPermissions: [
-          ]
+            key: "review",
+            userPermission: "阅卷员",
+            menu_name: "回评",
+            menu_url: "/home/review",
+            icon: "HighlightOutlined",
+            chidPermissions: [
+            ]
         },
-      ]
+        // {
+        //     key: "monitor",
+        //     userPermission: "组长",
+        //     menu_name: "评卷监控",
+        //     menu_url: "/home/monitor",
+        //     icon: "HighlightOutlined",
+        //     chidPermissions: [
+        //     ]
+        // },
+        // {
+        //     key: "test_management",
+        //     userPermission: "组长",
+        //     menu_name: "试卷管理",
+        //     menu_url: "/home/review",
+        //     icon: "HighlightOutlined",
+        //     chidPermissions: [
+        //     ]
+        // },
+        // {
+        //     key: "user_management",
+        //     userPermission: "组长",
+        //     menu_name: "用户管理",
+        //     menu_url: "/home/review",
+        //     icon: "HighlightOutlined",
+        //     chidPermissions: [
+        //     ]
+        // },
+    ]
     bindMenu = (menulist) => {
         let MenuList = menulist.map((item) => {
-          if (item.chidPermissions.length === 0) {  //没有子菜单
-            return <Menu.Item key={item.key} icon={React.createElement(Icon[item.icon])}  ><Link to={item.menu_url}>{item.menu_name}</Link></Menu.Item>
-          }
-          else {
-            return <SubMenu key={item.key}  title={item.menu_name}>
-              {this.bindMenu(item.chidPermissions)}
-            </SubMenu>
-          }
-      
+            if (item.chidPermissions.length === 0) {  //没有子菜单
+                return <Menu.Item key={item.key} icon={React.createElement(Icon[item.icon])}  ><Link to={item.menu_url}>{item.menu_name}</Link></Menu.Item>
+            }
+            else {
+                return <SubMenu key={item.key} title={item.menu_name}>
+                    {this.bindMenu(item.chidPermissions)}
+                </SubMenu>
+            }
+
         })
         return MenuList
-      }
+    }
 
-      bindRouter = (menulist) => {
+    bindRouter = (menulist) => {
         let routerList = menulist.map((item) => {
-          if (item.chidPermissions.length === 0) {
-            return <Route key={item.key} path={item.menu_url} component={MarkTasks}></Route>
-          } 
+            if (item.chidPermissions.length === 0) {
+                return <Route key={item.key} path={item.menu_url} component={MarkTasks}></Route>
+            }
         })
         return routerList
-      }
+    }
     componentDidMount() {
         this.getAccount();
         setTimeout(() => {
@@ -170,7 +197,7 @@ export default class index extends Component {
 
         return (
             <Dropdown key="200" overlay={menu} >
-                <a className="ant-dropdown-link" href="#" style={{ float: 'right',marginLeft: '50px' }}>
+                <a className="ant-dropdown-link" href="#" style={{ float: 'right', marginLeft: '50px' }}>
                     {
                         this.renderAvatar()
                     }
@@ -182,15 +209,15 @@ export default class index extends Component {
     renderAccount() {
         if (this.state.account === undefined || this.state.account === null) {
             return (
-              <a href={Auth.getAuthorizeUrl()} style={{ color: '#ffffff',marginLeft: '50px'}}>
-                登录
-              </a>
+                <a href={Auth.getAuthorizeUrl()} style={{ color: '#ffffff', marginLeft: '50px' }}>
+                    登录
+                </a>
             );
-          } else {
+        } else {
             return (
-              this.renderRightDropdown()
+                this.renderRightDropdown()
             )
-          }
+        }
     }
 
     funcChange = (e) => {
@@ -215,7 +242,7 @@ export default class index extends Component {
                                 <span className="header-teacher">当前密号：2008886</span>
                             </div>
                             {
-                            this.renderAccount()
+                                this.renderAccount()
                             }
                         </div>
 
@@ -232,19 +259,19 @@ export default class index extends Component {
                                 <Menu.Item key="answer" icon={<CheckCircleOutlined />}>答案</Menu.Item>
                                 <Menu.Item key="sample" icon={<ProfileOutlined />}>样卷</Menu.Item>
                                 <Menu.Item key="review" icon={<HighlightOutlined />}>回评</Menu.Item> */
-                                this.bindMenu(this.permissionList)
+                                    this.bindMenu(this.permissionList)
                                 }
 
                             </Menu>
                         </Sider>
                         <Content>
                             <Switch>
-                                { this.permissionList[0].userPermission == "阅卷员" ? <>
-                                <Redirect from="/home" to="/home/mark-tasks" exact></Redirect>
-                                <Route path="/home/mark-tasks" component={MarkTasks} exact></Route>
-                                <Route path="/home/answer" component={Answer} exact></Route>
-                                <Route path="/home/sample" component={Sample} exact></Route>
-                                <Route path="/home/review" component={Review} exact></Route> </>  
+                                {this.permissionList[0].userPermission === "阅卷员" ? <>
+                                    <Redirect from="/home" to="/home/mark-tasks" exact></Redirect>
+                                    <Route path="/home/mark-tasks" component={MarkTasks} exact></Route>
+                                    <Route path="/home/answer" component={Answer} exact></Route>
+                                    <Route path="/home/sample" component={Sample} exact></Route>
+                                    <Route path="/home/review" component={Review} exact></Route> </>
                                     : null
                                 }
                             </Switch>

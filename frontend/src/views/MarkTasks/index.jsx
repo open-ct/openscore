@@ -209,8 +209,7 @@ export default class index extends Component {
                 selectId: [],
                 selectScore: []
               })
-              this.getAllPaper();  
-              this.forceUpdate();          
+              this.getAllPaper();           
           })
           .catch((e) => {
             console.log(e)
