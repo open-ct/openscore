@@ -39,16 +39,16 @@ export default class index extends Component {
       })
   }
   getSampleList = () => {
-    Marking.testExampleList({ userId: this.userId, testId: "1" })
+    Marking.testExampleList({ userId: this.userId, testId: 1 })
       .then((res) => {
         if (res.data.status === "10000") {
           let sampleList = []
-          for (let i = 0; i< res.data.data.exampleTestId.length; i++) {
+          for (let i = 0; i< res.data.data.exampleTestPapers.length; i++) {
             sampleList.push({
               order: i,
-              question_id: res.data.data.exampleTestId[i].Test_id,
-              question_name: res.data.data.exampleTestId[i].Candidate,
-              score: res.data.data.exampleTestId[i].Final_score,
+              question_id: res.data.data.exampleTestPapers[i].test_id,
+              question_name: res.data.data.exampleTestPapers[i].candidate,
+              score: res.data.data.exampleTestPapers[i].final_score,
             })
           }
           this.setState({
@@ -89,7 +89,7 @@ export default class index extends Component {
     let testPaper = null;
     if (this.state.samplePaper !== undefined || this.state.samplePaper !== null) {
       testPaper = this.state.samplePaper.map((item) => {
-        return <img src={item.Pic_src} alt="加载失败" className="test-question-img"/>
+        return <img src={item.pic_src} alt="加载失败" className="test-question-img"/>
       })
     }
 
@@ -131,7 +131,7 @@ export default class index extends Component {
   }
   selectRow = (record) => {
     console.log(record.order)
-    Marking.testDetail({ userId: this.userId, exampleTestId: record.question_id.toString() })
+    Marking.testDetail({ userId: this.userId, exampleTestId: record.question_id })
     .then((res) => {
       if (res.data.status == "10000") {
         this.setState({

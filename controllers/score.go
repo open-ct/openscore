@@ -5,6 +5,8 @@ import (
 	"log"
 	"math"
 	"openscore/models"
+	"openscore/requests"
+	"openscore/responses"
 	"strconv"
 	"strings"
 	"time"
@@ -12,83 +14,107 @@ import (
 
 func (c *TestPaperApiController) Display() {
 	defer c.ServeJSON()
-	var requestBody map[string]interface{}
-	json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
-
-	log.Println(requestBody["testId"])
-	testIdstr := requestBody["testId"].(string)
-
-	testId, err := strconv.ParseInt(testIdstr, 10, 64)
+	var requestBody requests.TestDisplay
+	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
 	if err != nil {
-		log.Println("parse questionId fail")
+		resp := Response{"10001", "cannot unmarshal", err}
+		c.Data["json"] = resp
+		return
 	}
+	testId := requestBody.TestId
 
 	var testPaper models.TestPaper
 	var topic models.Topic
 	var subTopic []models.SubTopic
-	testPaper.GetTestPaper(testId)
-	topic.GetTopic(testPaper.Question_id)
-	models.GetSubTopicsByTestId(testPaper.Question_id, &subTopic)
-	type subTopicRes struct {
-		Question_detail_id    int64
-		Question_detail_name  string
-		Question_id           int64
-		Question_detail_score int64
-		Test_detail_id        int64
+	var response responses.TestDisplay
+
+	err = testPaper.GetTestPaper(testId)
+	if err != nil {
+		resp := Response{"10002", "get test paper fail", err}
+		c.Data["json"] = resp
+		return
 	}
-	var testInfoList []models.TestPaperInfo
-	var subTopics []subTopicRes
+	err = topic.GetTopic(testPaper.Question_id)
+	if err != nil {
+		resp := Response{"10003", "get topic fail", err}
+		c.Data["json"] = resp
+		return
+	}
+	err = models.GetSubTopicsByTestId(testPaper.Question_id, &subTopic)
+	if err != nil {
+		resp := Response{"10004", "get subtopic fail", err}
+		c.Data["json"] = resp
+		return
+	}
+
 	for i := 0; i < len(subTopic); i++ {
 		var testPaperInfo models.TestPaperInfo
-		testPaperInfo.GetTestPaperInfoByTestIdAndQuestionDetailId(testId, subTopic[i].Question_detail_id)
-		tempTopic := subTopicRes{subTopic[i].Question_detail_id, subTopic[i].Question_detail_name, subTopic[i].Question_id, subTopic[i].Question_detail_score, (testPaperInfo.Test_detail_id)}
-		subTopics = append(subTopics, tempTopic)
-		log.Println(subTopics)
-		testInfoList = append(testInfoList, testPaperInfo)
-	}
-	data := make(map[string]interface{})
-	data["questionId"] = testPaper.Question_id
+		err = testPaperInfo.GetTestPaperInfoByTestIdAndQuestionDetailId(testId, subTopic[i].Question_detail_id)
+		if err != nil {
+			resp := Response{"10005", "get testPaperInfo fail", err}
+			c.Data["json"] = resp
+			return
+		}
+		tempSubTopic := responses.SubTopicPlus{SubTopic: subTopic[i], Test_detail_id: testPaperInfo.Test_detail_id}
 
-	data["questionName"] = topic.Question_name
-	data["subTopic"] = subTopics
-	data["picSrcs"] = testInfoList
-	resp := Response{"10000", "OK", data}
+		response.SubTopics = append(response.SubTopics, tempSubTopic)
+		response.TestInfos = append(response.TestInfos, testPaperInfo)
+	}
+	response.QuestionId = topic.Question_id
+	response.QuestionName = topic.Question_name
+	response.TestId = testId
+	resp := Response{"10000", "OK", response}
 	c.Data["json"] = resp
 }
 
 func (c *TestPaperApiController) List() {
 	defer c.ServeJSON()
-	var requestBody map[string]interface{}
-	json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
-
-	userIdstr := requestBody["userId"].(string)
-
-	userId, err := strconv.ParseInt(userIdstr, 10, 64)
+	var requestBody requests.TetsList
+	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
 	if err != nil {
-		log.Println("parse userId fail")
+		resp := Response{"10001", "cannot unmarshal", err}
+		c.Data["json"] = resp
+		return
 	}
-	var papers []models.UnderCorrectedPaper
-	models.GetDistributedPaperByUserId(userId, &papers)
-	data := make(map[string]interface{})
-	data["papers"] = papers
-	resp := Response{"10000", "OK", data}
+	log.Println(requestBody)
+
+	userId := requestBody.UserId
+
+	var response responses.TestList
+	err = models.GetDistributedTestIdPaperByUserId(userId, &response.TestId)
+	if err != nil {
+		resp := Response{"10002", "get distribution fail", err}
+		c.Data["json"] = resp
+		return
+	}
+	if len(response.TestId) == 0 {
+		resp := Response{"10003", "there is no paper to correct", err}
+		c.Data["json"] = resp
+		return
+
+	}
+	log.Println(response)
+	resp := Response{"10000", "OK", response}
 	c.Data["json"] = resp
 
 }
 
 func (c *TestPaperApiController) Point() {
 	defer c.ServeJSON()
-	var requestBody map[string]interface{}
-	json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
-	userIdstr := requestBody["userId"].(string)
-	scoresstr := requestBody["scores"].(string)
-	testIdstr := requestBody["testId"].(string)
-	testDetailIdstr := requestBody["testDetailId"].(string)
-	// userId, _ := strconv.ParseInt(userIdstr, 10, 64)
-	userId := userIdstr
+	var requestBody requests.TestPoint
+	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	if err != nil {
+		resp := Response{"10001", "cannot unmarshal", err}
+		c.Data["json"] = resp
+		return
+	}
+	log.Println(requestBody)
+	userId := requestBody.UserId
+	scoresstr := requestBody.Scores
+	testId := requestBody.TestId
+	testDetailIdstr := requestBody.TestDetailId
 	scores := strings.Split(scoresstr, "-")
 	testDetailIds := strings.Split(testDetailIdstr, "-")
-	testId, _ := strconv.ParseInt(testIdstr, 10, 64)
 	var scoreArr []int64
 	var sum int64 = 0
 	for _, i := range scores {
@@ -102,14 +128,26 @@ func (c *TestPaperApiController) Point() {
 
 	var test models.TestPaper
 	var topic models.Topic
-	test.GetTestPaper(testId)
-	topic.GetTopic(test.Question_id)
-	// var testInfos []models.TestPaperInfo
-	// models.GetTestInfoListByTestId(testId, &testInfos)
+	err = test.GetTestPaper(testId)
+	if err != nil || test.Test_id == 0 {
+		resp := Response{"10002", "get test paper fail", err}
+		c.Data["json"] = resp
+		return
+	}
+	err = topic.GetTopic(test.Question_id)
+	if err != nil || topic.Question_id == 0 {
+		resp := Response{"10003", "get topic fail", err}
+		c.Data["json"] = resp
+		return
+	}
 
 	var underTest models.UnderCorrectedPaper
-	underTest.GetUnderCorrectedPaper(userId, testId)
-	// underTest.Delete()
+	err = underTest.GetUnderCorrectedPaper(userId, testId)
+	if err != nil || underTest.Question_id == 0 {
+		resp := Response{"10004", "get underCorrected fail", err}
+		c.Data["json"] = resp
+		return
+	}
 
 	final := false
 
@@ -126,7 +164,6 @@ func (c *TestPaperApiController) Point() {
 		if math.Abs(float64(test.Examiner_second_score)-float64(test.Examiner_first_score)) <= float64(topic.Standard_error) {
 			log.Println(math.Abs(float64(test.Examiner_second_score) - float64(test.Examiner_first_score)))
 			sum = int64(math.Abs(float64(test.Examiner_second_score+test.Examiner_first_score)) / 2)
-			log.Println("hello world")
 			final = true
 		} else {
 			newUnderTest := models.UnderCorrectedPaper{}
@@ -134,7 +171,12 @@ func (c *TestPaperApiController) Point() {
 			newUnderTest.Test_question_type = 3
 			newUnderTest.Test_id = underTest.Test_id
 			newUnderTest.Question_id = underTest.Question_id
-			newUnderTest.Save()
+			err = newUnderTest.Save()
+			if err != nil {
+				resp := Response{"10005", "insert undertest fail", err}
+				c.Data["json"] = resp
+				return
+			}
 		}
 	}
 	if underTest.Test_question_type == 4 || underTest.Test_question_type == 5 {
@@ -155,7 +197,6 @@ func (c *TestPaperApiController) Point() {
 			sum = (test.Examiner_third_score + test.Examiner_second_score) / 2
 		}
 		if small <= float64(topic.Standard_error) {
-			// test.Final_score = sum
 			final = true
 		} else {
 			test.Question_status = 2
@@ -165,29 +206,40 @@ func (c *TestPaperApiController) Point() {
 			newUnderTest.Test_question_type = 4
 			newUnderTest.Test_id = underTest.Test_id
 			newUnderTest.Question_id = underTest.Question_id
-			newUnderTest.Save()
-
+			err = newUnderTest.Save()
+			if err != nil {
+				resp := Response{"10006", "insert undertest fail", err}
+				c.Data["json"] = resp
+				return
+			}
 		}
-		//??
 	}
 	if final {
-		//???
 		test.Final_score = sum
 	}
-	//  else {
-	// 	newUnderTest := underTest
-	// 	newUnderTest.User_id = 10000
-	// 	// newUnderTest.Test_question_type += 1
-	// 	newUnderTest.Save()
-	// }
-	underTest.Delete()
-	test.Update()
+	err = underTest.Delete()
+	if err != nil {
+		resp := Response{"10006", "delete undertest fail", err}
+		c.Data["json"] = resp
+		return
+	}
+	err = test.Update()
+	if err != nil {
+		resp := Response{"10007", "update test fail", err}
+		c.Data["json"] = resp
+		return
+	}
 	for i := 0; i < len(scores); i++ {
 		score := scoreArr[i]
 		var tempTest models.TestPaperInfo
 		id, _ := strconv.ParseInt(testDetailIds[i], 10, 64)
 		log.Println(id)
-		tempTest.GetTestPaperInfo(id)
+		err = tempTest.GetTestPaperInfo(id)
+		if err != nil {
+			resp := Response{"10008", "get testPaper fail", err}
+			c.Data["json"] = resp
+			return
+		}
 		if topic.Score_type == 1 {
 			tempTest.Examiner_first_id = userId
 			tempTest.Examiner_first_score = score
@@ -197,9 +249,6 @@ func (c *TestPaperApiController) Point() {
 		} else if topic.Score_type == 2 && tempTest.Examiner_second_id == "-1" {
 			tempTest.Examiner_second_id = userId
 			tempTest.Examiner_second_score = score
-			// if final{
-			// 	score =  int64(math.Abs(float64(tempTest.Examiner_second_score+tempTest.Examiner_first_score)) / 2)
-			// }
 		}
 		if underTest.Test_question_type == 4 || underTest.Test_question_type == 5 {
 			tempTest.Leader_id = userId
@@ -211,7 +260,12 @@ func (c *TestPaperApiController) Point() {
 		if final {
 			tempTest.Final_score = score
 		}
-		tempTest.Update()
+		err = tempTest.Update()
+		if err != nil {
+			resp := Response{"10009", "update testPaper fail", err}
+			c.Data["json"] = resp
+			return
+		}
 	}
 
 	var record models.ScoreRecord
@@ -221,37 +275,72 @@ func (c *TestPaperApiController) Point() {
 	record.Test_record_type = underTest.Test_question_type
 	record.User_id = userId
 	record.Score_time = time.Now()
-	record.Save()
+	err = record.Save()
+	if err != nil {
+		resp := Response{"10010", "insert record fail", err}
+		c.Data["json"] = resp
+		return
+	}
+	resp := Response{"10000", "ok", err}
+	c.Data["json"] = resp
 }
 
 func (c *TestPaperApiController) Problem() {
 	defer c.ServeJSON()
-	var requestBody map[string]interface{}
-	json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
-	userIdstr := requestBody["userId"].(string)
-	problemTypestr := requestBody["problemType"].(string)
-	testIdstr := requestBody["testId"].(string)
-	// userId, _ := strconv.ParseInt(userIdstr, 10, 64)
-	userId := userIdstr
-	testId, _ := strconv.ParseInt(testIdstr, 10, 64)
-	problemType, _ := strconv.ParseInt(problemTypestr, 10, 64)
+	// var requestBody map[string]interface{}
+	var requestBody requests.TestProblem
+	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	if err != nil {
+		resp := Response{"10001", "cannot unmarshal", err}
+		c.Data["json"] = resp
+		return
+	}
+
+	userId := requestBody.UserId
+	problemType := requestBody.ProblemType
+	testId := requestBody.TestId
+
 	var underTest models.UnderCorrectedPaper
 	var record models.ScoreRecord
 	var test models.TestPaper
 
-	underTest.GetUnderCorrectedPaper(userId, testId)
+	err = underTest.GetUnderCorrectedPaper(userId, testId)
+	if err != nil {
+		resp := Response{"10002", "get underCorrected fail", err}
+		c.Data["json"] = resp
+		return
+	}
 	var newUnderTest = underTest
-	underTest.Delete()
+	err = underTest.Delete()
+	if err != nil {
+		resp := Response{"10002", "delete underTest fail", err}
+		c.Data["json"] = resp
+		return
+	}
 	newUnderTest.User_id = "10000"
 	newUnderTest.Test_question_type = 6
 	newUnderTest.Problem_type = problemType
 	has, _ := newUnderTest.IsDuplicate()
 	if !has {
-		log.Println("dup")
-		newUnderTest.Save()
-		test.GetTestPaper(testId)
+		err = newUnderTest.Save()
+		if err != nil {
+			resp := Response{"10003", "update underTest fail", err}
+			c.Data["json"] = resp
+			return
+		}
+		err = test.GetTestPaper(testId)
+		if err != nil {
+			resp := Response{"10004", "get testPaper fail", err}
+			c.Data["json"] = resp
+			return
+		}
 		test.Question_status = 3
-		test.Update()
+		err = test.Update()
+		if err != nil {
+			resp := Response{"10005", "update testPaper fail", err}
+			c.Data["json"] = resp
+			return
+		}
 	}
 
 	record.Test_record_type = 5
@@ -259,88 +348,161 @@ func (c *TestPaperApiController) Problem() {
 	record.User_id = userId
 	record.Question_id = test.Question_id
 	record.Test_record_type = 5
-	record.Save()
+	err = record.Save()
+	if err != nil {
+		resp := Response{"10006", "insert record fail", err}
+		c.Data["json"] = resp
+		return
+	}
+	resp := Response{"10000", "ok", err}
+	c.Data["json"] = resp
 }
 
 func (c *TestPaperApiController) Answer() {
 	defer c.ServeJSON()
-	var requestBody map[string]interface{}
-	json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
-	// userIdstr := requestBody["userId"].(string)
-	testIdstr := requestBody["testId"].(string)
-	testId, _ := strconv.ParseInt(testIdstr, 10, 64)
+	var requestBody requests.TestAnswer
+	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	if err != nil {
+		resp := Response{"10001", "cannot unmarshal", err}
+		c.Data["json"] = resp
+		return
+	}
+	testId := requestBody.TestId
 	var test models.TestPaper
-	test.GetTestPaper(testId)
+	err = test.GetTestPaper(testId)
+	if err != nil {
+		resp := Response{"10002", "get testPaper fail", err}
+		c.Data["json"] = resp
+		return
+	}
 	var answerTest models.TestPaper
-	answerTest.GetTestPaperByQuestionIdAndQuestionStatus(test.Question_id, 5)
+	err = answerTest.GetTestPaperByQuestionIdAndQuestionStatus(test.Question_id, 5)
+	if err != nil {
+		resp := Response{"10003", "get testPaper fail", err}
+		c.Data["json"] = resp
+		return
+	}
 
-	var as []models.TestPaperInfo
-	models.GetTestInfoListByTestId(answerTest.Test_id, &as)
-	data := make(map[string]interface{})
-	data["keyTest"] = as
-	resp := Response{"10000", "ok", data}
+	var as responses.TestAnswer
+	err = models.GetTestInfoPicListByTestId(answerTest.Test_id, &as.Pic_src)
+	if err != nil {
+		resp := Response{"10004", "get testPaperInfo fail", err}
+		c.Data["json"] = resp
+		return
+	}
+	resp := Response{"10000", "ok", as}
 	c.Data["json"] = resp
 }
 
 func (c *TestPaperApiController) ExampleDeatil() {
 	defer c.ServeJSON()
-	var requestBody map[string]interface{}
-	json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
-	// userIdstr := requestBody["userId"].(string)
-	testIdstr := requestBody["exampleTestId"].(string)
-	testId, _ := strconv.ParseInt(testIdstr, 10, 64)
+	var requestBody requests.ExampleDetail
+	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	if err != nil {
+		resp := Response{"10001", "cannot unmarshal", err}
+		c.Data["json"] = resp
+		return
+	}
+	testId := requestBody.ExampleTestId
+	log.Println(testId)
 	var test models.TestPaper
-	test.GetTestPaper(testId)
+	err = test.GetTestPaper(testId)
+	if err != nil {
+		resp := Response{"10002", "get testPaper fail", err}
+		c.Data["json"] = resp
+		return
+	}
 	var exampleTest []models.TestPaper
 	//??
-	models.GetTestPaperListByQuestionIdAndQuestionStatus(test.Question_id, 6, &exampleTest)
+	err = models.GetTestPaperListByQuestionIdAndQuestionStatus(test.Question_id, 6, &exampleTest)
+	if err != nil {
+		resp := Response{"10003", "get testPaper fail", err}
+		c.Data["json"] = resp
+		return
+	}
+	if len(exampleTest) == 0 {
+		resp := Response{"10004", "there is no exampleTest", err}
+		c.Data["json"] = resp
+		return
+
+	}
 
 	var topic models.Topic
-	topic.GetTopic(exampleTest[0].Question_id)
-	var tests [][]models.TestPaperInfo
+	err = topic.GetTopic(exampleTest[0].Question_id)
+	if err != nil {
+		resp := Response{"10005", "get topic fail", err}
+		c.Data["json"] = resp
+		return
+	}
+	var response responses.ExampleDeatil
+	response.QuestionName = topic.Question_name
 	for i := 0; i < len(exampleTest); i++ {
 		var temp []models.TestPaperInfo
-		models.GetTestInfoListByTestId(exampleTest[i].Test_id, &temp)
-		tests = append(tests, temp)
+		err = models.GetTestInfoListByTestId(exampleTest[i].Test_id, &temp)
+		if err != nil {
+			resp := Response{"10006", "get testPaperInfo fail", err}
+			c.Data["json"] = resp
+			return
+		}
+		response.Test = append(response.Test, temp)
 	}
-	data := make(map[string]interface{})
-	data["questionName"] = topic.Question_name
-	data["test"] = tests
-	resp := Response{"10000", "ok", data}
+	resp := Response{"10000", "ok", response}
 	c.Data["json"] = resp
 
 }
 
 func (c *TestPaperApiController) ExampleList() {
 	defer c.ServeJSON()
-	var requestBody map[string]interface{}
-	json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
-	// userIdstr := requestBody["userId"].(string)
-	testIdstr := requestBody["testId"].(string)
-	testId, _ := strconv.ParseInt(testIdstr, 10, 64)
+	var requestBody requests.ExampleList
+	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	if err != nil {
+		resp := Response{"10001", "cannot unmarshal", err}
+		c.Data["json"] = resp
+		return
+	}
+	testId := requestBody.TestId
 	var testPaper models.TestPaper
-	testPaper.GetTestPaper(testId)
-	var exampleTest []models.TestPaper
-	//??
-	models.GetTestPaperListByQuestionIdAndQuestionStatus(testPaper.Question_id, 6, &exampleTest)
-	data := make(map[string]interface{})
-	data["exampleTestId"] = exampleTest
-	resp := Response{"10000", "ok", data}
+	err = testPaper.GetTestPaper(testId)
+	if err != nil {
+		resp := Response{"10002", "get testPaper fail", err}
+		c.Data["json"] = resp
+		return
+	}
+	var response responses.ExampleList
+	err = models.GetTestPaperListByQuestionIdAndQuestionStatus(testPaper.Question_id, 6, &response.TestPapers)
+	if err != nil {
+		resp := Response{"10003", "get testPaper fail", err}
+		c.Data["json"] = resp
+		return
+	}
+	resp := Response{"10000", "ok", response}
 	c.Data["json"] = resp
 
 }
 
 func (c *TestPaperApiController) Review() {
 	defer c.ServeJSON()
-	var requestBody map[string]interface{}
-	json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
-	userIdstr := requestBody["userId"].(string)
-	// userId, _ := strconv.ParseInt(userIdstr, 10, 64)
-	userId := userIdstr
+	var requestBody requests.TestReview
+	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	if err != nil {
+		resp := Response{"10001", "cannot unmarshal", err}
+		c.Data["json"] = resp
+		return
+	}
+	userId := requestBody.UserId
 	var records []models.ScoreRecord
-	models.GetLatestRecores(userId, &records)
-	data := make(map[string]interface{})
-	data["records"] = records
-	resp := Response{"10000", "ok", data}
+	var response responses.TestReview
+	err = models.GetLatestRecords(userId, &records)
+	if err != nil {
+		resp := Response{"10002", "get record fail", err}
+		c.Data["json"] = resp
+		return
+	}
+	for i := 0; i < len(records); i++ {
+		response.TestId = append(response.TestId, records[i].Test_id)
+		response.Score = append(response.Score, records[i].Score)
+		response.ScoreTime = append(response.ScoreTime, records[i].Score_time)
+	}
+	resp := Response{"10000", "ok", response}
 	c.Data["json"] = resp
 }

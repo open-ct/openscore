@@ -60,7 +60,7 @@ export default class index extends Component {
   }
   // 当前试卷
   getCurrentPaper = () => {
-    Marking.testDisplay({ userId: this.userId, testId: this.state.papers[0].Test_id.toString() })
+    Marking.testDisplay({ userId: this.userId, testId: this.state.papers[0] })
       .then((res) => {
         if (res.data.status == "10000") {
           let currentPaper = res.data.data
@@ -78,9 +78,9 @@ export default class index extends Component {
   // 阅卷区
   showTest = () => {
     let testPaper = null;
-    if (this.state.currentPaper.picSrcs != undefined) {
-      testPaper = this.state.currentPaper.picSrcs.map((item) => {
-        return <img src={item.Pic_src} alt="加载失败" className="test-question-img"/>
+    if (this.state.currentPaper.testInfos != undefined) {
+      testPaper = this.state.currentPaper.testInfos.map((item) => {
+        return <img src={item.pic_src} alt="加载失败" className="test-question-img"/>
       })
     }
 
@@ -121,12 +121,12 @@ export default class index extends Component {
 
   showSelect = () => {
     let scoreSelect = null;
-    if (this.state.currentPaper.picSrcs != undefined) {
+    if (this.state.currentPaper.testInfos != undefined) {
       scoreSelect = this.state.currentPaper.subTopic.map((item,index) => {
         return <div className="score-select">
-          {item.Question_detail_name}：<Select key={index}  placeholder="请选择分数" style={{ width: 120 }} onSelect={this.select.bind(this,item.Question_detail_id)}>
+          {item.question_detail_name}：<Select key={index}  placeholder="请选择分数" style={{ width: 120 }} onSelect={this.select.bind(this,item.test_detail_id)}>
             {
-              this.selectBox(item.Question_detail_score)
+              this.selectBox(item.question_detail_score)
             }
           </Select>
         </div>
@@ -196,11 +196,10 @@ export default class index extends Component {
       onOk: () => {
         let Qustion_detail_id = Util.getTextByJs(this.state.selectId);
         let Question_detail_score = Util.getTextByJs(this.state.selectScore);
-        console.log()
         if (value == 1) {
           Marking.testPoint({ 
             userId: this.userId, 
-            testId: this.state.papers[0].Test_id.toString(),
+            testId: this.state.currentPaper.testId,
             scores: Question_detail_score, 
             testDetailId: Qustion_detail_id
           })
@@ -228,8 +227,8 @@ export default class index extends Component {
   handleOk = () => {
     Marking.testProblem({ 
       userId: this.userId, 
-      testId: this.state.papers[0].Test_id.toString(),
-      problemType: this.state.problemValue.toString()
+      testId: this.state.currentPaper.testId,
+      problemType: this.state.problemValue
     })
     .then((res) => {
         this.setState({
