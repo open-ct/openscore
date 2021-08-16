@@ -19,11 +19,11 @@ export default class index extends Component {
     .then((res) => {
       if (res.data.status == "10000") {
         let reviewList = []
-        for (let i = 0; i < res.data.data.records.length; i++) {
+        for (let i = 0; i < res.data.data.testId.length; i++) {
           reviewList.push({
             order: i+1,
-            test_id: res.data.data.records[i].Test_id,
-            score: res.data.data.records[i].Score
+            test_id: res.data.data.testId[i],
+            score: res.data.data.score[i]
           })
         }
         this.setState({
