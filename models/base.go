@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"log"
 
 	beego "github.com/beego/beego/v2/server/web"
 	_ "github.com/go-sql-driver/mysql"
@@ -28,4 +29,18 @@ func init() {
 	initMarkingModels()
 	initUserModels()
 
+}
+
+func initMarkingModels() {
+	err := x.Sync2(new(Topic), new(SubTopic), new(TestPaper), new(TestPaperInfo), new(ScoreRecord), new(UnderCorrectedPaper), new(PaperDistribution))
+	if err != nil {
+		log.Println(err)
+	}
+}
+
+func initUserModels() {
+	err := x.Sync2(new(User))
+	if err != nil {
+		log.Println(err)
+	}
 }
