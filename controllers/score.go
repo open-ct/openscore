@@ -506,3 +506,8 @@ func (c *TestPaperApiController) Review() {
 	resp := Response{"10000", "ok", response}
 	c.Data["json"] = resp
 }
+
+func (c *TestPaperApiController) ReviewPoint() {
+	defer c.ServeJSON()
+	c.Data["json"] = Response{"10000", "ok", nil}
+}
