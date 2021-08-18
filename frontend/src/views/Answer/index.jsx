@@ -57,15 +57,15 @@ export default class index extends Component {
     let testPaper = null;
     if (this.state.keyTest != undefined || this.state.keyTest != null) {
       testPaper = this.state.keyTest.map((item) => {
-        return <img src={item} alt="加载失败" className="test-question-img"/>
+        return <div className="test-question-img">
+        <img src={item} alt="加载失败" />
+        </div>
       })
     }
-
     return testPaper
   }
 
   render() {
-
     return (
       <DocumentTitle title="阅卷系统-答案">
         <div className="answer-tasks-page" data-component="answer-tasks-page">
@@ -81,5 +81,8 @@ export default class index extends Component {
       </DocumentTitle>
     )
   }
+
+  
+
 
 }

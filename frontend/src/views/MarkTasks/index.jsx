@@ -11,18 +11,6 @@ import Marking from "../../api/marking";
 const { Option } = Select;
 export default class index extends Component {
 
-  // state = { warningVisible: false };
-  // showModal = () => {
-  //   this.setState({
-  //     warningVisible: true,
-  //   });
-  // };
-
-  // hideModal = () => {
-  //   this.setState({
-  //     warningVisible: false,
-  //   });
-  // };
   userId = "1"
   state = {
     problemVisible: false,
@@ -33,7 +21,8 @@ export default class index extends Component {
     testLength: 0,
     selectId: [],
     selectScore: [],
-    subTopic: []
+    subTopic: [],
+    markScore: []
   };
 
   componentDidMount() {
@@ -47,7 +36,7 @@ export default class index extends Component {
           let papers = [...res.data.data.papers]
           this.setState(
             {
-              papers ,
+              papers,
               testLength: res.data.data.papers.length
             }
           )
@@ -64,10 +53,16 @@ export default class index extends Component {
       .then((res) => {
         if (res.data.status == "10000") {
           let currentPaper = res.data.data
-          let subTopic =res.data.data.subTopic
+          let subTopic = res.data.data.subTopic
+          let markScore = []
+          for (let i = 0; i < subTopic.length; i++) {
+            markScore.push(subTopic[i].score_type.split('-'))
+          }
+          console.log(markScore)
           this.setState({
             currentPaper,
-            subTopic
+            subTopic,
+            markScore
           })
         }
       })
@@ -75,12 +70,25 @@ export default class index extends Component {
         console.log(e)
       })
   }
+  // 打分展示
+  imgScore = (item) => {
+    let index
+    for (let i = 0; i < this.state.selectId.length; i++) {
+      if(item == this.state.selectId[i]) {
+        index = i
+      }
+    }
+    console.log(this.state.selectScore[index])
+    return this.state.selectScore[index]
+  }
   // 阅卷区
   showTest = () => {
     let testPaper = null;
     if (this.state.currentPaper.testInfos != undefined) {
       testPaper = this.state.currentPaper.testInfos.map((item) => {
-        return <img src={item.pic_src} alt="加载失败" className="test-question-img"/>
+        return <div className="test-question-img" data-content-before={this.imgScore(item.test_detail_id)}>
+        <img src={item.pic_src} alt="加载失败" />
+        </div>
       })
     }
 
@@ -108,25 +116,41 @@ export default class index extends Component {
     )
   }
   // 评分区
-  selectBox = (data) => {
-    let selectArr = [];
-    for (let i = 0; i <parseInt(data) +1; i++) {
-      let selectOpt = (
-        <Option key={i} value={i}>{i}</Option>
-      )
-      selectArr.push(selectOpt)
+
+  selectBox = (index) => {
+    let selectList
+    if (this.state.markScore.length != 0) {
+      selectList = this.state.markScore[index].map((item, i) => {
+        return <Option key={i} value={item} label={item}>{item}</Option>
+      })
+    } else {
+      return null
     }
-    return selectArr
+    return selectList
   }
 
   showSelect = () => {
     let scoreSelect = null;
     if (this.state.currentPaper.testInfos != undefined) {
-      scoreSelect = this.state.currentPaper.subTopic.map((item,index) => {
+      scoreSelect = this.state.currentPaper.subTopic.map((item, index) => {
         return <div className="score-select">
-          {item.question_detail_name}：<Select key={index}  placeholder="请选择分数" style={{ width: 120 }} onSelect={this.select.bind(this,item.test_detail_id)}>
+          {item.question_detail_name}：<Select
+            showSearch
+            key={index}
+            placeholder="请选择分数"
+            style={{ width: 120 }}
+            onSelect={this.select.bind(this, item.test_detail_id)}
+            optionFilterProp="label"
+            filterOption={(input, option) =>
+              option.label.indexOf(input) >= 0
+            }
+          filterSort={(optionA, optionB) =>
+            optionA.label.localeCompare(optionB.label)
+          }
+          >
             {
-              this.selectBox(item.question_detail_score)
+              this.selectBox(index)
+              // this.selectBox(item.question_detail_score)
             }
           </Select>
         </div>
@@ -135,11 +159,33 @@ export default class index extends Component {
 
     return scoreSelect
   }
-  select = (item,value) => {
+  select = (item, value) => {
+    console.log(item)
+    if (this.state.selectId.length < 3) {
       this.setState({
-        selectId :  [...this.state.selectId,item],
-        selectScore :  [...this.state.selectScore,value]
-      })   
+        selectId: [...this.state.selectId, item],
+        selectScore: [...this.state.selectScore, value]
+      })
+    } else {
+      let reviseSelectNo = 0;
+      let newSelectScore = [];
+      for (let i = 0; i < this.state.selectId.length; i++) {
+        if (this.state.selectId[i] == item) {
+          reviseSelectNo = i
+        }
+      }
+      this.state.selectScore.map((e, index) => {
+        if (index == reviseSelectNo) {
+          newSelectScore.push(value)
+        } else {
+          newSelectScore.push(e)
+        }
+      })
+      this.setState({
+        selectScore: newSelectScore
+      })
+    }
+    console.log(this.state.selectId, this.state.selectScore)
   }
   renderScoreDropDown() {
 
@@ -174,6 +220,7 @@ export default class index extends Component {
       </div>
     );
   }
+
   showWarning = (value) => {
     let title = '';
     switch (value) {
@@ -187,6 +234,7 @@ export default class index extends Component {
         title = '请确认是否提交该优秀卷';
         break;
     }
+    
     Modal.confirm({
       title: title,
       icon: <ExclamationCircleOutlined />,
@@ -197,22 +245,22 @@ export default class index extends Component {
         let Qustion_detail_id = Util.getTextByJs(this.state.selectId);
         let Question_detail_score = Util.getTextByJs(this.state.selectScore);
         if (value == 1) {
-          Marking.testPoint({ 
-            userId: this.userId, 
+          Marking.testPoint({
+            userId: this.userId,
             testId: this.state.currentPaper.testId,
-            scores: Question_detail_score, 
+            scores: Question_detail_score,
             testDetailId: Qustion_detail_id
           })
-          .then((res) => {
+            .then((res) => {
               this.setState({
                 selectId: [],
                 selectScore: []
               })
-              this.getAllPaper();           
-          })
-          .catch((e) => {
-            console.log(e)
-          })
+              this.getAllPaper();
+            })
+            .catch((e) => {
+              console.log(e)
+            })
         } else if (value == 3) {
           console.log('3')
         } else {
@@ -225,22 +273,21 @@ export default class index extends Component {
     });
   }
   handleOk = () => {
-    Marking.testProblem({ 
-      userId: this.userId, 
+    Marking.testProblem({
+      userId: this.userId,
       testId: this.state.currentPaper.testId,
       problemType: this.state.problemValue
     })
-    .then((res) => {
+      .then((res) => {
         this.setState({
           selectId: [],
           selectScore: []
-        })      
-        this.getAllPaper();  
-        this.forceUpdate();
-    })
-    .catch((e) => {
-      console.log(e)
-    })
+        })
+        this.getAllPaper();
+      })
+      .catch((e) => {
+        console.log(e)
+      })
     this.setState({
       problemVisible: false,
     });
