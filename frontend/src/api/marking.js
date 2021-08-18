@@ -50,6 +50,9 @@ const Marking = {
     testReview(data) {
         return  axios.post('/marking/score/test/review', data)
     },
+    testReviewPoint(data) {
+        return  axios.post('/marking/score/test/review/point', data)
+    },
 }
 
 

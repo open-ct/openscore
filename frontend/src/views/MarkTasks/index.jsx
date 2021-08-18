@@ -58,7 +58,6 @@ export default class index extends Component {
           for (let i = 0; i < subTopic.length; i++) {
             markScore.push(subTopic[i].score_type.split('-'))
           }
-          console.log(markScore)
           this.setState({
             currentPaper,
             subTopic,
@@ -238,7 +237,7 @@ export default class index extends Component {
     Modal.confirm({
       title: title,
       icon: <ExclamationCircleOutlined />,
-      content: '提交后系统将记录改试卷',
+      content: '提交后系统将记录该试卷',
       okText: '确认',
       cancelText: '取消',
       onOk: () => {
@@ -254,7 +253,8 @@ export default class index extends Component {
             .then((res) => {
               this.setState({
                 selectId: [],
-                selectScore: []
+                selectScore: [],
+                currentPaper: {}
               })
               this.getAllPaper();
             })
@@ -281,7 +281,8 @@ export default class index extends Component {
       .then((res) => {
         this.setState({
           selectId: [],
-          selectScore: []
+          selectScore: [],
+          currentPaper: {}
         })
         this.getAllPaper();
       })

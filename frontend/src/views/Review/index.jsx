@@ -97,9 +97,10 @@ export default class index extends Component {
         .then((res) => {
           this.setState({
             selectId: [],
-            selectScore: []
+            selectScore: [],
+            reviewVisible: true
           })
-          this.getAllPaper();
+          this.getReviewList();
         })
         .catch((e) => {
           console.log(e)
@@ -123,7 +124,6 @@ export default class index extends Component {
     }
   };
   reviewModal() {
-    console.log('111');
     return (
       <Modal
         title="回评列表"
@@ -131,6 +131,7 @@ export default class index extends Component {
         onOk={() => this.handleOk(1)}
         onCancel={() => { this.handleCancel(1) }}
         width={800}
+        maskClosable={false}
       >
         {
           this.reviewTable()
@@ -164,15 +165,30 @@ export default class index extends Component {
         if (res.data.status == "10000") {
           let currentPaper = res.data.data
           let subTopic = res.data.data.subTopic
+          let testInfos = res.data.data.testInfos
           let markScore = []
+          let selectId = []
+          let selectScore = []
           for (let i = 0; i < subTopic.length; i++) {
             markScore.push(subTopic[i].score_type.split('-'))
+            selectId.push(testInfos[i].test_detail_id)
+            // 判断用户改卷
+            let userScore
+            if (this.userId == testInfos[i].examiner_first_id) {
+              userScore = testInfos[i].examiner_first_score
+            } else if (this.userId == testInfos[i].examiner_second_id) {
+              userScore = testInfos[i].examiner_second_score
+            } else if (this.userId == testInfos[i].examiner_second_id) {
+              userScore = testInfos[i].examiner_third_score
+            }
+            selectScore.push(userScore)
           }
-          console.log(markScore)
           this.setState({
             currentPaper,
             subTopic,
-            markScore
+            markScore,
+            selectId,
+            selectScore
           })
         }
       })
@@ -218,7 +234,7 @@ export default class index extends Component {
               this.renderScoreDropDown()
             }
             {
-              this.renderPush() 
+              this.renderPush()
             }
             {
               this.reviewModal()
@@ -260,6 +276,7 @@ export default class index extends Component {
             filterSort={(optionA, optionB) =>
               optionA.label.localeCompare(optionB.label)
             }
+            defaultValue={this.state.selectScore[index]}
           >
             {
               this.selectBox(index)
@@ -316,7 +333,7 @@ export default class index extends Component {
         <div>
           <Button type="primary" style={{ width: 60 }} className="push-submit" onClick={() => {
             this.showWarning(1)
-          }}>提交</Button>
+          }}>回评</Button>
         </div>
         <div className="push-paper" >
           <Button className="push-problem" style={{ width: 60 }} onClick={() => {
@@ -350,14 +367,14 @@ export default class index extends Component {
     Modal.confirm({
       title: title,
       icon: <ExclamationCircleOutlined />,
-      content: '提交后系统将记录改试卷',
+      content: '提交后系统将记录该试卷',
       okText: '确认',
       cancelText: '取消',
       onOk: () => {
         let Qustion_detail_id = Util.getTextByJs(this.state.selectId);
         let Question_detail_score = Util.getTextByJs(this.state.selectScore);
         if (value == 1) {
-          Marking.testPoint({
+          Marking.testReviewPoint({
             userId: this.userId,
             testId: this.state.currentPaper.testId,
             scores: Question_detail_score,
@@ -366,9 +383,11 @@ export default class index extends Component {
             .then((res) => {
               this.setState({
                 selectId: [],
-                selectScore: []
+                selectScore: [],
+                currentPaper: {},
+                reviewVisible: true
               })
-              this.getAllPaper();
+              this.getReviewList();
             })
             .catch((e) => {
               console.log(e)
