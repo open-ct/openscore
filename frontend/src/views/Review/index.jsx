@@ -388,6 +388,7 @@ export default class index extends Component {
                 reviewVisible: true
               })
               this.getReviewList();
+              message.success('回评成功');
             })
             .catch((e) => {
               console.log(e)
