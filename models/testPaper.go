@@ -25,6 +25,8 @@ type TestPaper struct {
 	Final_score                int64  `json:"final_score"`
 	Final_score_id             string `json:"finale_score_id"`
 	Pratice_error              int64  `json:"pratice_error"`
+	Problem_type               int64  `json:"problem_type"`
+	Problem_message            string `json:"problem_message"`
 }
 
 func (t *TestPaper) GetTestPaperByQuestionIdAndQuestionStatus(question_id int64, question_statue int64) error {
