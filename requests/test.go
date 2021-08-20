@@ -17,9 +17,10 @@ type TestPoint struct {
 }
 
 type TestProblem struct {
-	UserId      string `json:"userId"`
-	ProblemType int64  `json:"problemType"`
-	TestId      int64  `json:"testId"`
+	UserId         string `json:"userId"`
+	ProblemType    int64  `json:"problemType"`
+	ProblemMessage string `json:"problemMessage"`
+	TestId         int64  `json:"testId"`
 }
 
 type TestAnswer struct {

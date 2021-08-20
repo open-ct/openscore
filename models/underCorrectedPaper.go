@@ -13,6 +13,7 @@ type UnderCorrectedPaper struct {
 	Question_id        int64  `json:"question_id"`
 	Test_question_type int64  `json:"test_question_type"`
 	Problem_type       int64  `json:"problem_type" xorm:"default(-1)"`
+	Problem_message    string `json:"problem_message"`
 }
 
 func (u *UnderCorrectedPaper) GetUnderCorrectedPaper(userId string, testId int64) error {

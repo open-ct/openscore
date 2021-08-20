@@ -299,6 +299,7 @@ func (c *TestPaperApiController) Problem() {
 	userId := requestBody.UserId
 	problemType := requestBody.ProblemType
 	testId := requestBody.TestId
+	problemMessage := requestBody.ProblemMessage
 
 	var underTest models.UnderCorrectedPaper
 	var record models.ScoreRecord
@@ -320,6 +321,13 @@ func (c *TestPaperApiController) Problem() {
 	newUnderTest.User_id = "10000"
 	newUnderTest.Test_question_type = 6
 	newUnderTest.Problem_type = problemType
+	if problemType == 0 {
+		newUnderTest.Problem_message = "The test is not clear"
+	} else if problemType == 1 {
+		newUnderTest.Problem_message = "Wrong question"
+	} else {
+		newUnderTest.Problem_message = problemMessage
+	}
 	has, _ := newUnderTest.IsDuplicate()
 	if !has {
 		err = newUnderTest.Save()
@@ -335,6 +343,14 @@ func (c *TestPaperApiController) Problem() {
 			return
 		}
 		test.Question_status = 3
+		test.Problem_type = problemType
+		if problemType == 0 {
+			test.Problem_message = "The test is not clear"
+		} else if problemType == 1 {
+			test.Problem_message = "Wrong question"
+		} else {
+			test.Problem_message = problemMessage
+		}
 		err = test.Update()
 		if err != nil {
 			resp := Response{"10005", "update testPaper fail", err}
