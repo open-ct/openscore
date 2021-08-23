@@ -3,7 +3,7 @@ import DocumentTitle from 'react-document-title'
 import { Modal, Dropdown, Button, message, Space, Tooltip, Select, Radio, Input } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import './index.less'
-import Marking from "../../api/marking";
+import Marking from "../../../api/marking";
 
 export default class index extends Component {
 

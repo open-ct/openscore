@@ -3,8 +3,8 @@ import DocumentTitle from 'react-document-title'
 import { Table, Modal, Dropdown, Button, message, Space, Tooltip, Select, Radio, Input } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import './index.less'
-import Marking from "../../api/marking";
-import * as Util from "../../util/Util";
+import Marking from "../../../api/marking";
+import * as Util from "../../../util/Util";
 const { Option } = Select;
 export default class index extends Component {
   userId = "1"
@@ -352,6 +352,7 @@ export default class index extends Component {
 
   showWarning = (value) => {
     let title = '';
+    let okContent = '提交后系统将记录该试卷';
     switch (value) {
       case 1:
         title = '请确认是否提交该试卷';
@@ -364,10 +365,26 @@ export default class index extends Component {
         break;
     }
 
+    if (value == 1) {
+      let selectOrdered = []
+      for (let i = 0; i < this.state.subTopic.length; i++) {
+        for (let j = 0; j < this.state.selectId.length; j++) {
+          if (this.state.selectId[j] == this.state.subTopic[i].test_detail_id) {
+            selectOrdered.push(this.state.selectScore[j])
+          }
+        }
+      }
+      let content = '该试卷评分记录为：';
+      for (let i = 0; i < selectOrdered.length; i++) {
+        content += selectOrdered[i] + '\n'
+      }
+      okContent = content + '提交后系统将记录该试卷';
+    }
+
     Modal.confirm({
       title: title,
       icon: <ExclamationCircleOutlined />,
-      content: '提交后系统将记录该试卷',
+      content: okContent,
       okText: '确认',
       cancelText: '取消',
       onOk: () => {
@@ -387,8 +404,8 @@ export default class index extends Component {
                 currentPaper: {},
                 reviewVisible: true
               })
-              this.getReviewList();
               message.success('回评成功');
+              this.props.history.push('/home/mark-tasks')
             })
             .catch((e) => {
               console.log(e)

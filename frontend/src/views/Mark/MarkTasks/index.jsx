@@ -6,8 +6,8 @@ import Zmage from 'react-zmage'
 
 import './index.less'
 
-import * as Util from "../../util/Util";
-import Marking from "../../api/marking";
+import * as Util from "../../../util/Util";
+import Marking from "../../../api/marking";
 const { Option } = Select;
 export default class index extends Component {
 
@@ -22,7 +22,7 @@ export default class index extends Component {
     selectId: [],
     selectScore: [],
     subTopic: [],
-    markScore: []
+    markScore: [],
   };
 
   componentDidMount() {
@@ -73,7 +73,7 @@ export default class index extends Component {
   imgScore = (item) => {
     let index
     for (let i = 0; i < this.state.selectId.length; i++) {
-      if(item == this.state.selectId[i]) {
+      if (item == this.state.selectId[i]) {
         index = i
       }
     }
@@ -86,7 +86,7 @@ export default class index extends Component {
     if (this.state.currentPaper.testInfos != undefined) {
       testPaper = this.state.currentPaper.testInfos.map((item) => {
         return <div className="test-question-img" data-content-before={this.imgScore(item.test_detail_id)}>
-        <img src={item.pic_src} alt="加载失败" />
+          <img src={item.pic_src} alt="加载失败" />
         </div>
       })
     }
@@ -143,9 +143,9 @@ export default class index extends Component {
             filterOption={(input, option) =>
               option.label.indexOf(input) >= 0
             }
-          filterSort={(optionA, optionB) =>
-            optionA.label.localeCompare(optionB.label)
-          }
+            filterSort={(optionA, optionB) =>
+              optionA.label.localeCompare(optionB.label)
+            }
           >
             {
               this.selectBox(index)
@@ -196,6 +196,7 @@ export default class index extends Component {
       </div>
     );
   }
+  
   renderPush() {
 
     return (
@@ -222,6 +223,7 @@ export default class index extends Component {
 
   showWarning = (value) => {
     let title = '';
+    let okContent = '提交后系统将记录该试卷';
     switch (value) {
       case 1:
         title = '请确认是否提交该试卷';
@@ -233,34 +235,53 @@ export default class index extends Component {
         title = '请确认是否提交该优秀卷';
         break;
     }
-    
+
+    if (value == 1) {
+      let selectOrdered = []
+      for (let i = 0; i < this.state.subTopic.length; i++) {
+        for (let j = 0; j < this.state.selectId.length; j++) {
+          if (this.state.selectId[j] == this.state.subTopic[i].test_detail_id) {
+            selectOrdered.push(this.state.selectScore[j])
+          }
+        }
+      }
+      let content = '该试卷评分记录为：';
+      for (let i = 0; i < selectOrdered.length; i++) {
+        content += selectOrdered[i] + '\n'
+      }
+      okContent = content + '提交后系统将记录该试卷';
+    }
     Modal.confirm({
       title: title,
       icon: <ExclamationCircleOutlined />,
-      content: '提交后系统将记录该试卷',
+      content: okContent,
       okText: '确认',
       cancelText: '取消',
       onOk: () => {
         let Qustion_detail_id = Util.getTextByJs(this.state.selectId);
         let Question_detail_score = Util.getTextByJs(this.state.selectScore);
         if (value == 1) {
-          Marking.testPoint({
-            userId: this.userId,
-            testId: this.state.currentPaper.testId,
-            scores: Question_detail_score,
-            testDetailId: Qustion_detail_id
-          })
-            .then((res) => {
-              this.setState({
-                selectId: [],
-                selectScore: [],
-                currentPaper: {}
+          if (this.state.selectScore.length < 3) {
+            message.warning('请将分数打全')
+          } else {
+            Marking.testPoint({
+              userId: this.userId,
+              testId: this.state.currentPaper.testId,
+              scores: Question_detail_score,
+              testDetailId: Qustion_detail_id
+            })
+              .then((res) => {
+                this.setState({
+                  selectId: [],
+                  selectScore: [],
+                  currentPaper: {}
+                })
+                this.getAllPaper();
               })
-              this.getAllPaper();
-            })
-            .catch((e) => {
-              console.log(e)
-            })
+              .catch((e) => {
+                console.log(e)
+              })
+          }
         } else if (value == 3) {
           console.log('3')
         } else {

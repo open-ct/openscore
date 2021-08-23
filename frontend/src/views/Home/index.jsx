@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Layout, Menu } from 'antd';
 import DocumentTitle from 'react-document-title'
-import { Switch, Route, Redirect } from 'react-router-dom'
+import { Switch, Route, Redirect,history } from 'react-router-dom'
 import { CheckCircleOutlined, FormOutlined, HighlightOutlined, ProfileOutlined } from '@ant-design/icons';
 import * as Icon from '@ant-design/icons'
 import { Avatar, Badge, Button, Col, Dropdown, Row } from "antd";
@@ -15,10 +15,23 @@ import * as AccountBackend from "../../backend/AccountBackend";
 import loadable from 'react-loadable';
 
 
-import MarkTasks from '../MarkTasks'
-import Answer from '../Answer'
-import Sample from '../Sample'
-import Review from '../Review'
+import MarkTasks from '../Mark/MarkTasks'
+import Answer from '../Mark/Answer'
+import Sample from '../Mark/Sample'
+import Review from '../Mark/Review'
+
+import all from '../Group/mark_monitor/all'
+import average from '../Group/mark_monitor/average'
+import score from '../Group/mark_monitor/score'
+import self from '../Group/mark_monitor/self'
+import standard from '../Group/mark_monitor/standard'
+import teacher from '../Group/mark_monitor/teacher'
+
+import arbitration from '../Group/test_monitor/arbitration'
+import marking from '../Group/test_monitor/marking'
+import problem from '../Group/test_monitor/problem'
+import markTasks from '../Group/test_monitor/markTasks'
+
 import './index.less'
 const { Header, Sider, Content } = Layout;
 const { SubMenu } = Menu
@@ -27,6 +40,7 @@ export default class index extends Component {
 
     state = {
         account: null,
+        current:"home"
     };
     permissionList = [
         {
@@ -66,62 +80,133 @@ export default class index extends Component {
             chidPermissions: [
             ]
         },
-        // {
-        //     key: "monitor",
-        //     userPermission: "组长",
-        //     menu_name: "评卷监控",
-        //     menu_url: "/home/monitor",
-        //     icon: "HighlightOutlined",
-        //     chidPermissions: [
-        //     ]
-        // },
-        // {
-        //     key: "test_management",
-        //     userPermission: "组长",
-        //     menu_name: "试卷管理",
-        //     menu_url: "/home/review",
-        //     icon: "HighlightOutlined",
-        //     chidPermissions: [
-        //     ]
-        // },
-        // {
-        //     key: "user_management",
-        //     userPermission: "组长",
-        //     menu_name: "用户管理",
-        //     menu_url: "/home/review",
-        //     icon: "HighlightOutlined",
-        //     chidPermissions: [
-        //     ]
-        // },
+        {
+            key: "mark_monitor",
+            userPermission: "组长",
+            menu_name: "评卷监控",
+            menu_url: "/home/markMonitor",
+            icon: "FormOutlined",
+            chidPermissions: [
+                {
+                    key: "teacher",
+                    userPermission: "组长",
+                    menu_name: "教师监控",
+                    menu_url: "/home/markMonitor/teacher",
+                    icon: "",
+                    chidPermissions: [
+                    ]
+                },
+                {
+                    key: "score",
+                    userPermission: "组长",
+                    menu_name: "分值分布",
+                    menu_url: "/home/markMonitor/score",
+                    icon: "",
+                    chidPermissions: [
+                    ]
+                },
+                {
+                    key: "self",
+                    userPermission: "组长",
+                    menu_name: "自评监控",
+                    menu_url: "/home/markMonitor/self",
+                    icon: "",
+                    chidPermissions: [
+                    ]
+                },
+                {
+                    key: "average",
+                    userPermission: "组长",
+                    menu_name: "平均分监控",
+                    menu_url: "/home/markMonitor/average",
+                    icon: "",
+                    chidPermissions: [
+                    ]
+                },
+                {
+                    key: "standard",
+                    userPermission: "组长",
+                    menu_name: "标准差监控",
+                    menu_url: "/home/markMonitor/standard",
+                    icon: "",
+                    chidPermissions: [
+                    ]
+                },
+                {
+                    key: "all",
+                    userPermission: "组长",
+                    menu_name: "总进度监控",
+                    menu_url: "/home/markMonitor/all",
+                    icon: "",
+                    chidPermissions: [
+                    ]
+                },
+            ]
+        },
+        {
+            key: "test_management",
+            userPermission: "组长",
+            menu_name: "试卷管理",
+            menu_url: "/home/testMonitor",
+            icon: "TableOutlined",
+            chidPermissions: [
+                {
+                    key: "arbitration",
+                    userPermission: "组长",
+                    menu_name: "仲裁卷",
+                    menu_url: "/home/group/arbitration",
+                    icon: "",
+                    chidPermissions: [
+                    ]
+                },
+                {
+                    key: "problem",
+                    userPermission: "组长",
+                    menu_name: "问题卷",
+                    menu_url: "/home/group/problem",
+                    icon: "",
+                    chidPermissions: [
+                    ]
+                },
+                {
+                    key: "marking",
+                    userPermission: "组长",
+                    menu_name: "正评卷",
+                    menu_url: "/home/group/marking",
+                    icon: "",
+                    chidPermissions: [
+                    ]
+                },
+            ]
+        },
+        {
+            key: "user_management",
+            userPermission: "组长",
+            menu_name: "用户管理",
+            menu_url: "/home/group/userMonitor",
+            icon: "UserOutlined",
+            chidPermissions: [
+            ]
+        },
     ]
-    bindMenu = (menulist) => {
-        let MenuList = menulist.map((item) => {
-            if (item.chidPermissions.length === 0) {  //没有子菜单
-                return <Menu.Item key={item.key} icon={React.createElement(Icon[item.icon])}  ><Link to={item.menu_url}>{item.menu_name}</Link></Menu.Item>
-            }
-            else {
-                return <SubMenu key={item.key} title={item.menu_name}>
-                    {this.bindMenu(item.chidPermissions)}
-                </SubMenu>
-            }
 
-        })
-        return MenuList
-    }
-
-    bindRouter = (menulist) => {
-        let routerList = menulist.map((item) => {
-            if (item.chidPermissions.length === 0) {
-                return <Route key={item.key} path={item.menu_url} component={MarkTasks}></Route>
-            }
-        })
-        return routerList
-    }
     componentDidMount() {
+        console.log(this.props)
         this.getAccount();
         setTimeout(() => {
             console.log(this.state)
         }, 5000);
+        let moren = this.props.location.pathname;
+        this.setState(
+            {current:moren.substring(moren.lastIndexOf("/")+1,moren.length)}
+        )
+        this.props.history.listen((e) => {
+            let test = e.pathname
+            let text =test.substring(test.lastIndexOf("/")+1,test.length)
+            this.setState({
+                current:text
+            })
+        })
     }
 
     getAccount() {
@@ -220,10 +305,30 @@ export default class index extends Component {
         }
     }
 
-    funcChange = (e) => {
-        this.props.history.push(`/home/${e.key}`)
+
+    bindMenu = (menulist) => {
+        let MenuList = menulist.map((item) => {
+            if (item.chidPermissions.length === 0) {  //没有子菜单
+                return <Menu.Item key={item.key} icon={item.icon?React.createElement(Icon[item.icon]):null}  ><Link to={item.menu_url}>{item.menu_name}</Link></Menu.Item>
+            }
+            else {
+                return <SubMenu key={item.key} title={item.menu_name} icon={React.createElement(Icon[item.icon])}>
+                    {this.bindMenu(item.chidPermissions)}
+                </SubMenu>
+            }
+
+        })
+        return MenuList
     }
 
+    bindRouter = (menulist) => {
+        let routerList = menulist.map((item) => {
+            if (item.chidPermissions.length === 0) {
+                return <Route key={item.key} path={item.menu_url} component={MarkTasks}></Route>
+            }
+        })
+        return routerList
+    }
 
 
     render() {
@@ -253,6 +358,7 @@ export default class index extends Component {
                                 style={{ width: 200, height: '100%' }}
                                 defaultSelectedKeys={['mark-tasks']}
                                 mode="inline"
+                                selectedKeys = {[this.state.current]}
                                 onClick={this.funcChange}
                             >
                                 {/* <Menu.Item key="mark-tasks" icon={<FormOutlined />}>评卷</Menu.Item>
@@ -271,7 +377,22 @@ export default class index extends Component {
                                     <Route path="/home/mark-tasks" component={MarkTasks} exact></Route>
                                     <Route path="/home/answer" component={Answer} exact></Route>
                                     <Route path="/home/sample" component={Sample} exact></Route>
-                                    <Route path="/home/review" component={Review} exact></Route> </>
+                                    <Route path="/home/review" component={Review} exact></Route>
+                                    
+                                    <Route path="/home/markMonitor/all" component={all} exact></Route>
+                                    <Route path="/home/markMonitor/average" component={average} exact></Route>
+                                    <Route path="/home/markMonitor/score" component={score} exact></Route>
+                                    <Route path="/home/markMonitor/self" component={self} exact></Route>
+                                    <Route path="/home/markMonitor/standard" component={standard} exact></Route>
+                                    <Route path="/home/markMonitor/teacher" component={teacher} exact></Route>
+
+                                    <Route path="/home/group/arbitration" component={arbitration} exact></Route>
+                                    <Route path="/home/group/marking" component={marking} exact></Route>
+                                    <Route path="/home/group/problem" component={problem} exact></Route> 
+
+                                    <Route path="/home/group/markTasks/:type" component={markTasks} exact></Route>                              <Route path="/home/review" component={Review} exact></Route>
+                                     </>
+
                                     : null
                                 }
                             </Switch>
