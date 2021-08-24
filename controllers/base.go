@@ -39,6 +39,10 @@ type TestPaperApiController struct {
 	beego.Controller
 }
 
+type SupervisorApiController struct {
+	beego.Controller
+}
+
 func (c *ApiController) GetSessionUser() *auth.Claims {
 	s := c.GetSession("user")
 	if s == nil {
