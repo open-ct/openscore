@@ -25,7 +25,7 @@ type User struct {
 	IsDistribute   int64     `json:"isDistribute"`
 }
 
-func (u *User) GetUser(id int64) error {
+func (u *User) GetUser(id string) error {
 	has, err := x.Where(builder.Eq{"user_id": id}).Get(u)
 	if !has || err != nil {
 		log.Println("could not found user")

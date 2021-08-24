@@ -37,3 +37,10 @@ func GetDistributedTestIdPaperByUserId(id string, up *[]int64) error {
 	}
 	return err
 }
+func GetTopicList ( topics *[]Topic) error{
+	err := x.Find(topics)
+	if err!=nil {
+		log.Println("GetTopicList err ")
+	}
+	return  err
+}

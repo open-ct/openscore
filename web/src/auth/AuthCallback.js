@@ -34,7 +34,7 @@ class AuthCallback extends React.Component {
     };
   }
 
-  componentDidMount() {
+  componentWillMount() {
     this.login();
   }
 

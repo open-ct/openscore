@@ -21,3 +21,10 @@ func (u *PaperDistribution) GetPaperDistribution(id string) error {
 	}
 	return err
 }
+func FindPaperDistributionByQuestionId(paperDistributions *[]PaperDistribution,questionId int64) error{
+	err:= x.Where("question_id = ?", questionId).Find(paperDistributions)
+	if err!=nil {
+		log.Println("FindPaperDistributionByQuestionId err ")
+	}
+ return err
+}
