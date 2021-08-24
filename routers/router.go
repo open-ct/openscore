@@ -27,7 +27,26 @@ func init() {
 	beego.Router("/openct/marking/score/test/example/detail", &controllers.TestPaperApiController{}, "post:ExampleDeatil")
 	beego.Router("/openct/marking/score/test/example/list", &controllers.TestPaperApiController{}, "post:ExampleList")
 	beego.Router("/openct/marking/score/test/review", &controllers.TestPaperApiController{}, "post:Review")
-	beego.Router("/openct/marking/score/test/review/point", &controllers.TestPaperApiController{}, "post:ReviewPoint")
 
 	// beego.Router("/api/get-users", &controllers.ApiController{}, "GET:GetUsers")
+
+
+/**
+chen :阅卷组长端
+ */
+	beego.Router("/openct/marking/supervisor/question/list",&controllers.SupervisorApiController{},"post:QuestionList")
+	beego.Router("/openct/marking/supervisor/user/info",&controllers.SupervisorApiController{},"post:UserInfo")
+	beego.Router("/openct/marking/supervisor/teacher/monitoring",&controllers.SupervisorApiController{},"post:TeacherMonitoring")
+	beego.Router("/openct/marking/supervisor/score/distribution",&controllers.SupervisorApiController{},"post:ScoreDistribution")
+	beego.Router("/openct/marking/supervisor/question/teacher/list",&controllers.SupervisorApiController{},"post:TeachersByQuestion")
+	beego.Router("/openct/marking/supervisor/self/score",&controllers.SupervisorApiController{},"post:SelfScore")
+	beego.Router("/openct/marking/supervisor/average/score",&controllers.SupervisorApiController{},"post:AverageScore")
+	beego.Router("/openct/marking/supervisor/problem/list",&controllers.SupervisorApiController{},"post:ProblemTest")
+	beego.Router("/openct/marking/supervisor/arbitrament/list",&controllers.SupervisorApiController{},"post:ArbitramentTest")
+	beego.Router("/openct/marking/supervisor/score/progress",&controllers.SupervisorApiController{},"post:ScoreProgress")
+	beego.Router("/openct/marking/supervisor/point",&controllers.SupervisorApiController{},"post:SupervisorPoint")
+
+/**
+ chen :管理员端
+ */
 }

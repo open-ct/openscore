@@ -299,7 +299,6 @@ func (c *TestPaperApiController) Problem() {
 	userId := requestBody.UserId
 	problemType := requestBody.ProblemType
 	testId := requestBody.TestId
-	problemMessage := requestBody.ProblemMessage
 
 	var underTest models.UnderCorrectedPaper
 	var record models.ScoreRecord
@@ -321,13 +320,6 @@ func (c *TestPaperApiController) Problem() {
 	newUnderTest.User_id = "10000"
 	newUnderTest.Test_question_type = 6
 	newUnderTest.Problem_type = problemType
-	if problemType == 0 {
-		newUnderTest.Problem_message = "The test is not clear"
-	} else if problemType == 1 {
-		newUnderTest.Problem_message = "Wrong question"
-	} else {
-		newUnderTest.Problem_message = problemMessage
-	}
 	has, _ := newUnderTest.IsDuplicate()
 	if !has {
 		err = newUnderTest.Save()
@@ -343,14 +335,6 @@ func (c *TestPaperApiController) Problem() {
 			return
 		}
 		test.Question_status = 3
-		test.Problem_type = problemType
-		if problemType == 0 {
-			test.Problem_message = "The test is not clear"
-		} else if problemType == 1 {
-			test.Problem_message = "Wrong question"
-		} else {
-			test.Problem_message = problemMessage
-		}
 		err = test.Update()
 		if err != nil {
 			resp := Response{"10005", "update testPaper fail", err}
@@ -521,77 +505,4 @@ func (c *TestPaperApiController) Review() {
 	}
 	resp := Response{"10000", "ok", response}
 	c.Data["json"] = resp
-}
-
-func (c *TestPaperApiController) ReviewPoint() {
-	defer c.ServeJSON()
-	var requestBody requests.TestPoint
-	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
-	if err != nil {
-		resp := Response{"10001", "cannot unmarshal", err}
-		c.Data["json"] = resp
-		return
-	}
-	log.Println(requestBody)
-	userId := requestBody.UserId
-	scoresstr := requestBody.Scores
-	testId := requestBody.TestId
-	testDetailIdstr := requestBody.TestDetailId
-	scores := strings.Split(scoresstr, "-")
-	testDetailIds := strings.Split(testDetailIdstr, "-")
-	var scoreArr []int64
-	var sum int64 = 0
-	for _, i := range scores {
-		j, err := strconv.ParseInt(i, 10, 64)
-		sum += j
-		if err != nil {
-			panic(err)
-		}
-		scoreArr = append(scoreArr, j)
-	}
-
-	var test models.TestPaper
-	err = test.GetTestPaper(testId)
-	if err != nil || test.Test_id == 0 {
-		resp := Response{"10002", "get test paper fail", err}
-		c.Data["json"] = resp
-		return
-	}
-	num := 0
-	if test.Examiner_first_id == userId {
-		num = 0
-		test.Examiner_first_score = sum
-	} else if test.Examiner_second_id == userId {
-		num = 1
-		test.Examiner_second_score = sum
-	} else {
-		num = 2
-		test.Examiner_third_score = sum
-	}
-	err = test.Update()
-	if err != nil || test.Test_id == 0 {
-		resp := Response{"10003", "update test paper fail", err}
-		c.Data["json"] = resp
-		return
-	}
-
-	for i := 0; i < len(testDetailIds); i++ {
-		var testInfo models.TestPaperInfo
-		testInfoId, _ := strconv.ParseInt(testDetailIds[i], 10, 64)
-		testInfo.GetTestPaperInfo(testInfoId)
-		if num == 0 {
-			testInfo.Examiner_first_score = scoreArr[i]
-		} else if num == 1 {
-			testInfo.Examiner_second_score = scoreArr[i]
-		} else {
-			testInfo.Examiner_third_score = scoreArr[i]
-		}
-		err = testInfo.Update()
-		if err != nil || test.Test_id == 0 {
-			resp := Response{"10004", "update testinfo paper fail", err}
-			c.Data["json"] = resp
-			return
-		}
-	}
-	c.Data["json"] = Response{"10000", "ok", nil}
 }
