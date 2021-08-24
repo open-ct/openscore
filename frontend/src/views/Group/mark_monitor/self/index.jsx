@@ -4,7 +4,7 @@ import { Modal, Dropdown, Button, message, Space, Tooltip, Select, Radio, Input,
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import './index.less'
 import group from "../../../../api/group";
-
+const { Option } = Select;
 export default class index extends Component {
 
 

@@ -53,6 +53,7 @@ const Marking = {
     testReviewPoint(data) {
         return  axios.post('/marking/score/test/review/point', data)
     },
+    
 }
 
 
