@@ -1,0 +1,338 @@
+Index: models/marking.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package models\r\n\r\nimport (\r\n\t\"log\"\r\n\t\"time\"\r\n\r\n\t\"xorm.io/builder\"\r\n)\r\n\r\n// Author: Junlang\r\n// struct : Topic(大题)\r\n// comment: must capitalize the first letter of the field in Topic\r\ntype Topic struct {\r\n\tQuestion_id    int64  `xorm:\"pk autoincr\"`\r\n\tQuestion_name  string `xorm:\"varchar(50)\"`\r\n\tSubject_name   string `xorm:\"varchar(50)\"`\r\n\tStandard_error int64\r\n\tQuestion_score int64\r\n\tScore_type     int64\r\n\tImport_number  int64\r\n\tImport_time    time.Time `xorm:updated`\r\n}\r\n\r\ntype SubTopic struct {\r\n\tQuestion_detail_id    int64 `xorm:\"pk autoincr\" `\r\n\tQuestion_detail_name  string\r\n\tQuestion_id           int64\r\n\tQuestion_detail_score int64\r\n}\r\n\r\ntype TestPaper struct {\r\n\tTest_id                    int64 `xorm:\"pk autoincr\"`\r\n\tQuestion_id                int64\r\n\tCandidate                  string\r\n\tQuestion_status            int64\r\n\tExaminer_first_id          int64 `xorm:\"default(0)\"`\r\n\tExaminer_first_score       int64\r\n\tExaminer_first_self_score  int64\r\n\tExaminer_second_id         int64 `xorm:\"default(0)\"`\r\n\tExaminer_second_score      int64\r\n\tExaminer_second_self_score int64\r\n\tExaminer_third_id          int64 `xorm:\"default(0)\"`\r\n\tExaminer_third_score       int64\r\n\tExaminer_third_self_score  int64\r\n\tLeader_id                  int64 `xorm:\"default(0)\"`\r\n\tLeader_score               int64\r\n\tFinal_score                int64\r\n\tFinal_score_id             int64\r\n\tPratice_error              int64\r\n\tAnswer_test_id             int64\r\n\tExample_test_id            int64\r\n}\r\n\r\ntype TestPaperInfo struct {\r\n\tTest_detail_id             int64 `xorm:\"pk autoincr\"`\r\n\tQuestion_detail_id         int64\r\n\tTest_id                    int64\r\n\tPic_src                    string\r\n\tExaminer_first_id          int64 `xorm:\"default(0)\"`\r\n\tExaminer_first_score       int64\r\n\tExaminer_first_self_score  int64\r\n\tExaminer_second_id         int64 `xorm:\"default(0)\"`\r\n\tExaminer_second_score      int64\r\n\tExaminer_second_self_score int64\r\n\tExaminer_third_id          int64 `xorm:\"default(0)\"`\r\n\tExaminer_third_score       int64\r\n\tExaminer_third_self_score  int64\r\n\tLeader_id                  int64 `xorm:\"default(0)\"`\r\n\tLeader_score               int64\r\n\tFinal_score                int64\r\n\tFinal_score_id             int64 `xorm:\"default(0)\"`\r\n}\r\n\r\ntype UnderCorrectedPaper struct {\r\n\tUnderCorrected_id  int64 `xorm:\"pk autoincr\"`\r\n\tUser_id            int64\r\n\tTest_id            int64\r\n\tQuestion_id        int64\r\n\tTest_question_type int64\r\n\tProblem_type       int64 `xorm:\"default(-1)\"`\r\n}\r\n\r\ntype ScoreRecord struct {\r\n\tRecord_id        int64 `xorm:\"pk autoincr\"`\r\n\tQuestion_id      int64\r\n\tTest_id          int64\r\n\tUser_id          int64\r\n\tScore_time       time.Time\r\n\tScore            int64\r\n\tTest_record_type int64\r\n\tProblem_type     int64 `xorm:\"default(-1)\"`\r\n}\r\n\r\ntype PaperDistribution struct {\r\n\tDistribution_id          int64 `xorm:\"pk autoincr\"`\r\n\tUser_id                  int64\r\n\tQuestion_id              int64\r\n\tTest_distribution_number int64\r\n\tPaperType                int64\r\n}\r\n\r\nfunc initMarkingModels() {\r\n\terr := x.Sync2(new(Topic), new(SubTopic), new(TestPaper), new(TestPaperInfo), new(ScoreRecord), new(UnderCorrectedPaper), new(PaperDistribution))\r\n\tif err != nil {\r\n\t\tlog.Println(err)\r\n\t}\r\n}\r\n\r\nfunc (t *Topic) GetTopic(id int64) error {\r\n\thas, err := x.Where(builder.Eq{\"question_id\": id}).Get(t)\r\n\tif !has || err != nil {\r\n\t\tlog.Println(\"could not find topic\")\r\n\t}\r\n\treturn err\r\n}\r\n\r\nfunc GetSubTopicsByQuestionId(id int64, st *[]SubTopic) error {\r\n\terr := x.Where(\"question_id = ?\", id).Find(st)\r\n\tif err != nil {\r\n\t\tlog.Println(\"could not find any SubTopic\")\r\n\t}\r\n\treturn err\r\n}\r\n\r\nfunc GetSubTopicsByTestId(id int64, st *[]SubTopic) error {\r\n\terr := x.Where(builder.Eq{\"question_id\": id}).Find(st)\r\n\tif err != nil {\r\n\t\tlog.Println(\"could not find any SubTopic\")\r\n\t\tlog.Println(err)\r\n\t}\r\n\treturn err\r\n}\r\n\r\nfunc GetDistributedPaperByUserId(id int64, up *[]UnderCorrectedPaper) error {\r\n\terr := x.Where(\"user_id = ?\", id).Find(up)\r\n\tif err != nil {\r\n\t\tlog.Println(\"could not find any paper\")\r\n\t}\r\n\treturn err\r\n}\r\n\r\nfunc GetTestInfoListByTestId(id int64, as *[]TestPaperInfo) error {\r\n\terr := x.Where(\"test_id = ?\", id).Find(as)\r\n\tif err != nil {\r\n\t\tlog.Println(\"could not find any paper\")\r\n\t}\r\n\treturn err\r\n}\r\n\r\nfunc (t *TestPaper) GetTestPaperByQuestionIdAndQuestionStatus(question_id int64, question_statue int64) error {\r\n\thas, err := x.Where(\"question_id = ? and question_status = ?\", question_id, question_statue).Get(t)\r\n\tif !has || err != nil {\r\n\t\tlog.Println(\"could not specific test\")\r\n\t}\r\n\treturn err\r\n}\r\n\r\nfunc GetTestPaperListByQuestionIdAndQuestionStatus(question_id int64, question_statue int64, tl *[]TestPaper) error {\r\n\terr := x.Where(\"question_id = ? and question_status = ?\", question_id, question_statue).Find(tl)\r\n\tif err != nil {\r\n\t\tlog.Println(\"could not specific test\")\r\n\t\tlog.Println(err)\r\n\t}\r\n\treturn err\r\n}\r\n\r\nfunc (t *TestPaperInfo) GetTestPaperInfoByTestIdAndQuestionDetailId(testId int64, questionDetailId int64) error {\r\n\thas, err := x.Where(\"question_detail_id = ? and test_id = ?\", questionDetailId, testId).Get(t)\r\n\tif !has || err != nil {\r\n\t\tlog.Println(\"could not specific info\")\r\n\t}\r\n\treturn err\r\n}\r\n\r\nfunc (st *SubTopic) GetSubTopic(id int64) error {\r\n\thas, err := x.Where(builder.Eq{\"question_detail_id\": id}).Get(st)\r\n\tif !has || err != nil {\r\n\t\tlog.Println(\"could not find SubTopic\")\r\n\t}\r\n\treturn err\r\n}\r\n\r\nfunc (t *TestPaper) GetTestPaper(id int64) error {\r\n\thas, err := x.Where(builder.Eq{\"test_id\": id}).Get(t)\r\n\tif !has || err != nil {\r\n\t\tlog.Println(\"could not find test paper\")\r\n\t}\r\n\treturn err\r\n}\r\n\r\nfunc (t *TestPaperInfo) GetTestPaperInfo(id int64) error {\r\n\thas, err := x.Where(builder.Eq{\"test_detail_id\": id}).Get(t)\r\n\tif !has || err != nil {\r\n\t\tlog.Println(\"could not find test paper info\")\r\n\t\tlog.Println(err)\r\n\t}\r\n\treturn err\r\n}\r\n\r\nfunc (u *UnderCorrectedPaper) GetUnderCorrectedPaper(userId int64, testId int64) error {\r\n\thas, err := x.Where(builder.Eq{\"test_id\": testId, \"user_id\": userId}).Get(u)\r\n\tif !has || err != nil {\r\n\t\tlog.Println(\"could not find under corrected paper\")\r\n\t\tlog.Println(err)\r\n\t}\r\n\treturn err\r\n}\r\n\r\nfunc (u *UnderCorrectedPaper) Delete() error {\r\n\tcode, err := x.Where(builder.Eq{\"test_id\": u.Test_id, \"user_id\": u.User_id}).Delete(u)\r\n\tif code == 0 || err != nil {\r\n\t\tlog.Println(\"delete fail\")\r\n\t}\r\n\treturn err\r\n}\r\n\r\nfunc (u *PaperDistribution) GetPaperDistribution(id int64) error {\r\n\thas, err := x.Where(builder.Eq{\"user_id\": id}).Get(u)\r\n\tif !has || err != nil {\r\n\t\tlog.Println(\"could not find paper distribution\")\r\n\t}\r\n\treturn err\r\n}\r\n\r\nfunc (s *ScoreRecord) GetTopic(id int64) error {\r\n\thas, err := x.Where(builder.Eq{\"Question_id\": id}).Get(s)\r\n\tif !has || err != nil {\r\n\t\tlog.Println(\"could not find user\")\r\n\t}\r\n\treturn err\r\n}\r\n\r\nfunc (t *TestPaperInfo) Update() error {\r\n\tcode, err := x.Where(builder.Eq{\"test_detail_id\": t.Test_detail_id}).Update(t)\r\n\tif code == 0 || err != nil {\r\n\t\tlog.Println(\"update test paper info fail\")\r\n\t\tlog.Println(err)\r\n\t}\r\n\treturn err\r\n}\r\n\r\nfunc (t *TestPaper) Update() error {\r\n\tcode, err := x.Where(builder.Eq{\"test_id\": t.Test_id}).Update(t)\r\n\tif code == 0 || err != nil {\r\n\t\tlog.Println(\"update test paper fail\")\r\n\t\tlog.Printf(\"%+v\", err)\r\n\t}\r\n\treturn err\r\n}\r\n\r\nfunc (r *ScoreRecord) Save() error {\r\n\tcode, err := x.Insert(r)\r\n\tif code == 0 || err != nil {\r\n\t\tlog.Println(\"insert record fail\")\r\n\t}\r\n\treturn err\r\n}\r\n\r\nfunc (u *UnderCorrectedPaper) Save() error {\r\n\tcode, err := x.Insert(u)\r\n\tif code == 0 || err != nil {\r\n\t\tlog.Println(\"insert paper fail\")\r\n\t\tlog.Println(err)\r\n\t}\r\n\treturn err\r\n}\r\n\r\nfunc (u *UnderCorrectedPaper) IsDuplicate() (bool, error) {\r\n\tvar temp UnderCorrectedPaper\r\n\thas, err := x.Where(builder.Eq{\"test_id\": u.Test_id, \"problem_type\": u.Problem_type}).Get(&temp)\r\n\tif !has || err != nil {\r\n\t\tlog.Println(err)\r\n\t}\r\n\treturn has, err\r\n}\r\n\r\nfunc GetLatestRecores(userId int64, records *[]ScoreRecord) error {\r\n\t// x.QueryString(\"select top 10 * from scoreRecord where user_id = \" + strconv.FormatInt(userId, 10) + \" order by record_id desc\")\r\n\terr := x.Limit(10).Where(builder.Eq{\"user_id\": userId}).Desc(\"record_id\").Find(records)\r\n\tif err != nil {\r\n\t\tlog.Println(\"could not find any paper\")\r\n\t}\r\n\r\n\treturn err\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/models/marking.go b/models/marking.go
+--- a/models/marking.go	
++++ b/models/marking.go	
+@@ -32,23 +32,23 @@
+ 	Test_id                    int64 `xorm:"pk autoincr"`
+ 	Question_id                int64
+ 	Candidate                  string
++	Correcting_status          int64
+ 	Question_status            int64
+-	Examiner_first_id          int64 `xorm:"default(0)"`
++	Examiner_first_id          int64
+ 	Examiner_first_score       int64
+ 	Examiner_first_self_score  int64
+-	Examiner_second_id         int64 `xorm:"default(0)"`
++	Examiner_second_id         int64
+ 	Examiner_second_score      int64
+ 	Examiner_second_self_score int64
+-	Examiner_third_id          int64 `xorm:"default(0)"`
++	Examiner_third_id          int64
+ 	Examiner_third_score       int64
+ 	Examiner_third_self_score  int64
+-	Leader_id                  int64 `xorm:"default(0)"`
++	Leader_id                  int64
+ 	Leader_score               int64
+ 	Final_score                int64
+ 	Final_score_id             int64
++
+ 	Pratice_error              int64
+-	Answer_test_id             int64
+-	Example_test_id            int64
+ }
+ 
+ type TestPaperInfo struct {
+@@ -56,19 +56,19 @@
+ 	Question_detail_id         int64
+ 	Test_id                    int64
+ 	Pic_src                    string
+-	Examiner_first_id          int64 `xorm:"default(0)"`
++	Examiner_first_id          int64
+ 	Examiner_first_score       int64
+ 	Examiner_first_self_score  int64
+-	Examiner_second_id         int64 `xorm:"default(0)"`
++	Examiner_second_id         int64
+ 	Examiner_second_score      int64
+ 	Examiner_second_self_score int64
+-	Examiner_third_id          int64 `xorm:"default(0)"`
++	Examiner_third_id          int64
+ 	Examiner_third_score       int64
+ 	Examiner_third_self_score  int64
+-	Leader_id                  int64 `xorm:"default(0)"`
++	Leader_id                  int64
+ 	Leader_score               int64
+ 	Final_score                int64
+-	Final_score_id             int64 `xorm:"default(0)"`
++	Final_score_id             int64
+ }
+ 
+ type UnderCorrectedPaper struct {
+@@ -77,18 +77,22 @@
+ 	Test_id            int64
+ 	Question_id        int64
+ 	Test_question_type int64
+-	Problem_type       int64 `xorm:"default(-1)"`
++
++	Problem_type       int64
+ }
+ 
+ type ScoreRecord struct {
+ 	Record_id        int64 `xorm:"pk autoincr"`
+ 	Question_id      int64
++
++
+ 	Test_id          int64
+ 	User_id          int64
+ 	Score_time       time.Time
+ 	Score            int64
+ 	Test_record_type int64
+-	Problem_type     int64 `xorm:"default(-1)"`
++	Problem_finish   int64
++	Problem_type     int64
+ }
+ 
+ type PaperDistribution struct {
+@@ -106,6 +110,15 @@
+ 	}
+ }
+ 
++func GetTopicList(ts *[]Topic)  {
++	   err :=x.Find(ts)
++	if err!=nil {
++		log.Println(err)
++	}
++
++}
++
++
+ func (t *Topic) GetTopic(id int64) error {
+ 	has, err := x.Where(builder.Eq{"question_id": id}).Get(t)
+ 	if !has || err != nil {
+@@ -205,6 +218,14 @@
+ 	}
+ 	return err
+ }
++func (u *UnderCorrectedPaper) GetUnderCorrectedPaperByUserIdAndTestId(id int64,testId int64) error {
++	has, err := x.Where(builder.Eq{"user_id": id}).Where(builder.Eq{"test_id":testId}).Get(u)
++	if !has || err != nil {
++		log.Println("could not find under corrected paper")
++		log.Println(err)
++	}
++	return err
++}
+ 
+ func (u *UnderCorrectedPaper) Delete() error {
+ 	code, err := x.Where(builder.Eq{"test_id": u.Test_id, "user_id": u.User_id}).Delete(u)
+@@ -213,6 +234,13 @@
+ 	}
+ 	return err
+ }
++func (u *UnderCorrectedPaper) DeleteByUserIdAndTestId() error {
++	code, err := x.Where(builder.Eq{"test_id": u.Test_id}).Where(builder.Eq{"user_id": u.User_id}).Delete(u)
++	if code == 0 || err != nil {
++		log.Println("delete fail")
++	}
++	return err
++}
+ 
+ func (u *PaperDistribution) GetPaperDistribution(id int64) error {
+ 	has, err := x.Where(builder.Eq{"user_id": id}).Get(u)
+@@ -221,6 +249,13 @@
+ 	}
+ 	return err
+ }
++func  GetPaperDistributionByQuestionId(paperDistribution *[]PaperDistribution ,id int64) error {
++	  err:= x.Where("question_id = ?",id).Find(paperDistribution)
++	if  err != nil {
++		log.Println("could not find paper distribution")
++	}
++	return err
++}
+ 
+ func (s *ScoreRecord) GetTopic(id int64) error {
+ 	has, err := x.Where(builder.Eq{"Question_id": id}).Get(s)
+@@ -228,8 +263,173 @@
+ 		log.Println("could not find user")
+ 	}
+ 	return err
++
++}
++
++func CountFinishTestNumberByUserId(userId int64)(count int64)  {
++	var scoreRecord  ScoreRecord
++    count,err:= x.Where("user_id=?",userId).Where("test_record_type!=?",0).Where("Stest_record_type!=?",5).Count(scoreRecord)
++	if err != nil {
++		log.Println("CountFinishTestNumberByUserId error")
++	}
++    return count
++}
++func CountFailTestNumberByUserId(userId int64 ) (count int64)  {
++	var scoreRecord  ScoreRecord
++	count,err:= x.Where("user_id=?",userId).Where("test_record_type=？",5).Count(scoreRecord)
++	if err != nil {
++		log.Println("CountFailTestNumberByUserId error")
++	}
++	return count
++}
++func CountRemainingTestNumberByUserId(userId int64 )(count int64)  {
++	var underCorrectedPaper  UnderCorrectedPaper
++	count,err:= x.Where("user_id=?",userId).Count(underCorrectedPaper)
++	if err != nil {
++		log.Println("CountRemainingTestNumberByUserId error")
++	}
++	return count
++}
++
++func SumFinishScore(userId int64)(sum float64)  {
++	var scoreRecord  ScoreRecord
++	res, err := x.Where("user_id=?", userId).Where("test_record_type!=?",0).Where("Stest_record_type!=?",5).Sum(scoreRecord, "Score")
++	if err != nil {
++		log.Println("SumFinishScore error")
++	}
++	return res
++}
++
++func CountSelfScore(userId int64)(count int64)  {
++	var scoreRecord  ScoreRecord
++	count,err:= x.Where("user_id=?",userId).Where("test_record_type=?",0).Count(scoreRecord)
++	if err != nil {
++		log.Println("CountSelfScore error")
++	}
++	return count
++
++}
++
++func FindFinshScoreRecordListByQuestionId(scoreRecordList *[]ScoreRecord ,questionId int64) {
++	err := x.Where("question_id=?",questionId).Where("test_record_type!=?",0).Where("test_record_type!=?",5).Find(scoreRecordList)
++	if err != nil {
++		log.Println("FindAllScoreRecordList error")
++	}
++
++}
++
++func CountFinishTestNumberByQuestionId(questionId int64)(count int64)  {
++	var scoreRecord  ScoreRecord
++	count,err:= x.Where("question_id=?",questionId).Where("test_record_type!=?",0).Where("test_record_type!=?",5).Count(scoreRecord)
++	if err != nil {
++		log.Println("CountFinishTestNumberByUserId error")
++	}
++	return count
++}
++
++func CountTestByScore(scoreRecordList *[]ScoreRecord ,score int64) (count int64)  {
++
++	count,err:= x.Where("score=?",score).Count(scoreRecordList)
++	if err != nil {
++		log.Println("CountTestByScore error")
++	}
++	return count
++}
++func FindSelfScoreRecordByUserId(scoreRecordList *[]ScoreRecord ,userId int64)   {
++
++	err:= x.Where("user_id=?",userId).Where("test_record_type=?",0).Find(scoreRecordList)
++	if err != nil {
++		log.Println("FindSelfScoreRecordByUserId error")
++	}
++
++}
++func GetTestScoreRecordByTestIdAndUserId(testScoreRecord *ScoreRecord ,testId int64 ,userId int64)   {
++
++	_,err := x.Where("test_id=?", testId).Where("test_record_type!=1or2or3").Where("user_id=", userId).Get(testScoreRecord)
++	if err != nil {
++		log.Println("GetTestScoreRecordByTestIdAndUserId error")
++	}
++
++}
++
++func FindProblemUnderCorrectedPaperByQuestionId( ProblemUnderCorrectedPaperList *[]UnderCorrectedPaper , questionId int64)  {
++	err:= x.Where("question_id=?", questionId).Where("test_record_type=?",6).Find(ProblemUnderCorrectedPaperList)
++	if err!=nil {
++             log.Println("FindProblemScoreRecordByQuestionId error")
++	}
++}
++
++func FindArbitramentUnderCorrectedPaperByQuestionId( arbitramentUnderCorrectedPaper *[]UnderCorrectedPaper , questionId int64)  {
++	err:= x.Where("question_id=?", questionId).Where("test_record_type=?",4).Find(arbitramentUnderCorrectedPaper)
++	if err!=nil {
++             log.Println("FindArbitramentUnderCorrectedPaperByQuestionId error")
++	}
++}
++func CountFinishScoreNumberByQuestionId(questionId int64 ) (count int64) {
++	t := new(TestPaper)
++	count,err := x.Where("question_id=?", questionId).Where("final_score!=null").Count(t)
++	if err!=nil{
++		log.Println("CountFinishScoreNumberByQuestionId error")
++	}
++	return count
++}
++func CountFirstScoreNumberByQuestionId(questionId int64 ) (count int64) {
++	t := new(TestPaper)
++	count,err := x.Where("question_id=?", questionId).Where("examiner_first_score!=null").Count(t)
++	if err!=nil{
++		log.Println("CountFirstScoreNumberByQuestionId error")
++	}
++	return count
++}
++func CountSecondScoreNumberByQuestionId(questionId int64 ) (count int64) {
++	t := new(TestPaper)
++	count,err := x.Where("question_id=?", questionId).Where("examiner_second_score!=null").Count(t)
++	if err!=nil{
++		log.Println("CountSecondScoreNumberByQuestionId error")
++	}
++	return count
+ }
+ 
++func CountThirdScoreNumberByQuestionId(questionId int64 ) (count int64) {
++	t := new(TestPaper)
++	count,err := x.Where("question_id=?", questionId).Where("examiner_third_score!=null").Count(t)
++	if err!=nil{
++		log.Println("CountThirdScoreNumberByQuestionId error")
++	}
++	return count
++}
++func CountArbitramentNumberByQuestionId(questionId int64 ) (count int64) {
++	t := new(TestPaper)
++	count,err := x.Where("question_id=?", questionId).Where("question_status=2").Count(t)
++	if err!=nil{
++		log.Println("CountArbitramentNumberByQuestionId error")
++	}
++	return count
++}
++func CountArbitramentFinishNumberByQuestionId(questionId int64 ) (count int64) {
++	t := new(TestPaper)
++	count,err := x.Where("question_id=?", questionId).Where("question_status=2").Where("final_score!=null").Count(t)
++	if err!=nil{
++		log.Println("CountArbitramentFinishNumberByQuestionId error")
++	}
++	return count
++}
++func CountProblemNumberByQuestionId(questionId int64 ) (count int64) {
++	t := new(TestPaper)
++	count,err := x.Where("question_id=?", questionId).Where("question_status=3").Count(t)
++	if err!=nil{
++		log.Println("CountProblemNumberByQuestionId error")
++	}
++	return count
++}
++func CountProblemFinishNumberByQuestionId(questionId int64 ) (count int64) {
++	t := new(TestPaper)
++	count,err := x.Where("question_id=?", questionId).Where("question_status=3").Where("final_score!=null").Count(t)
++	if err!=nil{
++		log.Println("CountProblemFinishNumberByQuestionId error")
++	}
++	return count
++}
+ func (t *TestPaperInfo) Update() error {
+ 	code, err := x.Where(builder.Eq{"test_detail_id": t.Test_detail_id}).Update(t)
+ 	if code == 0 || err != nil {
+Index: lastupdate.tmp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>{\"C:\\\\Users\\\\dav1d\\\\code\\\\OpenCt\\\\openscore\\\\controllers\":1628686352928000000}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lastupdate.tmp b/lastupdate.tmp
+--- a/lastupdate.tmp	
++++ b/lastupdate.tmp	
+@@ -1,1 +1,1 @@
+-{"C:\\Users\\dav1d\\code\\OpenCt\\openscore\\controllers":1628686352928000000}
+\ No newline at end of file
++{"C:\\Users\\chen\\go\\src\\openscore\\controllers":1628760095055175000}
+\ No newline at end of file
