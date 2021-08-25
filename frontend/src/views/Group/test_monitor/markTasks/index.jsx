@@ -8,7 +8,8 @@ import group from "../../../../api/group";
 export default class index extends Component {
 
     state = {
-        type: ''
+        type: '',
+        paperButton: 1
     }
     componentDidMount() {
         if (this.props.match.params.type === "1") {
@@ -69,10 +70,10 @@ export default class index extends Component {
                             {this.state.type}数：30
                         </div>
                         <div className="buttonList">
-                            <Button type="primary" style={{ width: 60 }}>评卷</Button>
-                            <Button type="primary" style={{ width: 60 }}>答案</Button>
-                            <Button type="primary" style={{ width: 60 }}>样卷</Button>
-                            <Button type="primary" style={{ width: 32 }}>…</Button>
+                            <Button type="primary" style={{ width: 60 }} onClick={()=>{this.paperDisplay(1)}}>评卷</Button>
+                            <Button type="default" style={{ width: 60 }} onClick={()=>{this.paperDisplay(2)}}>答案</Button>
+                            <Button type="default" style={{ width: 60 }} onClick={()=>{this.paperDisplay(3)}}>样卷</Button>
+                            <Button type="default" style={{ width: 32 }} onClick={()=>{this.paperDisplay(4)}}>…</Button>
                         </div>
                     </div>
                     <div className="paperPage">
