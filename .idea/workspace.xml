@@ -1,29 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="90d49d24-cd7e-4f14-b075-c6e5fe5ae2ce" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/openscore.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/controllers/Administrator.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/controllers/supervisor.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/requests/supervisor.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/responses/supervisor.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/conf/mysql.conf" beforeDir="false" afterPath="$PROJECT_DIR$/conf/mysql.conf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controllers/base.go" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/base.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lastupdate.tmp" beforeDir="false" afterPath="$PROJECT_DIR$/lastupdate.tmp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/paperDistribution.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/paperDistribution.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/scoreRecord.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/scoreRecord.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/testPaper.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/testPaper.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/topic.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/topic.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/underCorrectedPaper.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/underCorrectedPaper.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/user.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routers/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/routers/router.go" afterDir="false" />
-    </list>
+    <list default="true" id="90d49d24-cd7e-4f14-b075-c6e5fe5ae2ce" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -66,12 +44,12 @@
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/controllers/score.go" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/controllers/supervisor.go" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/controllers/base.go" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/responses/test.go" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/controllers/default.go" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/controllers/Administrator.go" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/responses/test.go" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/requests/supervisor.go" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/controllers/supervisor.go" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/controllers/base.go" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MavenImportPreferences">
     <option name="generalSettings">
@@ -96,7 +74,7 @@
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
-    <property name="last_opened_file_path" value="$USER_HOME$/Desktop/open-ct" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
