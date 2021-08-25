@@ -35,6 +35,29 @@ const group = {
     return axios.post('/marking/supervisor/self/score', data)
   },
 
+  averageMonitor(data) {
+    return axios.post('/marking/supervisor/average/score', data)
+  },
+
+  standardMonitor(data) {
+    return axios.post('/marking/supervisor/score/deviation ', data)
+  },
+  
+  allMonitor(data) {
+    return axios.post('/marking/supervisor/score/progress ', data)
+  },
+
+  arbitramentList(data) {
+    return axios.post('/marking/supervisor/arbitrament/list ', data)
+  },
+
+  problemList(data) {
+    return axios.post('/marking/supervisor/problem/list ', data)
+  },
+
+  MonitorPoint(data) {
+    return axios.post('/marking/supervisor/point', data)
+  },
 
 
 }

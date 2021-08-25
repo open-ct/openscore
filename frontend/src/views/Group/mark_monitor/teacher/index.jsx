@@ -14,19 +14,7 @@ export default class index extends Component {
         questionList: [],
         tableData: []
     }
-
-    // "UserId": "1",
-    // "UserName": "阅卷员1",
-    // "TestDistributionNumber": 40,
-    // "TestSuccessNumber": 42,
-    // "TestRemainingNumber": 0,
-    // "TestProblemNumber": 9,
-    // "MarkingSpeed": 0,
-    // "AverageScore": 8.976190476190476,
-    // "Validity": 0.5,
-    // "StandardDeviation": 0,
-    // "EvaluationIndex": 0,
-    // "OnlineTime": 0
+    
     columns = [
         {
             title: '老师',
