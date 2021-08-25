@@ -95,9 +95,17 @@ func GetUnderCorrectedPaperByUserIdAndTestId(underCorrectedPaper * UnderCorrecte
 
 func FindArbitramentUnderCorrectedPaperByQuestionId(arbitramentUnderCorrectedPaper *[] UnderCorrectedPaper,questionId int64)error{
 
-	err := x.Where("question_id=?", questionId).Where(" test_score_type =?", 4).Find(arbitramentUnderCorrectedPaper)
+	err := x.Where("question_id=?", questionId).Where(" test_question_type =?", 4).Find(arbitramentUnderCorrectedPaper)
 	if err!=nil {
 		log.Println("FindArbitramentUnderCorrectedPaperByQuestionId err ")
+	}
+   return err
+}
+func FindAllArbitramentUnderCorrectedPaper(arbitramentUnderCorrectedPaper *[] UnderCorrectedPaper)error{
+
+	err := x.Where(" test_question_type =?", 4).Find(arbitramentUnderCorrectedPaper)
+	if err!=nil {
+		log.Println("FindAllArbitramentUnderCorrectedPaper err ")
 	}
    return err
 }
@@ -107,6 +115,14 @@ func FindProblemUnderCorrectedPaperByQuestionId(problemUnderCorrectedPaper *[] U
 	err := x.Where("question_id=?", questionId).Where(" test_question_type =?", 6).Find(problemUnderCorrectedPaper)
 	if err!=nil {
 		log.Println("FindProblemUnderCorrectedPaperByQuestionId err ")
+	}
+ return err
+}
+func FindProblemUnderCorrectedList(problemUnderCorrectedPaper *[] UnderCorrectedPaper) error{
+
+	err := x.Where(" test_question_type =?", 6).Find(problemUnderCorrectedPaper)
+	if err!=nil {
+		log.Println("FindProblemUnderCorrectedList err ")
 	}
  return err
 }

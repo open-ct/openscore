@@ -45,3 +45,9 @@ type SupervisorPoint struct {
 type ScoreProgress struct {
 	SupervisorId string   `joson:"supervisorId"`
 }
+type ArbitramentUnmarkList struct {
+	SupervisorId string   `joson:"supervisorId"`
+}
+type ProblemUnmarkList struct {
+	SupervisorId string   `joson:"supervisorId"`
+}

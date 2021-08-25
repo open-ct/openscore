@@ -55,6 +55,9 @@ type ProblemUnderCorrectedPaperVO struct {
 	ProblemType  int64
 	ProblemMes string
 }
+type ProblemUnmarkListVO struct {
+	TestId int64
+}
 
 type  ArbitramentTestVO struct {
 	TestId int64
@@ -64,9 +67,16 @@ type  ArbitramentTestVO struct {
 	ExaminerSecondId string
 	ExaminerSecondName string
 	ExaminerSecondScore int64
+	ExaminerThirdId string
+	ExaminerThirdName string
+	ExaminerThirdScore int64
 	PracticeError int64
 	StandardError int64
 
+}
+
+type  ArbitramentUnmarkListVO struct {
+	TestId int64
 }
 
 type ScoreProgressVO struct {
@@ -80,25 +90,25 @@ type ScoreProgressVO struct {
 	FinishRate float64
 	UnfinishedNumber float64
 	UnfinishedRate float64
-	IsAllFinished int64
+	IsAllFinished string
 	//AverageSpeed float64
 	FirstFinishedNumber int64
 	FirstFinishedRate float64
 	FirstUnfinishedNumber float64
 	FirstUnfinishedRate float64
-	IsFirstFinished int64
+	IsFirstFinished string
 
 	SecondFinishedNumber int64
 	SecondFinishedRate float64
 	SecondUnfinishedNumber float64
 	SecondUnfinishedRate float64
-	IsSecondFinished int64
+	IsSecondFinished string
 
 	ThirdFinishedNumber int64
 	ThirdFinishedRate float64
 	ThirdUnfinishedNumber float64
 	ThirdUnfinishedRate float64
-	IsThirdFinished int64
+	IsThirdFinished string
 
 	ArbitramentNumber int64
 	ArbitramentRate float64
@@ -106,7 +116,7 @@ type ScoreProgressVO struct {
 	ArbitramentFinishedRate float64
 	ArbitramentUnfinishedNumber int64
 	ArbitramentUnfinishedRate float64
-	IsArbitramentFinished int64
+	IsArbitramentFinished string
 
 
 	ProblemNumber int64
@@ -115,6 +125,6 @@ type ScoreProgressVO struct {
 	ProblemFinishedRate float64
 	ProblemUnfinishedNumber int64
 	ProblemUnfinishedRate float64
-	IsProblemFinished int64
+	IsProblemFinished string
 }
 

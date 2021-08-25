@@ -580,7 +580,7 @@ func (c *SupervisorApiController) ArbitramentTest() {
 		return
 	}
 	//输出标准
-	arbitramentTestVOList := make([]responses.ArbitramentTestVO,0)
+	arbitramentTestVOList := make([]responses.ArbitramentTestVO,len(arbitramentUnderCorrectedPaper))
 
 	var count = len(arbitramentUnderCorrectedPaper)
 	//求阅卷老师名和转化输出
@@ -610,6 +610,7 @@ func (c *SupervisorApiController) ArbitramentTest() {
         //存试卷第一次评分人姓名和分数
 		arbitramentTestVOList[i].ExaminerFirstName=examinerFirstName
 		arbitramentTestVOList[i].ExaminerFirstScore=testPaper.Examiner_first_score
+
 		//查存试卷第二次评分人id
 		var examinerSecondId = testPaper.Examiner_second_id
 		arbitramentTestVOList[i].ExaminerSecondId=examinerSecondId
@@ -623,9 +624,26 @@ func (c *SupervisorApiController) ArbitramentTest() {
 		}
 		//查第二次评分人姓名
 		secondExaminerName :=secondExaminer.User_name
-		//存第一次评分人姓名和分数
+		//存第二次评分人姓名和分数
 		arbitramentTestVOList[i].ExaminerSecondName=secondExaminerName
 		arbitramentTestVOList[i].ExaminerSecondScore=testPaper.Examiner_second_score
+
+		//查存试卷第三次评分人id
+		var examinerThirdId = testPaper.Examiner_third_id
+		arbitramentTestVOList[i].ExaminerThirdId=examinerThirdId
+		//查第二次试卷评分人
+		thirdExaminer:=models.User{User_id: examinerThirdId}
+		err = thirdExaminer.GetUser(examinerThirdId)
+		if err!=nil {
+			resp = Response{"20001","could not found user",err}
+			c.Data["json"] = resp
+			return
+		}
+		//查第三次评分人姓名
+		thirdExaminerName :=thirdExaminer.User_name
+		//存第三次评分人姓名和分数
+		arbitramentTestVOList[i].ExaminerThirdName=thirdExaminerName
+		arbitramentTestVOList[i].ExaminerThirdScore=testPaper.Examiner_third_score
 		//查存实际误差
 		arbitramentTestVOList[i].PracticeError=testPaper.Pratice_error
 		//查存标准误差
@@ -719,11 +737,11 @@ func (c *SupervisorApiController) ScoreProgress() {
 		}
 		scoreProgressVOList[i].UnfinishedRate = unfinishedRate
 		//是否全部完成
-		var isAllFinished int64
+		var isAllFinished string
 		if unfinishedNumberFloat != 0 {
-			isAllFinished = 0
+			isAllFinished = "未完成"
 		} else {
-			isAllFinished = 1
+			isAllFinished = "完成"
 		}
 		scoreProgressVOList[i].IsAllFinished = isAllFinished
 		//--------------------------------------------------
@@ -753,11 +771,11 @@ func (c *SupervisorApiController) ScoreProgress() {
 		}
 		scoreProgressVOList[i].FirstUnfinishedRate = firstUnfinishedRate
 		//第一次阅卷是否全部完成
-		var isFirstFinished int64
+		var isFirstFinished string
 		if firstUnfinishedNumber != 0 {
-			isAllFinished = 0
+			isAllFinished = "未完成"
 		} else {
-			isAllFinished = 1
+			isAllFinished = "完成"
 		}
 		scoreProgressVOList[i].IsFirstFinished = isFirstFinished
 
@@ -790,11 +808,11 @@ func (c *SupervisorApiController) ScoreProgress() {
 		}
 		scoreProgressVOList[i].SecondUnfinishedRate = secondUnfinishedRate
 		//第二次阅卷是否全部完成
-		var isSecondFinished int64
+		var isSecondFinished string
 		if secondUnfinishedNumber != 0 {
-			isSecondFinished = 0
+			isSecondFinished = "未完成"
 		} else {
-			isSecondFinished = 1
+			isSecondFinished = "完成"
 		}
 		scoreProgressVOList[i].IsSecondFinished = isSecondFinished
 
@@ -827,11 +845,11 @@ func (c *SupervisorApiController) ScoreProgress() {
 		}
 		scoreProgressVOList[i].ThirdUnfinishedRate = thirdUnfinishedRate
 		//第三次阅卷是否全部完成
-		var isThirdFinished int64
+		var isThirdFinished string
 		if thirdUnfinishedNumber != 0 {
-			isThirdFinished = 0
+			isThirdFinished = "未完成"
 		} else {
-			isThirdFinished = 1
+			isThirdFinished = "完成"
 		}
 		scoreProgressVOList[i].IsThirdFinished = isThirdFinished
 
@@ -884,11 +902,11 @@ func (c *SupervisorApiController) ScoreProgress() {
 		}
 		scoreProgressVOList[i].ArbitramentUnfinishedRate = arbitramentUnfinishedRate
 		//仲裁卷是否全部完成
-		var ArbitramentFinished int64
+		var ArbitramentFinished string
 		if arbitramentUnfinishedNumber != 0 {
-			ArbitramentFinished = 0
+			ArbitramentFinished = "未完成"
 		} else {
-			ArbitramentFinished = 1
+			ArbitramentFinished = "完成"
 		}
 		scoreProgressVOList[i].IsArbitramentFinished = ArbitramentFinished
 
@@ -945,11 +963,11 @@ func (c *SupervisorApiController) ScoreProgress() {
 		}
 		scoreProgressVOList[i].ProblemUnfinishedRate = problemUnfinishedRate
 		//问题卷是否全部完成
-		var IsProblemFinished int64
+		var IsProblemFinished string
 		if problemUnfinishedNumber != 0 {
-			IsProblemFinished = 0
+			IsProblemFinished = "未完成"
 		} else {
-			IsProblemFinished = 1
+			IsProblemFinished = "完成"
 		}
 		scoreProgressVOList[i].IsProblemFinished = IsProblemFinished
 	}
@@ -1047,6 +1065,7 @@ func (c *SupervisorApiController) SupervisorPoint() {
 	record.User_id = supervisorId
 	record.Question_id=underTest.Question_id
 	record.Problem_type=underTest.Problem_type
+	record.Test_finish=1
 
 	err = record.Save()
 	if err!=nil {
@@ -1064,5 +1083,101 @@ func (c *SupervisorApiController) SupervisorPoint() {
 	resp = Response{"10000", "OK", nil}
 	c.Data["json"] = resp
 }
+/**
+20.问题卷列表
+ */
+func (c *SupervisorApiController) ProblemUnmarkList() {
+	defer c.ServeJSON()
+	var requestBody requests.ProblemUnmarkList
+	var resp Response
+	var  err error
+
+	err=json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	if err!=nil {
+		resp = Response{"10001","cannot unmarshal",err}
+		c.Data["json"] = resp
+		return
+	}
+	//supervisorId := requestBody.SupervisorId
+
+	//------------------------------------------------
+
+
+	//根据大题号找到问题卷
+	problemUnderCorrectedPaper :=make([]models.UnderCorrectedPaper ,0)
+	models.FindProblemUnderCorrectedList(&problemUnderCorrectedPaper)
+	if err!=nil {
+		resp = Response{"20027","FindProblemUnderCorrectedList  fail",err}
+		c.Data["json"] = resp
+		return
+	}
+	//输出标准
+	ProblemUnmarkVOList := make([]responses.ProblemUnmarkListVO,len(problemUnderCorrectedPaper))
+
+	//求阅卷输出
+	for i:=0 ;i<len(problemUnderCorrectedPaper);i++ {
+		//存testId
+		ProblemUnmarkVOList[i].TestId=problemUnderCorrectedPaper[i].Test_id
+	}
+
+	//--------------------------------------------------
+
+	data := make(map[string]interface{})
+	data["ProblemUnmarkVOList"] =ProblemUnmarkVOList
+
+	resp = Response{"10000", "OK", data}
+	c.Data["json"] = resp
+
+}
+
+/**
+21.仲裁卷列表
+ */
+func (c *SupervisorApiController) ArbitramentUnmarkList() {
+	defer c.ServeJSON()
+	var requestBody requests.ArbitramentUnmarkList
+	var resp Response
+	var  err error
+
+	err=json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	if err!=nil {
+		resp = Response{"10001","cannot unmarshal",err}
+		c.Data["json"] = resp
+		return
+	}
+	//supervisorId := requestBody.SupervisorId
+
+	//------------------------------------------------
+
+	//找到仲裁卷
+	arbitramentUnderCorrectedPaper :=make([]models.UnderCorrectedPaper ,0)
+	err = models.FindAllArbitramentUnderCorrectedPaper(&arbitramentUnderCorrectedPaper)
+	if err!=nil {
+		resp = Response{"20026","FindAllArbitramentUnderCorrectedPaper  fail",err}
+		c.Data["json"] = resp
+		return
+	}
+	//输出标准
+	arbitramentUnmarkListVOList := make([]responses.ArbitramentUnmarkListVO,len(arbitramentUnderCorrectedPaper))
+
+
+	for i:=0 ;i<len(arbitramentUnderCorrectedPaper);i++ {
+		//存testId
+		var testId = arbitramentUnderCorrectedPaper[i].Test_id
+		arbitramentUnmarkListVOList[i].TestId=testId
+		}
+
+
+
+
+	//--------------------------------------------------
+
+    data := make(map[string]interface{})
+	data["arbitramentUnmarkListVOList"] =arbitramentUnmarkListVOList
+	resp = Response{"10000", "OK", data}
+	c.Data["json"] = resp
+
+}
+
 
 //16标准差
