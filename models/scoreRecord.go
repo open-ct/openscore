@@ -138,7 +138,7 @@ func FindFinishScoreRecordListByQuestionId (scoreRecordList *[]ScoreRecord , que
 
 func FindSelfScoreRecordByUserId(selfScoreRecord *[] ScoreRecord,examinerId string)error {
 
-	err := x.Where("user_id=?", examinerId).Where("test_score_type =?",0).Find(selfScoreRecord)
+	err := x.Where("user_id=?", examinerId).Where("test_record_type =?",0).Find(selfScoreRecord)
 	if err!=nil {
 		log.Println("FindSelfScoreRecordByUserId err ")
 	}
