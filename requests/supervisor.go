@@ -51,3 +51,7 @@ type ArbitramentUnmarkList struct {
 type ProblemUnmarkList struct {
 	SupervisorId string   `joson:"supervisorId"`
 }
+type ScoreDeviation struct {
+	SupervisorId string   `joson:"supervisorId"`
+	QuestionId int64  `joson:"questionId"`
+}
