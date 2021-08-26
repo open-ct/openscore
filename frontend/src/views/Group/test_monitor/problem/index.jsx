@@ -18,12 +18,12 @@ export default class index extends Component {
             dataIndex: 'TestId',
         },
         {
-            title: '阅卷人—账号',
+            title: '阅卷人一账号',
             width: 150,
             dataIndex: 'ExaminerId',
         },
         {
-            title: '阅卷人—名称',
+            title: '阅卷人一名称',
             width: 150,
             dataIndex: 'ExaminerName',
         },

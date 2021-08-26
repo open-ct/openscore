@@ -12,8 +12,18 @@ export default class index extends Component {
     state = {
         questionList: [],
         teacherList: [],
-        tableData: [],
-        QuestionId: undefined
+        tableData: [
+            { order: '上次评分' },
+            { order: '本次评分' }
+        ],
+        QuestionId: undefined,
+        columns: [
+            {
+                title: '序号',
+                width: 150,
+                dataIndex: 'order',
+            },
+        ]
     }
     componentDidMount() {
         this.questionList();
@@ -91,31 +101,40 @@ export default class index extends Component {
         })
         this.teacherList(this.state.questionList[index].QuestionId)
     }
+
+
     tableData = (examinerId) => {
         group.selfMonitor({ supervisorId: "2", examinerId })
             .then((res) => {
                 if (res.data.status == "10000") {
-                    let tableData = [];
-                    console.log(res.data)
-                    // for (let i = 0; i < res.data.data.teacherMonitoringList.length; i++) {
-                    //     let item = res.data.data.teacherMonitoringList[i]
-                    //     tableData.push({
-                    //         UserName: item.UserName,
-                    //         TestDistributionNumber: item.TestDistributionNumber,
-                    //         TestSuccessNumber: item.TestSuccessNumber,
-                    //         TestRemainingNumber: item.TestRemainingNumber,
-                    //         TestProblemNumber: item.TestProblemNumber,
-                    //         MarkingSpeed: item.MarkingSpeed,
-                    //         AverageScore: item.AverageScore,
-                    //         Validity: item.Validity,
-                    //         StandardDeviation: item.StandardDeviation,
-                    //         EvaluationIndex: item.EvaluationIndex,
-                    //         OnlineTime: item.OnlineTime = 0 ? "在线" : "离线"
-                    //     })
-                    // }
-                    // this.setState({
-                    //     tableData
-                    // })
+                    let tableData = [
+                        { order: '上次评分' },
+                        { order: '本次评分' }
+                    ]
+
+                    let columns = [
+                        {
+                            title: '序号（试卷编码）',
+                            width: 150,
+                            dataIndex: 'order',
+                        },
+                    ]
+                    for (let i = 0; i < res.data.data.selfScoreRecordVOList.length; i++) {
+                        let item = res.data.data.selfScoreRecordVOList[i]
+                        columns.push(
+                            {
+                                title: `${i + 1}(${item.TestId})`,
+                                width: 150,
+                                dataIndex: `id_${i}`,
+                            }
+                        )
+                        tableData[0]['id_' + i] = item.Score
+                        tableData[1]['id_' + i] = item.SelfScore
+                    }
+
+                    this.setState({
+                        tableData, columns
+                    })
                 }
             })
             .catch((e) => {
@@ -175,7 +194,8 @@ export default class index extends Component {
                     <div className="display-container">
                         <Table
                             pagination={{ position: ['bottomCenter'] }}
-
+                            columns={this.state.columns}
+                            dataSource={this.state.tableData}
                         />
                     </div>
                 </div>

@@ -59,6 +59,13 @@ const group = {
     return axios.post('/marking/supervisor/point', data)
   },
 
+  problemTestId(data) {
+    return axios.post('/marking/supervisor/problem/unmark/list', data)
+  },
+  
+  arbitrationTestId(data) {
+    return axios.post('/marking/supervisor/arbitrament/unmark/list', data)
+  },
 
 }
 export default group

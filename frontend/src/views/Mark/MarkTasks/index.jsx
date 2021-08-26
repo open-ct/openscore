@@ -17,7 +17,6 @@ export default class index extends Component {
     problemValue: 1,
     papers: [],
     currentPaper: {},
-    currentPaperNum: 0,
     testLength: 0,
     selectId: [],
     selectScore: [],

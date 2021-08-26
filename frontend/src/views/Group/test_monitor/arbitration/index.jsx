@@ -17,7 +17,7 @@ export default class index extends Component {
     state = {
         questionList: [],
         tableData: [],
-        arbitramentCount: undefined
+        count: undefined
     }
 
     questionList = () => {
@@ -35,21 +35,82 @@ export default class index extends Component {
                 console.log(e)
             })
     }
+    columns = [
+        {
+            title: '试卷号',
+            width: 150,
+            dataIndex: 'TestId',
+        },
+        {
+            title: '阅卷人一账号',
+            width: 150,
+            dataIndex: 'ExaminerFirstId',
+        },
+        {
+            title: '阅卷人一名称',
+            width: 150,
+            dataIndex: 'ExaminerFirstName',
+        },
+        {
+            title: '阅卷人一分数',
+            width: 150,
+            dataIndex: 'ExaminerFirstScore',
+        },
+        {
+            title: '阅卷人二账号',
+            width: 150,
+            dataIndex: 'ExaminerSecondId',
+        },
+        {
+            title: '阅卷人二名称',
+            width: 150,
+            dataIndex: 'ExaminerSecondName',
+        },
+        {
+            title: '阅卷人二分数',
+            width: 150,
+            dataIndex: 'ExaminerSecondScore',
+        },
+        {
+            title: '阅卷人三账号',
+            width: 150,
+            dataIndex: 'ExaminerThirdId',
+        },
+        {
+            title: '阅卷人三名称',
+            width: 150,
+            dataIndex: 'ExaminerThirdName',
+        },
+        {
+            title: '阅卷人三分数',
+            width: 150,
+            dataIndex: 'ExaminerThirdScore',
+        },
+        {
+            title: '标准误差',
+            width: 150,
+            dataIndex: 'StandardError',
+        },
+        {
+            title: '实际误差',
+            width: 150,
+            dataIndex: 'PracticeError',
+        },
+
+    ]
+
     tableData = (questionId) => {
         group.arbitramentList({ supervisorId: "2", questionId: questionId })
             .then((res) => {
                 if (res.data.status == "10000") {
                     let tableData = [];
-                    // for (let i = 0; i < res.data.data.scoreAverageVOList.length; i++) {
-                    //     let item = res.data.data.scoreAverageVOList[i]
-                    //     tableData.push({
-                    //         UserName: item.UserName,
-                    //         Average: item.Average,
-                    //     })
-                    // }
+                    for (let i = 0; i < res.data.data.arbitramentTestVOList.length; i++) {
+                        let item = res.data.data.arbitramentTestVOList[i]
+                        tableData.push(item)
+                    }
                     this.setState({
                         tableData,
-                        arbitramentCount: res.data.data.arbitramentCount
+                        count: res.data.data.count
                     })
                 }
             })
@@ -106,11 +167,10 @@ export default class index extends Component {
                                 {
                                     this.selectBox()
                                 }
-
                             </Select>
                         </div>
                         <div className="paper-num">
-                            待仲裁数：{this.state.arbitramentCount}
+                            待仲裁数：{this.state.count}
                         </div>
                         <div className="paper-mark" onClick={() => {this.paperMark()}}>
                             评阅所有仲裁卷
@@ -119,7 +179,8 @@ export default class index extends Component {
                     <div className="display-container">
                         <Table 
                             pagination={{ position: ['bottomCenter'] }}
-
+                            columns={this.columns}
+                            dataSource={this.state.tableData}
                         />
                     </div>
                 </div>
