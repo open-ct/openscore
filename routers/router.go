@@ -47,6 +47,7 @@ chen :阅卷组长端
 	beego.Router("/openct/marking/supervisor/point",&controllers.SupervisorApiController{},"post:SupervisorPoint")
 	beego.Router("/openct/marking/supervisor/arbitrament/unmark/list",&controllers.SupervisorApiController{},"post:ArbitramentUnmarkList")
 	beego.Router("/openct/marking/supervisor/problem/unmark/list",&controllers.SupervisorApiController{},"post:ProblemUnmarkList")
+	beego.Router("/opnect/marking/supervisor/score/deviation",&controllers.SupervisorApiController{},"post:ScoreDeviation")
 /**
  chen :管理员端
  */
