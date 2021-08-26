@@ -14,7 +14,7 @@ type TeacherMonitoringVO struct {
 	UserId string
 	UserName string
 	TestDistributionNumber int64
-	TestSuccessNumber int64
+	TestSuccessNumber float64
 	TestRemainingNumber int64
 	TestProblemNumber int64
 	MarkingSpeed  float64
@@ -128,3 +128,8 @@ type ScoreProgressVO struct {
 	IsProblemFinished string
 }
 
+type ScoreDeviationVO struct {
+	UserId string
+	UserName string
+	DeviationScore float64
+}

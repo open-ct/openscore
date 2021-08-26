@@ -87,6 +87,13 @@ func CountFinishScoreNumberByQuestionId(questionId int64)(count int64 ,err error
 	}
 	return count,err1
 }
+func FindFinishTestNumberByUserId(scoreRecord *[]ScoreRecord,userId string,questionId int64)( err error) {
+	err1 := x.Where("question_id = ?", questionId).Where("user_id=?",userId).Where("test_finish=1").Find(scoreRecord)
+	if err!=nil {
+		log.Println("FindFinishTestNumberByUserId err ")
+	}
+	return err1
+}
 
 func CountFirstScoreNumberByQuestionId(questionId int64)(count int64 ,err error) {
 	record :=new (ScoreRecord)

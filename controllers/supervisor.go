@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"math"
 	"openscore/models"
 	"openscore/requests"
 	"openscore/responses"
@@ -129,15 +130,17 @@ func (c *SupervisorApiController) TeacherMonitoring() {
 		//testDistributionNumberString:=strconv.FormatInt(testDistributionNumber,10)
 		//testDistributionNumberFloat,_:=strconv.ParseFloat(testDistributionNumberString,64)
 
-		finishCount ,err1:= models.CountFinishTestNumberByUserId(userId,questionId)
-		if err1!=nil {
-			resp = Response{"20022","CountFinishTestNumberByUserId  fail",err}
+		var finishScoreList []models.ScoreRecord
+		err = models.FindFinishTestNumberByUserId(&finishScoreList,userId, questionId)
+		if err!=nil {
+			resp = Response{"2027","FindFinishTestNumberByUserId fail",err}
 			c.Data["json"] = resp
 			return
 		}
-		teacherMonitoringList[i].TestSuccessNumber=finishCount
-		finishCountString:=strconv.FormatInt(finishCount,10)
-		finishCountFloat,_:=strconv.ParseFloat(finishCountString,64)
+		var finishCount =len(finishScoreList)
+
+		teacherMonitoringList[i].TestSuccessNumber=(float64(finishCount))
+
 
 		remainingTestNumber,err1 := models.CountRemainingTestNumberByUserId(questionId,userId)
 		if err1!=nil {
@@ -154,7 +157,7 @@ func (c *SupervisorApiController) TeacherMonitoring() {
 			return
 		}
 		teacherMonitoringList[i].TestProblemNumber=failCount
-		failCountString:=strconv.FormatInt(finishCount,10)
+		failCountString:=strconv.FormatInt(failCount,10)
 		failCountFloat,_:=strconv.ParseFloat(failCountString,64)
 
 
@@ -171,7 +174,7 @@ func (c *SupervisorApiController) TeacherMonitoring() {
 
 		var markingSpeed float64 =0
 		if onlineTime!=0 {
-			markingSpeed =finishCountFloat/onlineTime
+			markingSpeed =float64(finishCount)/onlineTime
 		}
 		teacherMonitoringList[i].MarkingSpeed=markingSpeed
 
@@ -183,13 +186,13 @@ func (c *SupervisorApiController) TeacherMonitoring() {
 				c.Data["json"] = resp
 				return
 			}
-			averageScore=sum/finishCountFloat
+			averageScore=sum/float64(finishCount)
 		}
 		teacherMonitoringList[i].AverageScore=averageScore
 
 		var validity  float64=0
-		if (finishCountFloat+failCountFloat)!=0 {
-			validity =finishCountFloat/(finishCountFloat+failCountFloat)
+		if (float64(finishCount)+failCountFloat)!=0 {
+			validity =float64(finishCount)/(float64(finishCount)+failCountFloat)
 		}
 		teacherMonitoringList[i].Validity=validity
 
@@ -204,12 +207,21 @@ func (c *SupervisorApiController) TeacherMonitoring() {
 
 		var selfScoreRate float64=0
 		if finishCount!=0 {
-			selfScoreRate= selfTestCountFloat/finishCountFloat
+			selfScoreRate= selfTestCountFloat/float64(finishCount)
 		}
 		teacherMonitoringList[i].EvaluationIndex=selfScoreRate
 
-		//标准差不会
-		teacherMonitoringList[i].StandardDeviation=0
+		//标准差
+		var add float64
+		for j:=0;j<finishCount;j++ {
+			scoreJ :=finishScoreList[j].Score
+			tempJ :=math.Abs((float64(scoreJ))-averageScore)
+			add = add+math.Exp2(tempJ)
+
+		}
+		sqrt := math.Sqrt(add)
+
+		teacherMonitoringList[i].StandardDeviation=sqrt
 
 	}
 
@@ -1181,3 +1193,88 @@ func (c *SupervisorApiController) ArbitramentUnmarkList() {
 
 
 //16标准差
+
+func (c *SupervisorApiController) ScoreDeviation() {
+	defer c.ServeJSON()
+	var requestBody requests.ScoreDeviation
+	var resp Response
+	var  err error
+
+	err=json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	if err!=nil {
+		resp = Response{"10001","cannot unmarshal",err}
+		c.Data["json"] = resp
+		return
+	}
+	//supervisorId := requestBody.SupervisorId
+	 questionId := requestBody.QuestionId
+
+	//------------------------------------------------
+
+	//根据大题求试卷分配表
+	paperDistributions :=make([]models.PaperDistribution ,0)
+	err = models.FindPaperDistributionByQuestionId(&paperDistributions, questionId)
+	if err!=nil {
+		resp = Response{"20007","FindPaperDistributionByQuestionId err",err}
+		c.Data["json"] = resp
+		return
+	}
+	//输出标准
+	ScoreDeviationVOList := make([]responses.ScoreDeviationVO,len(paperDistributions))
+
+	//求教师名和转化输出
+	for i:=0 ;i<len(paperDistributions);i++ {
+		//求userId 和userName
+		userId :=paperDistributions[i].User_id
+		user:=models.User{User_id: userId}
+		err := user.GetUser(userId)
+		if err!=nil {
+			resp = Response{"20001","could not found user",err}
+			c.Data["json"] = resp
+			return
+		}
+		userName :=user.User_name
+		ScoreDeviationVOList[i].UserId=userId
+		ScoreDeviationVOList[i].UserName=userName
+
+
+		var finishScoreList []models.ScoreRecord
+		 err = models.FindFinishTestNumberByUserId(&finishScoreList,userId, questionId)
+		if err!=nil {
+			resp = Response{"2027","FindFinishTestNumberByUserId fail",err}
+			c.Data["json"] = resp
+			return
+		}
+		var finishCount =len(finishScoreList)
+
+
+		var averageScore float64 =0
+		if finishCount!=0 {
+			sum, err := models.SumFinishScore(userId, questionId)
+			if err!=nil {
+				resp = Response{"20009","SumFinishScore fail",err}
+				c.Data["json"] = resp
+				return
+			}
+			averageScore=math.Abs(sum/(float64(finishCount)))
+		}
+		var add float64
+		for j:=0;j<finishCount;j++ {
+			scoreJ :=finishScoreList[j].Score
+			tempJ :=math.Abs((float64(scoreJ))-averageScore)
+			add = add+math.Exp2(tempJ)
+
+		}
+		sqrt := math.Sqrt(add)
+		ScoreDeviationVOList[i].DeviationScore=sqrt
+	}
+
+	//--------------------------------------------------
+
+	data := make(map[string]interface{})
+	data["ScoreDeviationVOList"] =ScoreDeviationVOList
+	resp = Response{"10000", "OK", data}
+	c.Data["json"] = resp
+
+}
+
