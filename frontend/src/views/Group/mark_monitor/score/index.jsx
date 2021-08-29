@@ -4,29 +4,58 @@ import { Modal, Dropdown, Button, message, Space, Tooltip, Select, Radio, Input,
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import './index.less'
 import group from "../../../../api/group";
+
+import echarts from 'echarts/lib/echarts'
+import ReactEcharts from 'echarts-for-react';
 const { Option } = Select;
 export default class index extends Component {
     supervisorId = '2'
     state = {
         questionList: [],
-        tableData: [],
-        columns : [
+        columns: [
             {
                 title: '分数',
                 width: 120,
                 dataIndex: 'Score',
             },
         ],
-        tableData:[
-            {Score: '教师'}
+        tableData: [
+            { Score: '教师' }
         ]
     }
 
     componentDidMount() {
         this.questionList();
-        
+
     }
 
+    getOption = ()=>{
+        let X_data=[]
+        let Y_data=[]
+        for (let i = 1; i < this.state.columns.length; i++) {
+            X_data.push(this.state.columns[i].title)
+        }
+        for (const key in this.state.tableData[0]) {
+            if (key != 'Score') {
+                Y_data.push(this.state.tableData[0][key])
+            }
+        }
+        let option = {
+            xAxis: {
+                name: '分数',
+                data: X_data
+            },
+            yAxis: {
+                name: '教师（%）'
+            },
+            series: [{
+                name: '分数',
+                type: 'bar',
+                data: Y_data
+            }]
+        };
+        return option;
+    };
     questionList = () => {
         group.questionList({ supervisorId: "2" })
             .then((res) => {
@@ -57,21 +86,21 @@ export default class index extends Component {
                         Score: '教师'
                     }];
 
- 
+
                     for (let i = 0; i < res.data.data.scoreDistributionList.length; i++) {
                         let item = res.data.data.scoreDistributionList[i]
-                        tableData[0]["score_"+item.Score] = item.Rate
+                        tableData[0]["score_" + item.Score] = item.Rate
                         columns.push(
                             {
                                 title: item.Score + 1,
                                 width: 180,
-                                dataIndex: "score_"+item.Score 
+                                dataIndex: "score_" + item.Score
                             }
                         )
                     }
-                    console.log(tableData,columns)
+                    console.log(tableData, columns)
                     this.setState({
-                        tableData,columns
+                        tableData, columns
                     })
                 }
             })
@@ -131,16 +160,18 @@ export default class index extends Component {
                     </div>
                     <div className="display-container">
                         <Table
-                            
+
                             pagination={{ position: ['bottomCenter'] }}
                             columns={this.state.columns}
                             dataSource={this.state.tableData}
                         />
                     </div>
+                    <ReactEcharts option={this.getOption()} style={{width:762,height:300}}/>
                 </div>
             </DocumentTitle>
         )
     }
+
 
 
 

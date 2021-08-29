@@ -3,8 +3,8 @@ import DocumentTitle from 'react-document-title'
 import { Table, Modal, Dropdown, Button, message, Space, Tooltip, Select, Radio, Input } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import './index.less'
-import Marking from "../../../api/marking";
 import * as Util from "../../../util/Util";
+import Marking from "../../../api/marking";
 const { Option } = Select;
 export default class index extends Component {
   userId = "1"

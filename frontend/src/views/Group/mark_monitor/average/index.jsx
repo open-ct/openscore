@@ -1,6 +1,6 @@
 import React, { Component, useState } from 'react'
 import DocumentTitle from 'react-document-title'
-import { Modal, Dropdown, Button, message, Space, Tooltip, Select, Radio, Input, Table } from 'antd';
+import { Modal, Dropdown, Button, message, Space, Tooltip, Select, Radio, Input, Table, Progress  } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import './index.less'
 import group from "../../../../api/group";
@@ -89,6 +89,18 @@ export default class index extends Component {
             dataIndex: 'Average',
         }
     ]
+    progressItem = () => {
+        let progressItem = []
+        if (this.state.tableData.length != 0) {
+            progressItem = this.state.tableData.map((item)=>{
+                return <div className="progress-item"><span>{item.UserName}&nbsp;&nbsp;</span><Progress percent={item.Average/this.state.fullScore*100} showInfo={false} />&nbsp;&nbsp;<span>{item.Average}</span></div> 
+            })
+        } else {
+            return null
+        }
+        return progressItem
+    }
+
     render() {
         return (
             <DocumentTitle title="阅卷系统-平均分监控">
@@ -120,12 +132,26 @@ export default class index extends Component {
                         </div>
                     </div>
                     <div className="display-container">
-                        <Table
-                            pagination={{ position: ['bottomCenter'] }}
-                            columns={this.columns}
-                            dataSource={this.state.tableData}
-                        />
+                        <div className="display-table">
+                            <Table
+                                pagination={{ position: ['bottomCenter'] }}
+                                columns={this.columns}
+                                dataSource={this.state.tableData}
+                            />
+                        </div>
+                        <div className="progress">
+                            <div className="progress-header">
+                                <span>教师</span><span>小题平均分</span>
+                            </div>
+                            {
+                                this.progressItem()
+                            }
+                            <div className="progress-footer">
+                                <span>满分：{this.state.fullScore}</span>
+                            </div>
+                        </div>
                     </div>
+
                 </div>
             </DocumentTitle>
         )

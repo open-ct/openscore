@@ -4,6 +4,9 @@ import { Modal, Dropdown, Button, message, Space, Tooltip, Select, Radio, Input,
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import './index.less'
 import group from "../../../../api/group";
+import { Link } from 'react-router-dom'
+import echarts from 'echarts/lib/echarts'
+import ReactEcharts from 'echarts-for-react';
 const { Option } = Select;
 export default class index extends Component {
 
@@ -12,22 +15,72 @@ export default class index extends Component {
     state = {
         questionList: [],
         teacherList: [],
-        tableData: [
-            { order: '上次评分' },
-            { order: '本次评分' }
-        ],
+        tableData: [],
         QuestionId: undefined,
-        columns: [
-            {
-                title: '序号',
-                width: 150,
-                dataIndex: 'order',
-            },
-        ]
+        selfScoreRecordVOList:[]
     }
+    columns = [
+        {
+            title: '序号（试卷编码）',
+            width: 150,
+            dataIndex: 'order',
+        },
+        {
+            title: '上次评分',
+            width: 150,
+            dataIndex: 'last',
+        },
+        {
+            title: '本次评分',
+            width: 150,
+            dataIndex: 'current',
+        },
+        {
+            title: '操作',
+            width: 150,
+            dataIndex: 'operation',
+            render: (text, record, index) => <Link to={'/home/group/marking/'+ this.state.selfScoreRecordVOList[index].TestId}>自评</Link>
+        },
+
+    ]
     componentDidMount() {
         this.questionList();
     }
+    getOption = ()=>{ 
+        console.log(this.state.tableData,this.state.columns)
+        let X_data=[]
+        let Y1_data=[]
+        let Y2_data=[]
+        for (let i = 0; i < this.state.tableData.length; i++) {
+            X_data.push(this.state.tableData[i].order)
+        }
+        for (let i = 0; i < this.state.tableData.length; i++) {
+            Y1_data.push(this.state.tableData[i].last)
+        }
+        for (let i = 0; i < this.state.tableData.length; i++) {
+            Y2_data.push(this.state.tableData[i].current)
+        }
+        let option = {
+            xAxis: {
+                name: '序号',
+                data: X_data
+            },
+            yAxis: {
+                name: '分数'
+            },
+            series: [{
+                name: '分数',
+                type: 'bar',
+                data: Y1_data
+            },
+            {
+                name: '分数',
+                type: 'bar',
+                data: Y2_data
+            }]
+        };
+        return option;
+    };
     questionList = () => {
         group.questionList({ supervisorId: "2" })
             .then((res) => {
@@ -107,33 +160,18 @@ export default class index extends Component {
         group.selfMonitor({ supervisorId: "2", examinerId })
             .then((res) => {
                 if (res.data.status == "10000") {
-                    let tableData = [
-                        { order: '上次评分' },
-                        { order: '本次评分' }
-                    ]
-
-                    let columns = [
-                        {
-                            title: '序号（试卷编码）',
-                            width: 150,
-                            dataIndex: 'order',
-                        },
-                    ]
+                    let tableData = [];
+                    let selfScoreRecordVOList = res.data.data.selfScoreRecordVOList
                     for (let i = 0; i < res.data.data.selfScoreRecordVOList.length; i++) {
                         let item = res.data.data.selfScoreRecordVOList[i]
-                        columns.push(
-                            {
-                                title: `${i + 1}(${item.TestId})`,
-                                width: 150,
-                                dataIndex: `id_${i}`,
-                            }
-                        )
-                        tableData[0]['id_' + i] = item.Score
-                        tableData[1]['id_' + i] = item.SelfScore
+                        tableData.push({
+                            order : `${i+1}(${item.TestId})`,
+                            last : item.Score,
+                            current : item.SelfScore
+                         })
                     }
-
                     this.setState({
-                        tableData, columns
+                        tableData,selfScoreRecordVOList
                     })
                 }
             })
@@ -194,10 +232,11 @@ export default class index extends Component {
                     <div className="display-container">
                         <Table
                             pagination={{ position: ['bottomCenter'] }}
-                            columns={this.state.columns}
+                            columns={this.columns}
                             dataSource={this.state.tableData}
                         />
                     </div>
+                    <ReactEcharts option={this.getOption()} style={{width:762,height:300}}/>
                 </div>
             </DocumentTitle>
         )

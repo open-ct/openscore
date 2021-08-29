@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Layout, Menu } from 'antd';
 import DocumentTitle from 'react-document-title'
-import { Switch, Route, Redirect,history } from 'react-router-dom'
+import { Switch, Route, Redirect, history } from 'react-router-dom'
 import { CheckCircleOutlined, FormOutlined, HighlightOutlined, ProfileOutlined } from '@ant-design/icons';
 import * as Icon from '@ant-design/icons'
 import { Avatar, Badge, Button, Col, Dropdown, Row } from "antd";
@@ -40,7 +40,7 @@ export default class index extends Component {
 
     state = {
         account: null,
-        current:"home"
+        current: "home"
     };
     permissionList = [
         {
@@ -171,7 +171,7 @@ export default class index extends Component {
                 {
                     key: "marking",
                     userPermission: "组长",
-                    menu_name: "正评卷",
+                    menu_name: "自评卷",
                     menu_url: "/home/group/marking",
                     icon: "",
                     chidPermissions: [
@@ -197,14 +197,16 @@ export default class index extends Component {
             console.log(this.state)
         }, 5000);
         let moren = this.props.location.pathname;
+        console.log(moren)
         this.setState(
-            {current:moren.substring(moren.lastIndexOf("/")+1,moren.length)}
+            { current: moren.substring(moren.lastIndexOf("/") + 1, moren.length) }
         )
+        
         this.props.history.listen((e) => {
             let test = e.pathname
-            let text =test.substring(test.lastIndexOf("/")+1,test.length)
+            let text = test.substring(test.lastIndexOf("/") + 1, test.length)
             this.setState({
-                current:text
+                current: text
             })
         })
     }
@@ -309,7 +311,7 @@ export default class index extends Component {
     bindMenu = (menulist) => {
         let MenuList = menulist.map((item) => {
             if (item.chidPermissions.length === 0) {  //没有子菜单
-                return <Menu.Item key={item.key} icon={item.icon?React.createElement(Icon[item.icon]):null}  ><Link to={item.menu_url}>{item.menu_name}</Link></Menu.Item>
+                return <Menu.Item key={item.key} icon={item.icon ? React.createElement(Icon[item.icon]) : null}  ><Link to={item.menu_url}>{item.menu_name}</Link></Menu.Item>
             }
             else {
                 return <SubMenu key={item.key} title={item.menu_name} icon={React.createElement(Icon[item.icon])}>
@@ -358,7 +360,7 @@ export default class index extends Component {
                                 style={{ width: 200, height: '100%' }}
                                 defaultSelectedKeys={['mark-tasks']}
                                 mode="inline"
-                                selectedKeys = {[this.state.current]}
+                                selectedKeys={[this.state.current]}
                                 onClick={this.funcChange}
                             >
                                 {/* <Menu.Item key="mark-tasks" icon={<FormOutlined />}>评卷</Menu.Item>
@@ -378,7 +380,7 @@ export default class index extends Component {
                                     <Route path="/home/answer" component={Answer} exact></Route>
                                     <Route path="/home/sample" component={Sample} exact></Route>
                                     <Route path="/home/review" component={Review} exact></Route>
-                                    
+
                                     <Route path="/home/markMonitor/all" component={all} exact></Route>
                                     <Route path="/home/markMonitor/average" component={average} exact></Route>
                                     <Route path="/home/markMonitor/score" component={score} exact></Route>
@@ -387,11 +389,10 @@ export default class index extends Component {
                                     <Route path="/home/markMonitor/teacher" component={teacher} exact></Route>
 
                                     <Route path="/home/group/arbitration" component={arbitration} exact></Route>
-                                    <Route path="/home/group/marking" component={marking} exact></Route>
-                                    <Route path="/home/group/problem" component={problem} exact></Route> 
-
-                                    <Route path="/home/group/markTasks/:type" component={markTasks} exact></Route>                              <Route path="/home/review" component={Review} exact></Route>
-                                     </>
+                                    <Route path="/home/group/marking/:TestId" component={marking}></Route>
+                                    <Route path="/home/group/problem" component={problem} exact></Route>
+                                    <Route path="/home/group/markTasks/:type" component={markTasks} exact></Route>                              
+                                </>
 
                                     : null
                                 }

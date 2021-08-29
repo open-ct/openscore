@@ -20,9 +20,43 @@
 
     }
     .display-container{
-        width: 330px;
-        box-sizing: border-box;
-        margin-top: 24px;
-        margin-left: 24px;
+        display: flex;
+        flex-direction: row;
+        .display-table{
+            width: 330px;
+            box-sizing: border-box;
+            margin-top: 24px;
+            margin-left: 24px;
+            display: flex;
+            flex-direction: row;
+        }
+        .progress {
+            width: 550px;
+            margin-top: 24px;
+            margin-left: 24px;
+            background-color: #fff;
+            display: flex;
+            flex-direction: column;
+            padding: 14px 38px 14px 48px;
+            .progress-header {
+                display: flex;
+                justify-content: space-between;
+            }
+            .progress-item{
+                display: flex;
+                flex-direction: row;
+                margin-top: 20px;
+                span {
+                    white-space:nowrap;
+                }
+            }
+            .progress-footer{
+                display: flex;
+                flex-direction: row;
+                justify-content: flex-end;
+                margin-top: 13px;
+            }
+        }
     }
+
 }
