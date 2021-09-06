@@ -2,20 +2,44 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="90d49d24-cd7e-4f14-b075-c6e5fe5ae2ce" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/casdoor/conf/app.conf" beforeDir="false" afterPath="$PROJECT_DIR$/casdoor/conf/app.conf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/casdoor/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/casdoor/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/Group/mark_monitor/average/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/Group/mark_monitor/average/index.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/Group/mark_monitor/average/index.less" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/Group/mark_monitor/average/index.less" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/Group/mark_monitor/score/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/Group/mark_monitor/score/index.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/Group/mark_monitor/self/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/Group/mark_monitor/self/index.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/Group/mark_monitor/standard/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/Group/mark_monitor/standard/index.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/Group/test_monitor/marking/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/Group/test_monitor/marking/index.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/Group/test_monitor/marking/index.less" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/Group/test_monitor/marking/index.less" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/Home/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/Home/index.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/Mark/Review/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/Mark/Review/index.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/yarn.lock" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/openscore.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/controllers/administrator.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/controllers/supervisor.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/font/msyh.ttc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/font/msyhbd.ttc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/font/msyhl.ttc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/font/simhei.ttf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/font/simkai.ttf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/font/simsun.ttc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/subject.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/requests/admin.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/requests/supervisor.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/responses/admin.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/responses/supervisor.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test.xlsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test1.xlsm" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/conf/mysql.conf" beforeDir="false" afterPath="$PROJECT_DIR$/conf/mysql.conf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controllers/base.go" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/base.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controllers/score.go" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/score.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lastupdate.tmp" beforeDir="false" afterPath="$PROJECT_DIR$/lastupdate.tmp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/base.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/base.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/paperDistribution.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/paperDistribution.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/scoreRecord.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/scoreRecord.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/subTopic.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/subTopic.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/testPaper.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/testPaper.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/testPaperInfo.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/testPaperInfo.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/topic.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/topic.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/underCorrectedPaper.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/underCorrectedPaper.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/user.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routers/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/routers/router.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -55,6 +79,14 @@
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
+  </component>
   <component name="GoLibraries">
     <option name="indexEntireGoPath" value="false" />
   </component>
@@ -64,7 +96,6 @@
     <setting file="file://$PROJECT_DIR$/controllers/base.go" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/responses/test.go" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/controllers/default.go" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/controllers/Administrator.go" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/requests/supervisor.go" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MavenImportPreferences">
@@ -102,10 +133,18 @@
     <property name="project.structure.last.edited" value="Libraries" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
+    <property name="restartRequiresConfirmation" value="false" />
     <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\chen\go\src\openscore" />
+      <recent name="C:\Users\chen\go\src\openscore\font" />
+      <recent name="C:\Users\chen\go\src\openscore\controllers" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\chen\go\src\openscore" />
+      <recent name="C:\Users\chen\go\src\openscore\controllers" />
       <recent name="C:\Users\chen\go\src\openscore\responses" />
     </key>
   </component>
@@ -174,6 +213,7 @@
   <component name="XDebuggerManager">
     <watches-manager>
       <configuration name="GoApplicationRunConfiguration">
+        <watch expression="*(*&quot;[]string&quot;)(824637671088)" />
         <watch expression="*(*&quot;[]string&quot;)(824637671088)" />
       </configuration>
     </watches-manager>

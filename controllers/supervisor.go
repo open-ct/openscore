@@ -1047,7 +1047,7 @@ func (c *SupervisorApiController) SupervisorPoint() {
 		sum += score
 	}
 	//给试卷表打分
-	err = test.GetTestPaper(testId)
+	_,err = test.GetTestPaper(testId)
 	if err != nil || test.Test_id == 0 {
 		resp := Response{"10002", "get test paper fail", err}
 		c.Data["json"] = resp

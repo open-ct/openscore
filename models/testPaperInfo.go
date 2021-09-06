@@ -12,17 +12,17 @@ type TestPaperInfo struct {
 	Test_id                    int64  `json:"test_id"`
 	Pic_src                    string `json:"pic_src"`
 	Examiner_first_id          string `json:"examiner_first_id" xorm:"default('-1')"`
-	Examiner_first_score       int64  `json:"examiner_first_score"`
-	Examiner_first_self_score  int64  `json:"examiner_first_self_score"`
+	Examiner_first_score       int64  `json:"examiner_first_score" xorm:"default(-1)"`
+	Examiner_first_self_score  int64  `json:"examiner_first_self_score" xorm:"default(-1)"`
 	Examiner_second_id         string `json:"examiner_second_id" xorm:"default('-1')"`
-	Examiner_second_score      int64  `json:"examiner_second_score"`
-	Examiner_second_self_score int64  `json:"examiner_second_self_score"`
+	Examiner_second_score      int64  `json:"examiner_second_score" xorm:"default(-1)"`
+	Examiner_second_self_score int64  `json:"examiner_second_self_score" xorm:"default(-1)"`
 	Examiner_third_id          string `json:"examiner_third_id" xorm:"default('-1')"`
-	Examiner_third_score       int64  `json:"examiner_third_score"`
-	Examiner_third_self_score  int64  `json:"examiner_third_self_score"`
+	Examiner_third_score       int64  `json:"examiner_third_score" xorm:"default(-1)"`
+	Examiner_third_self_score  int64  `json:"examiner_third_self_score" xorm:"default(-1)"`
 	Leader_id                  string `json:"leader_id" xorm:"default('-1')"`
-	Leader_score               int64  `json:"leader_score"`
-	Final_score                int64  `json:"finale_score"`
+	Leader_score               int64  `json:"leader_score" xorm:"default(-1)"`
+	Final_score                int64  `json:"finale_score" xorm:"default(-1)"`
 	Final_score_id             string `json:"final_score_id" xorm:"default('-1')"`
 }
 
@@ -47,6 +47,14 @@ func (t *TestPaperInfo) Update() error {
 	code, err := x.Where(builder.Eq{"test_detail_id": t.Test_detail_id}).Update(t)
 	if code == 0 || err != nil {
 		log.Println("update test paper info fail")
+		log.Println(err)
+	}
+	return err
+}
+func (t *TestPaperInfo) Insert() error {
+	code, err := x.Insert(t)
+	if code == 0 || err != nil {
+		log.Println("Insert test paper info fail")
 		log.Println(err)
 	}
 	return err
