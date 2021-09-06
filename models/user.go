@@ -23,12 +23,40 @@ type User struct {
 	Status         int64     `json:"status"`
 	UserType       int64     `json:"userType"`
 	IsDistribute   int64     `json:"isDistribute"`
+
+	QuestionId   int64 `json:"question_id"`
+
 }
 
 func (u *User) GetUser(id string) error {
 	has, err := x.Where(builder.Eq{"user_id": id}).Get(u)
 	if !has || err != nil {
 		log.Println("could not found user")
+	}
+	return err
+}
+func (u *User) Update() error {
+	_,err := x.Update(u)
+	if err != nil {
+		log.Println("could not Update user")
+	}
+	return err
+}
+
+func CountOnlineNumber( )(count int64,err error) {
+	user :=new (User)
+	count, err1 := x.Where("status = ? ", 1).Where(" user_type=?",1).Where("is_distribute = ?",0).Count(user)
+	if err!=nil {
+		log.Println("CountOnlineNumber err ")
+	}
+	return count,err1
+}
+
+func FindUsers( u *[]User) error {
+	err := x.Where("status = ? ", 1).Where(" user_type=?",1).Where("is_distribute = ?",0).Find(u)
+	if err != nil {
+		log.Println("could not FindUsers ")
+		log.Println(err)
 	}
 	return err
 }

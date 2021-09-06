@@ -19,6 +19,7 @@ type Topic struct {
 	Score_type     int64     `json:"score_type"`
 	Import_number  int64     `json:"import_number"`
 	Import_time    time.Time `json:"import_time"`
+	Subject_Id    int64  	 `json:"subject_id"`
 }
 
 func (t *Topic) GetTopic(id int64) error {
@@ -43,4 +44,35 @@ func GetTopicList ( topics *[]Topic) error{
 		log.Println("GetTopicList err ")
 	}
 	return  err
+}
+func FindTopicBySubNameList ( topics *[]Topic,subjectName string) error{
+	err := x.Where("subject_name=?",subjectName).Find(topics)
+	if err!=nil {
+		log.Println("FindTopicBySubNameList err ")
+	}
+	return  err
+}
+func InsertTopic ( topic *Topic)(err1 error,questionId int64) {
+	_,err:= x.Insert(topic)
+	if err!=nil {
+		log.Println("GetTopicList err ")
+	}
+
+	return  err,topic.Question_id
+}
+//func Update ( topic *Topic,questionId int64)error {
+//	_,err:= x.Where("question_id=?",questionId).Update(&topic)
+//	if err!=nil {
+//		log.Println("Update topic err ")
+//	}
+//
+//	return  err
+//}
+func (t *Topic) Update() error {
+	code, err := x.Where(builder.Eq{"question_id": t.Question_id}).Update(t)
+	if code == 0 || err != nil {
+		log.Println("update Topic paper fail")
+		log.Printf("%+v", err)
+	}
+	return err
 }

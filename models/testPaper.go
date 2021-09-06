@@ -12,19 +12,21 @@ type TestPaper struct {
 	Candidate                  string `json:"candidate"`
 	Question_status            int64  `json:"question_status"`
 	Examiner_first_id          string `json:"examiner_first_id" xorm:"default('-1')"`
-	Examiner_first_score       int64  `json:"examiner_first_score"`
-	Examiner_first_self_score  int64  `json:"examiner_first_self_score"`
+	Examiner_first_score       int64  `json:"examiner_first_score" xorm:"default(-1)"`
+	Examiner_first_self_score  int64  `json:"examiner_first_self_score" xorm:"default(-1)"`
 	Examiner_second_id         string `json:"examiner_second_id" xorm:"default('-1')"`
-	Examiner_second_score      int64  `json:"examiner_second_score"`
-	Examiner_second_self_score int64  `json:"examiner_seconde_self_score"`
+	Examiner_second_score      int64  `json:"examiner_second_score" xorm:"default(-1)"`
+	Examiner_second_self_score int64  `json:"examiner_seconde_self_score" xorm:"default(-1)"`
 	Examiner_third_id          string `json:"examiner_third_id" xorm:"default('-1')"`
-	Examiner_third_score       int64  `json:"examiner_third_score"`
-	Examiner_third_self_score  int64  `json:"examiner_third_self_score"`
+	Examiner_third_score       int64  `json:"examiner_third_score" xorm:"default(-1)"`
+	Examiner_third_self_score  int64  `json:"examiner_third_self_score" xorm:"default(-1)"`
 	Leader_id                  string `json:"leader_id" xorm:"default('-1')"`
-	Leader_score               int64  `json:"leader_score"`
-	Final_score                int64  `json:"final_score"`
+	Leader_score               int64  `json:"leader_score" xorm:"default(-1)"`
+	Final_score                int64  `json:"final_score" xorm:"default(-1)" `
 	Final_score_id             string `json:"finale_score_id"`
 	Pratice_error              int64  `json:"pratice_error"`
+	Correcting_status          int64  `json:"correcting_status"`
+
 }
 
 func (t *TestPaper) GetTestPaperByQuestionIdAndQuestionStatus(question_id int64, question_statue int64) error {
@@ -44,18 +46,26 @@ func GetTestPaperListByQuestionIdAndQuestionStatus(question_id int64, question_s
 	return err
 }
 
-func (t *TestPaper) GetTestPaper(id int64) error {
+func (t *TestPaper) GetTestPaper(id int64) (bool,error) {
 	has, err := x.Where(builder.Eq{"test_id": id}).Get(t)
 	if !has || err != nil {
 		log.Println("could not find test paper")
 	}
-	return err
+	return has,err
 }
 
 func (t *TestPaper) Update() error {
 	code, err := x.Where(builder.Eq{"test_id": t.Test_id}).Update(t)
 	if code == 0 || err != nil {
 		log.Println("update test paper fail")
+		log.Printf("%+v", err)
+	}
+	return err
+}
+func (t *TestPaper) Insert() error {
+	code, err := x.Insert(t)
+	if code == 0 || err != nil {
+		log.Println("insert test paper fail")
 		log.Printf("%+v", err)
 	}
 	return err
@@ -67,4 +77,19 @@ func CountProblemFinishNumberByQuestionId(questionId int64)(count int64,err erro
 		log.Println("CountProblemFinishNumberByQuestionId err ")
 	}
 	return count,err1
+}
+func FindTestPaperByQuestionId(question_id int64,  t *[]TestPaper) error {
+	err := x.Where("question_id = ? and correcting_status = ?", question_id, 0).Find(t)
+	if err != nil {
+		log.Println("could not FindTestPaperByQuestionId ")
+		log.Println(err)
+	}
+	return err
+}
+func  FindUnDistributeTest(id int64 , t*[]TestPaper) error {
+	 err := x.Where("question_id=?",id).Where("correcting_status=?",0).Find(t)
+	if err != nil {
+		log.Println("could not GetUnDistributeTest")
+	}
+	return err
 }

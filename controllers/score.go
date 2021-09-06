@@ -28,7 +28,7 @@ func (c *TestPaperApiController) Display() {
 	var subTopic []models.SubTopic
 	var response responses.TestDisplay
 
-	err = testPaper.GetTestPaper(testId)
+	_,err = testPaper.GetTestPaper(testId)
 	if err != nil {
 		resp := Response{"10002", "get test paper fail", err}
 		c.Data["json"] = resp
@@ -128,7 +128,7 @@ func (c *TestPaperApiController) Point() {
 
 	var test models.TestPaper
 	var topic models.Topic
-	err = test.GetTestPaper(testId)
+	_,err = test.GetTestPaper(testId)
 	if err != nil || test.Test_id == 0 {
 		resp := Response{"10002", "get test paper fail", err}
 		c.Data["json"] = resp
@@ -328,7 +328,7 @@ func (c *TestPaperApiController) Problem() {
 			c.Data["json"] = resp
 			return
 		}
-		err = test.GetTestPaper(testId)
+		_,err = test.GetTestPaper(testId)
 		if err != nil {
 			resp := Response{"10004", "get testPaper fail", err}
 			c.Data["json"] = resp
@@ -369,7 +369,7 @@ func (c *TestPaperApiController) Answer() {
 	}
 	testId := requestBody.TestId
 	var test models.TestPaper
-	err = test.GetTestPaper(testId)
+	_,err = test.GetTestPaper(testId)
 	if err != nil {
 		resp := Response{"10002", "get testPaper fail", err}
 		c.Data["json"] = resp
@@ -406,7 +406,7 @@ func (c *TestPaperApiController) ExampleDeatil() {
 	testId := requestBody.ExampleTestId
 	log.Println(testId)
 	var test models.TestPaper
-	err = test.GetTestPaper(testId)
+	_,err = test.GetTestPaper(testId)
 	if err != nil {
 		resp := Response{"10002", "get testPaper fail", err}
 		c.Data["json"] = resp
@@ -462,7 +462,7 @@ func (c *TestPaperApiController) ExampleList() {
 	}
 	testId := requestBody.TestId
 	var testPaper models.TestPaper
-	err = testPaper.GetTestPaper(testId)
+	_,err = testPaper.GetTestPaper(testId)
 	if err != nil {
 		resp := Response{"10002", "get testPaper fail", err}
 		c.Data["json"] = resp

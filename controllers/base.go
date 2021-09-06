@@ -42,6 +42,9 @@ type TestPaperApiController struct {
 type SupervisorApiController struct {
 	beego.Controller
 }
+type AdminApiController struct {
+	beego.Controller
+}
 
 func (c *ApiController) GetSessionUser() *auth.Claims {
 	s := c.GetSession("user")
