@@ -2,26 +2,20 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="90d49d24-cd7e-4f14-b075-c6e5fe5ae2ce" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/openscore.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/controllers/Administrator.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/controllers/supervisor.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/requests/supervisor.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/responses/supervisor.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/conf/mysql.conf" beforeDir="false" afterPath="$PROJECT_DIR$/conf/mysql.conf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controllers/base.go" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/base.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/casdoor/conf/app.conf" beforeDir="false" afterPath="$PROJECT_DIR$/casdoor/conf/app.conf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/casdoor/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/casdoor/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Group/mark_monitor/average/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/Group/mark_monitor/average/index.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Group/mark_monitor/average/index.less" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/Group/mark_monitor/average/index.less" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Group/mark_monitor/score/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/Group/mark_monitor/score/index.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Group/mark_monitor/self/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/Group/mark_monitor/self/index.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Group/mark_monitor/standard/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/Group/mark_monitor/standard/index.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Group/test_monitor/marking/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/Group/test_monitor/marking/index.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Group/test_monitor/marking/index.less" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/Group/test_monitor/marking/index.less" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Home/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/Home/index.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Mark/Review/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/Mark/Review/index.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/yarn.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lastupdate.tmp" beforeDir="false" afterPath="$PROJECT_DIR$/lastupdate.tmp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/paperDistribution.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/paperDistribution.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/scoreRecord.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/scoreRecord.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/testPaper.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/testPaper.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/topic.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/topic.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/underCorrectedPaper.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/underCorrectedPaper.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/user.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routers/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/routers/router.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -83,6 +77,7 @@
     </option>
   </component>
   <component name="ProjectId" id="1wGQ5od5FlSdqjEXHsUm5X5Fmj6" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="showLibraryContents" value="true" />
   </component>
@@ -124,11 +119,6 @@
       <filePath value="$PROJECT_DIR$/main.go" />
       <method v="2" />
     </configuration>
-    <recent_temporary>
-      <list>
-        <item itemvalue="Go Build.go build openscore" />
-      </list>
-    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="SvnConfiguration">
@@ -142,6 +132,7 @@
       <option name="presentableId" value="Default" />
       <updated>1628082264190</updated>
       <workItem from="1628082267172" duration="70000" />
+      <workItem from="1630225901722" duration="22000" />
     </task>
     <servers />
   </component>
@@ -181,20 +172,6 @@
     <integration-enabled>true</integration-enabled>
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/controllers/supervisor.go</url>
-          <line>58</line>
-          <option name="timeStamp" value="2" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/controllers/supervisor.go</url>
-          <line>18</line>
-          <option name="timeStamp" value="3" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
     <watches-manager>
       <configuration name="GoApplicationRunConfiguration">
         <watch expression="*(*&quot;[]string&quot;)(824637671088)" />

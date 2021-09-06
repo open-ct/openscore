@@ -18,6 +18,7 @@ export default class index extends Component {
         selectScore: [],
         problemVisible: false,
         problemValue: 1,
+        inpValu: '',
         currentPaper: {},
         subTopic: [],
         markScore: [],
@@ -289,30 +290,59 @@ export default class index extends Component {
         });
     }
     handleOk = () => {
-        Marking.testProblem({
-            userId: this.userId,
-            testId: this.state.currentTestId,
-            problemType: this.state.problemValue
-        })
-            .then((res) => {
-                this.setState({
-                    selectId: [],
-                    selectScore: [],
-                    currentPaper: {},
-                    count: undefined,
-                    currentTestId: undefined,
+        if (this.state.problemValue == 2) {
+            Marking.testProblem({
+                userId: this.userId,
+                testId: this.state.currentTestId,
+                problemType: this.state.problemValue,
+                problemMessage :this.state.inpValu
+            })
+                .then((res) => {
+                    this.setState({
+                        selectId: [],
+                        selectScore: [],
+                        currentPaper: {},
+                        count: undefined,
+                        currentTestId: undefined,
+                    })
+                    if (this.state.type === '仲裁卷') {
+                        this.getArbitrationTestId();
+                    } else if (this.state.type === '问题卷') {
+    
+                        this.getProblemTestId()
+                    } else {
+                    }
                 })
-                if (this.state.type === '仲裁卷') {
-                    this.getArbitrationTestId();
-                } else if (this.state.type === '问题卷') {
-
-                    this.getProblemTestId()
-                } else {
-                }
+                .catch((e) => {
+                    console.log(e)
+                })
+        }else{
+            Marking.testProblem({
+                userId: this.userId,
+                testId: this.state.currentTestId,
+                problemType: this.state.problemValue
             })
-            .catch((e) => {
-                console.log(e)
-            })
+                .then((res) => {
+                    this.setState({
+                        selectId: [],
+                        selectScore: [],
+                        currentPaper: {},
+                        count: undefined,
+                        currentTestId: undefined,
+                    })
+                    if (this.state.type === '仲裁卷') {
+                        this.getArbitrationTestId();
+                    } else if (this.state.type === '问题卷') {
+    
+                        this.getProblemTestId()
+                    } else {
+                    }
+                })
+                .catch((e) => {
+                    console.log(e)
+                })
+        }
+        
         this.setState({
             problemVisible: false,
         });
@@ -324,6 +354,11 @@ export default class index extends Component {
             problemVisible: false,
         });
     };
+    handelChange(e) {
+        this.setState({
+          inpValu: e.target.value
+        })
+      }
     onRidioChange = e => {
         console.log('radio checked', e.target.value);
         this.setState({
@@ -346,7 +381,7 @@ export default class index extends Component {
                         <Radio value={3}>其他错误</Radio>
                     </Space>
                 </Radio.Group>
-                <Input placeholder="请输入问题" style={{ marginTop: 10 }} />
+                <Input placeholder="请输入问题"  onChange={this.handelChange.bind(this)} style={{ marginTop: 10 }} />
             </Modal>
         )
     }

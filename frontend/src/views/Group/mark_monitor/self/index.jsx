@@ -39,7 +39,7 @@ export default class index extends Component {
             title: '操作',
             width: 150,
             dataIndex: 'operation',
-            render: (text, record, index) => <Link to={'/home/group/marking/'+ this.state.selfScoreRecordVOList[index].TestId}>自评</Link>
+            render: (text, record, index) => <Link to={{pathname: '/home/group/marking', state:{TestId: this.state.selfScoreRecordVOList[index].TestId}}}>自评</Link>
         },
 
     ]
@@ -47,7 +47,6 @@ export default class index extends Component {
         this.questionList();
     }
     getOption = ()=>{ 
-        console.log(this.state.tableData,this.state.columns)
         let X_data=[]
         let Y1_data=[]
         let Y2_data=[]
@@ -115,7 +114,7 @@ export default class index extends Component {
         let selectList
         if (this.state.questionList.length != 0) {
             selectList = this.state.questionList.map((item, i) => {
-                return <Option key={i} value={item.QuestionName} label={item.QuestionName}>{item.UserName}</Option>
+                return <Option key={i} value={item.QuestionName} label={item.QuestionName}>{item.QuestionName}</Option>
             })
         } else {
             return null
@@ -143,6 +142,7 @@ export default class index extends Component {
         this.tableData(this.state.teacherList[index].UserId)
     }
     selectQuestion = (e) => {
+        console.log(e)
         let index
         for (let i = 0; i < this.state.questionList.length; i++) {
             if (this.state.questionList[i].QuestionName === e) {

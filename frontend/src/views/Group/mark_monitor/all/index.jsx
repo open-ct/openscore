@@ -258,6 +258,7 @@ export default class index extends Component {
                 console.log(e)
             })
     }
+     
     tableData = () => {
         group.allMonitor({ supervisorId: "2" })
             .then((res) => {
@@ -289,20 +290,22 @@ export default class index extends Component {
             selectList = this.state.questionList.map((item, i) => {
                 return <Option key={i} value={item.QuestionName} label={item.QuestionName}>{item.QuestionName}</Option>
             })
+            
         } else {
             return null
         }
+        console.log(selectList)
         return selectList
     }
-    // select = (e) => {
-    //     let index
-    //     for (let i = 0; i < this.state.questionList.length; i++) {
-    //         if (this.state.questionList[i].QuestionName === e) {
-    //             index = i
-    //         }
-    //     }
-    //     this.tableData(this.state.questionList[index].QuestionId)
-    // }
+    select = (e) => {
+        let index
+        for (let i = 0; i < this.state.questionList.length; i++) {
+            if (this.state.questionList[i].QuestionName === e) {
+                index = i
+            }
+        }
+        // this.tableData(this.state.questionList[index].QuestionId)
+    }
 
 
     render() {

@@ -13,6 +13,7 @@ export default class index extends Component {
     state = {
         problemVisible: false,
         problemValue: 1,
+        inpValu: '',
         currentPaper: {},
         currentPaperNum: 0,
         testLength: 0,
@@ -23,28 +24,50 @@ export default class index extends Component {
         TestId:undefined
     }
     componentDidMount() {
-        this.setState({
-            TestId: this.props.match.params.TestId
-        })
-        this.getCurrentPaper(this.props.match.params.TestId)
+        if (this.props.location.state) {
+            this.setState({
+                TestId: this.props.location.state.TestId
+            })
+            this.getCurrentPaper(this.props.location.state.TestId)
+        }
     }
 
     handleOk = (value) => {
-        Marking.testProblem({
-            userId: this.userId,
-            testId: this.state.currentPaper.testId,
-            problemType: this.state.problemValue
-        })
-            .then((res) => {
-                this.setState({
-                    selectId: [],
-                    selectScore: [],
+        if (this.state.problemValue == 2) {
+            Marking.testProblem({
+                userId: this.userId,
+                testId: this.state.currentPaper.testId,
+                problemType: this.state.problemValue,
+                problemMessage :this.state.inpValu
+            })
+                .then((res) => {
+                    this.setState({
+                        selectId: [],
+                        selectScore: [],
+                    })
+                    this.props.history.push('/home/markMonitor/self')
                 })
-                this.props.history.push('/home/markMonitor/self')
+                .catch((e) => {
+                    console.log(e)
+                })
+        }else{
+            Marking.testProblem({
+                userId: this.userId,
+                testId: this.state.currentPaper.testId,
+                problemType: this.state.problemValue
             })
-            .catch((e) => {
-                console.log(e)
-            })
+                .then((res) => {
+                    this.setState({
+                        selectId: [],
+                        selectScore: [],
+                    })
+                    this.props.history.push('/home/markMonitor/self')
+                })
+                .catch((e) => {
+                    console.log(e)
+                })
+        }
+
         this.setState({
             problemVisible: false,
         });
@@ -65,7 +88,6 @@ export default class index extends Component {
                     let currentPaper = res.data.data
                     let subTopic = res.data.data.subTopic
                     let markScore = []
-
                     for (let i = 0; i < subTopic.length; i++) {
                         markScore.push(subTopic[i].score_type.split('-'))
                     }
@@ -287,6 +309,11 @@ export default class index extends Component {
             problemValue: e.target.value,
         });
     }
+    handelChange(e) {
+        this.setState({
+          inpValu: e.target.value
+        })
+      }
     problemModal() {
         const { problemValue } = this.state;
         return (
@@ -303,7 +330,7 @@ export default class index extends Component {
                         <Radio value={3}>其他错误</Radio>
                     </Space>
                 </Radio.Group>
-                <Input placeholder="请输入问题" style={{ marginTop: 10 }} />
+                <Input placeholder="请输入问题"  onChange={this.handelChange.bind(this)} style={{ marginTop: 10 }} />
             </Modal>
         )
     }

@@ -3,8 +3,8 @@ import DocumentTitle from 'react-document-title'
 import { Table, Modal, Dropdown, Button, message, Space, Tooltip, Select, Radio, Input } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import './index.less'
-import * as Util from "../../../util/Util";
 import Marking from "../../../api/marking";
+import * as Util from "../../../util/Util";
 const { Option } = Select;
 export default class index extends Component {
   userId = "1"
@@ -12,6 +12,7 @@ export default class index extends Component {
     reviewVisible: true,
     reviewList: [],
     problemVisible: false,
+    inpValu: '',
     problemValue: 1,
     currentPaper: {},
     currentPaperNum: 0,
@@ -89,22 +90,42 @@ export default class index extends Component {
         reviewVisible: false,
       });
     } else {
-      Marking.testProblem({
-        userId: this.userId,
-        testId: this.state.currentPaper.testId,
-        problemType: this.state.problemValue
-      })
-        .then((res) => {
-          this.setState({
-            selectId: [],
-            selectScore: [],
-            reviewVisible: true
+      if (this.state.problemValue == 2) {
+        Marking.testProblem({
+          userId: this.userId,
+          testId: this.state.currentPaper.testId,
+          problemType: this.state.problemValue,
+          problemMessage: this.state.inpValu
+        })
+          .then((res) => {
+            this.setState({
+              selectId: [],
+              selectScore: [],
+              reviewVisible: true
+            })
+            this.getReviewList();
           })
-          this.getReviewList();
+          .catch((e) => {
+            console.log(e)
+          })
+      } else {
+        Marking.testProblem({
+          userId: this.userId,
+          testId: this.state.currentPaper.testId,
+          problemType: this.state.problemValue
         })
-        .catch((e) => {
-          console.log(e)
-        })
+          .then((res) => {
+            this.setState({
+              selectId: [],
+              selectScore: [],
+              reviewVisible: true
+            })
+            this.getReviewList();
+          })
+          .catch((e) => {
+            console.log(e)
+          })
+      }
       this.setState({
         problemVisible: false,
       });
@@ -422,8 +443,11 @@ export default class index extends Component {
     });
   }
 
-
-
+  handelChange(e) {
+    this.setState({
+      inpValu: e.target.value
+    })
+  }
   onRidioChange = e => {
     console.log('radio checked', e.target.value);
     this.setState({
@@ -446,7 +470,7 @@ export default class index extends Component {
             <Radio value={3}>其他错误</Radio>
           </Space>
         </Radio.Group>
-        <Input placeholder="请输入问题" style={{ marginTop: 10 }} />
+        <Input placeholder="请输入问题" onChange={this.handelChange.bind(this)}  style={{ marginTop: 10 }} />
       </Modal>
     )
   }
