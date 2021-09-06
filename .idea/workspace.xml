@@ -9,16 +9,34 @@
       <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/.idea/openscore.iml" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/controllers/Administrator.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/controllers/administrator.go" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/controllers/supervisor.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/font/msyh.ttc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/font/msyhbd.ttc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/font/msyhl.ttc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/font/simhei.ttf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/font/simkai.ttf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/font/simsun.ttc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/subject.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/requests/admin.go" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/requests/supervisor.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/responses/admin.go" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/responses/supervisor.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test.xlsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test1.xlsm" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/conf/mysql.conf" beforeDir="false" afterPath="$PROJECT_DIR$/conf/mysql.conf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/controllers/base.go" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/base.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controllers/score.go" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/score.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lastupdate.tmp" beforeDir="false" afterPath="$PROJECT_DIR$/lastupdate.tmp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/base.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/base.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/models/paperDistribution.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/paperDistribution.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/models/scoreRecord.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/scoreRecord.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/subTopic.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/subTopic.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/models/testPaper.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/testPaper.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/testPaperInfo.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/testPaperInfo.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/models/topic.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/topic.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/models/underCorrectedPaper.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/underCorrectedPaper.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/models/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/user.go" afterDir="false" />
@@ -61,6 +79,14 @@
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
+  </component>
   <component name="GoLibraries">
     <option name="indexEntireGoPath" value="false" />
   </component>
@@ -70,7 +96,6 @@
     <setting file="file://$PROJECT_DIR$/controllers/base.go" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/responses/test.go" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/controllers/default.go" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/controllers/Administrator.go" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/requests/supervisor.go" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MavenImportPreferences">
@@ -107,10 +132,18 @@
     <property name="project.structure.last.edited" value="Libraries" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
+    <property name="restartRequiresConfirmation" value="false" />
     <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\chen\go\src\openscore" />
+      <recent name="C:\Users\chen\go\src\openscore\font" />
+      <recent name="C:\Users\chen\go\src\openscore\controllers" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\chen\go\src\openscore" />
+      <recent name="C:\Users\chen\go\src\openscore\controllers" />
       <recent name="C:\Users\chen\go\src\openscore\responses" />
     </key>
   </component>
@@ -181,22 +214,9 @@
     <integration-enabled>true</integration-enabled>
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/controllers/supervisor.go</url>
-          <line>58</line>
-          <option name="timeStamp" value="2" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/controllers/supervisor.go</url>
-          <line>18</line>
-          <option name="timeStamp" value="3" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
     <watches-manager>
       <configuration name="GoApplicationRunConfiguration">
+        <watch expression="*(*&quot;[]string&quot;)(824637671088)" />
         <watch expression="*(*&quot;[]string&quot;)(824637671088)" />
       </configuration>
     </watches-manager>

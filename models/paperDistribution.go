@@ -28,3 +28,12 @@ func FindPaperDistributionByQuestionId(paperDistributions *[]PaperDistribution,q
 	}
  return err
 }
+
+func (u *PaperDistribution) Save() error {
+	code, err := x.Insert(u)
+	if code == 0 || err != nil {
+		log.Println("insert PaperDistribution fail")
+		log.Println(err)
+	}
+	return err
+}

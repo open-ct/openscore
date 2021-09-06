@@ -32,7 +32,7 @@ func init() {
 }
 
 func initMarkingModels() {
-	err := x.Sync2(new(Topic), new(SubTopic), new(TestPaper), new(TestPaperInfo), new(ScoreRecord), new(UnderCorrectedPaper), new(PaperDistribution))
+	err := x.Sync2(new(Topic), new(SubTopic), new(TestPaper), new(TestPaperInfo), new(ScoreRecord), new(UnderCorrectedPaper), new(PaperDistribution), new(Subject))
 	if err != nil {
 		log.Println(err)
 	}
