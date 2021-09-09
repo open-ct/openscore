@@ -273,10 +273,10 @@ export default class index extends Component {
                                     <Route path="/home/group/problem" component={problem} exact></Route>
                                     <Route path="/home/group/markTasks/:type" component={markTasks} exact></Route>
                                     
-                                    <Route path="/home/management/question/export" component={question} exact></Route>
-                                    <Route path="/home/management/paper/export" component={paper}></Route>
-                                    <Route path="/home/management/paper/allot" component={allot} exact></Route>
-                                    <Route path="/home/management/paper/manage" component={paperManage} exact></Route>                               
+                                    <Route path="/home/management/question" component={question} exact></Route>
+                                    <Route path="/home/management/paper" component={paper}></Route>
+                                    <Route path="/home/management/paper_allot" component={allot} exact></Route>
+                                    <Route path="/home/management/paper_manage" component={paperManage} exact></Route>                               
                                     
                                 </>
 

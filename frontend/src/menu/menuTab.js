@@ -154,19 +154,19 @@ export default [
         icon: "FormOutlined",
         chidPermissions: [
             {
-                key: "question_eximport",
+                key: "question",
                 userPermission: "管理员",
                 menu_name: "导入题目",
-                menu_url: "/home/management/question/export",
+                menu_url: "/home/management/question",
                 icon: "",
                 chidPermissions: [
                 ]
             },
             {
-                key: "paper_eximport",
+                key: "paper",
                 userPermission: "管理员",
                 menu_name: "导入导出试卷",
-                menu_url: "/home/management/paper/export",
+                menu_url: "/home/management/paper",
                 icon: "",
                 chidPermissions: [
                 ]
@@ -175,7 +175,7 @@ export default [
                 key: "paper_allot",
                 userPermission: "管理员",
                 menu_name: "试卷分配",
-                menu_url: "/home/management/paper/allot",
+                menu_url: "/home/management/paper_allot",
                 icon: "",
                 chidPermissions: [
                 ]
@@ -184,7 +184,7 @@ export default [
                 key: "paper_manage",
                 userPermission: "管理员",
                 menu_name: "试卷管理",
-                menu_url: "/home/management/paper/manage",
+                menu_url: "/home/management/paper_manage",
                 icon: "",
                 chidPermissions: [
                 ]
@@ -202,7 +202,7 @@ export default [
                 key: "user_export",
                 userPermission: "管理员",
                 menu_name: "导入导出用户",
-                menu_url: "/home/management/user/export",
+                menu_url: "/home/management/user/user_export",
                 icon: "",
                 chidPermissions: [
                 ]
@@ -211,7 +211,7 @@ export default [
                 key: "user_manage",
                 userPermission: "管理员",
                 menu_name: "用户管理",
-                menu_url: "/home/management/user/manage",
+                menu_url: "/home/management/user/user_manage",
                 icon: "",
                 chidPermissions: [
                 ]
