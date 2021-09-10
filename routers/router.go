@@ -58,6 +58,8 @@ func init() {
 	beego.Router("/openct/marking/admin/questionBySubList",&controllers.AdminApiController{},"post:QuestionBySubList")
 	beego.Router("/openct/marking/admin/insertTopic",&controllers.AdminApiController{},"post:InsertTopic")
 	beego.Router("/openct/marking/admin/subjectList",&controllers.AdminApiController{},"post:SubjectList")
+	beego.Router("/openct/marking/admin/topicList",&controllers.AdminApiController{},"post:TopicList")
+	beego.Router("/openct/marking/admin/DistributionRecord",&controllers.AdminApiController{},"post:DistributionRecord")
 
 	beego.Router("/openct/marking/admin/img",&controllers.AdminApiController{},"post:Pic")
 

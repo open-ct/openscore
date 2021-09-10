@@ -44,6 +44,14 @@ func GetLatestRecords(userId string, records *[]ScoreRecord) error {
 
 	return err
 }
+func CountProblemFinishNumberByQuestionId(questionId int64)(count int64,err error) {
+	record :=new (ScoreRecord)
+	count, err1 := x.Where("question_id = ?", questionId).Where("test_record_type=?",6).Count(record)
+	if err!=nil {
+		log.Println("CountProblemFinishNumberByQuestionId err ")
+	}
+	return count,err1
+}
 func CountSelfScore(userId string,questionId int64)(count int64,err error) {
 	record :=new (ScoreRecord)
 	count, err1 := x.Where("question_id = ?", questionId).Where("test_record_type=0").Where("user_id=?", userId).Count(record)

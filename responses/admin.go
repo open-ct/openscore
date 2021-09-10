@@ -1,4 +1,9 @@
 package responses
+
+import (
+	"time"
+)
+
 type AddTopicVO struct {
 	QuestionId int64
     QuestionDetailIds []AddTopicDetailVO
@@ -18,4 +23,27 @@ type QuestionBySubListVO struct {
 type DistributionInfoVO struct {
 	ImportTestNumber  int64
 	OnlineNumber int64
+}
+type TopicVO struct {
+	TopicId int64
+	SubjectName string
+	TopicName string
+	Score int64
+	StandardError int64
+	ScoreType int64
+	ImportTime time.Time
+	SubTopicVOList  []SubTopicVO
+}
+type SubTopicVO struct {
+	SubTopicId int64
+	SubTopicName string
+	Score int64
+	ScoreDistribution string
+}
+type DistributionRecordVO struct {
+	TopicId int64
+	TopicName string
+	ImportNumber int64
+	DistributionTestNumber int64
+	DistributionUserNumber int64
 }

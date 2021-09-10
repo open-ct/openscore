@@ -52,6 +52,13 @@ func FindTopicBySubNameList ( topics *[]Topic,subjectName string) error{
 	}
 	return  err
 }
+func FindTopicList ( topics *[]Topic) error{
+	err := x.Find(topics)
+	if err!=nil {
+		log.Println("FindTopicList err ")
+	}
+	return  err
+}
 func InsertTopic ( topic *Topic)(err1 error,questionId int64) {
 	_,err:= x.Insert(topic)
 	if err!=nil {

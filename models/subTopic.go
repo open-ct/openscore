@@ -14,7 +14,7 @@ type SubTopic struct {
 	Score_type            string `json:"score_type"`
 }
 
-func GetSubTopicsByQuestionId(id int64, st *[]SubTopic) error {
+func FindSubTopicsByQuestionId(id int64, st *[]SubTopic) error {
 	err := x.Where("question_id = ?", id).Find(st)
 	if err != nil {
 		log.Println("could not find any SubTopic")

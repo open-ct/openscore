@@ -70,14 +70,7 @@ func (t *TestPaper) Insert() error {
 	}
 	return err
 }
-func CountProblemFinishNumberByQuestionId(questionId int64)(count int64,err error) {
-	record :=new (ScoreRecord)
-	count, err1 := x.Where("question_id = ?", questionId).Where("test_record_type=?",6).Count(record)
-	if err!=nil {
-		log.Println("CountProblemFinishNumberByQuestionId err ")
-	}
-	return count,err1
-}
+
 func FindTestPaperByQuestionId(question_id int64,  t *[]TestPaper) error {
 	err := x.Where("question_id = ? and correcting_status = ?", question_id, 0).Find(t)
 	if err != nil {
@@ -92,4 +85,14 @@ func  FindUnDistributeTest(id int64 , t*[]TestPaper) error {
 		log.Println("could not GetUnDistributeTest")
 	}
 	return err
+}
+
+
+func CountTestDistributionNumberByQuestionId(questionId int64)(count int64,err error) {
+	testPaper :=new (TestPaper)
+	count, err1 := x.Where("question_id = ?", questionId).Where("correcting_status=?",1).Count(testPaper)
+	if err!=nil {
+		log.Println("CountTestDistributionNumberByQuestionId err ")
+	}
+	return count,err1
 }
