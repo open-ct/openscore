@@ -37,3 +37,11 @@ func (u *PaperDistribution) Save() error {
 	}
 	return err
 }
+func CountUserDistributionNumberByQuestionId(questionId int64)(count int64,err error) {
+	paperDistribution :=new (PaperDistribution)
+	count, err1 := x.Where("question_id = ?", questionId).Count(paperDistribution)
+	if err!=nil {
+		log.Println("countUserDistributionNumberByQuestionId err ")
+	}
+	return count ,err1
+}

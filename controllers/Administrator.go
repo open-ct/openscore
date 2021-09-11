@@ -140,9 +140,20 @@ func (c *AdminApiController) ReadExcel(){
 		return
 	}
 	//supervisorId := requestBody.SupervisorId
-	  failPath := requestBody.FilePath
+	// filePath := requestBody.FilePath
+	bytes := requestBody.Excel
 	//----------------------------------------------------
-	f, err := excelize.OpenFile(failPath)
+
+
+
+	//bytes, err := os.ReadFile(filePath)
+
+
+	file, err := os.Create("excelFile")
+	file.Write(bytes)
+
+
+	f, err := excelize.OpenFile("excelFile")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -206,6 +217,9 @@ func (c *AdminApiController) ReadExcel(){
 		topic.Import_number=int64(len(rows)-1)
 		topic.Update()
 	}
+
+	 file.Close()
+	 os.Remove("excelFile")
 	//------------------------------------------------
 	data := make(map[string]interface{})
 	data["data"] =nil
@@ -554,13 +568,10 @@ func (c *AdminApiController) Distribution(){
 8.图片显示
  */
 func (c *AdminApiController) Pic() {
-
 	defer c.ServeJSON()
 	var requestBody requests.ReadFile
 	var resp Response
 	var  err error
-
-
 	err =json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
 	if err!=nil {
 		resp = Response{"10001","cannot unmarshal",err}
@@ -612,3 +623,115 @@ func cutUser(oldData []models.User, n int) (newData[]models.User) {
 	}
 	return newData1
 }
+
+/**
+9.大题展示列表
+*/
+
+
+func (c *AdminApiController) TopicList() {
+	defer c.ServeJSON()
+	var requestBody requests.TopicList
+	var resp Response
+	var  err error
+
+	err =json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	if err!=nil {
+		resp = Response{"10001","cannot unmarshal",err}
+		c.Data["json"] = resp
+		return
+	}
+	//supervisorId := requestBody.SupervisorId
+
+	//----------------------------------------------------
+	//获取大题列表
+	topics  := make([]models.Topic,0)
+	err = models.FindTopicList(&topics)
+	if err!=nil {
+		resp  = Response{"0000","FindTopicList err ",err}
+		c.Data["json"] = resp
+		return
+	}
+
+	var topicVOList = make([]responses.TopicVO,len(topics))
+	for i := 0; i < len(topics); i++ {
+
+		topicVOList[i].SubjectName=topics[i].Subject_name
+		topicVOList[i].TopicName=topics[i].Question_name
+		topicVOList[i].Score=topics[i].Question_score
+		topicVOList[i].StandardError=topics[i].Standard_error
+		topicVOList[i].ScoreType=topics[i].Score_type
+		topicVOList[i].TopicId=topics[i].Question_id
+		topicVOList[i].ImportTime=topics[i].Import_time
+
+		subTopics := make([]models.SubTopic, 0)
+		models.FindSubTopicsByQuestionId(topics[i].Question_id,&subTopics)
+		subTopicVOS := make([]responses.SubTopicVO, len(subTopics))
+		for j:=0;j<len(subTopics);j++ {
+			subTopicVOS[j].SubTopicId=subTopics[j].Question_detail_id
+			subTopicVOS[j].SubTopicName=subTopics[j].Question_detail_name
+			subTopicVOS[j].Score=subTopics[j].Question_detail_score
+			subTopicVOS[j].ScoreDistribution=subTopics[j].Score_type
+		}
+		topicVOList[i].SubTopicVOList=subTopicVOS
+	}
+
+	//----------------------------------------------------
+	data := make(map[string]interface{})
+	data["topicVOList"] =topicVOList
+	resp = Response{"10000", "OK", data}
+	c.Data["json"] = resp
+}
+
+
+/**
+DistributionRecord
+ */
+func (c *AdminApiController) DistributionRecord() {
+	defer c.ServeJSON()
+	var requestBody requests.DistributionRecord
+	var resp Response
+	var  err error
+
+	err =json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	if err!=nil {
+		resp = Response{"10001","cannot unmarshal",err}
+		c.Data["json"] = resp
+		return
+	}
+	//supervisorId := requestBody.SupervisorId
+	subjectName := requestBody.SubjectName
+	//----------------------------------------------------
+	//获取大题列表
+	topics  := make([]models.Topic,0)
+	err = models.FindTopicBySubNameList(&topics,subjectName)
+	if err!=nil {
+		resp  = Response{"30003","FindTopicBySubNameList err ",err}
+		c.Data["json"] = resp
+		return
+	}
+
+	var distributionRecordList = make([]responses.DistributionRecordVO,len(topics))
+	for i := 0; i < len(topics); i++ {
+
+		distributionRecordList[i].TopicId=topics[i].Question_id
+		distributionRecordList[i].TopicName=topics[i].Question_name
+		distributionRecordList[i].ImportNumber=topics[i].Import_number
+		distributionTestNumber,err1 :=models.CountTestDistributionNumberByQuestionId(topics[i].Question_id)
+		fmt.Println(err1)
+		distributionUserNumber ,err1:=models.CountUserDistributionNumberByQuestionId(topics[i].Question_id)
+		fmt.Println(err1)
+		distributionRecordList[i].DistributionUserNumber=distributionUserNumber
+		distributionRecordList[i].DistributionTestNumber=distributionTestNumber
+
+	}
+
+	//----------------------------------------------------
+	data := make(map[string]interface{})
+	data["distributionRecordList"] =distributionRecordList
+	resp = Response{"10000", "OK", data}
+	c.Data["json"] = resp
+}
+
+
+
