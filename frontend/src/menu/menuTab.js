@@ -156,7 +156,7 @@ export default [
             {
                 key: "question",
                 userPermission: "管理员",
-                menu_name: "导入题目",
+                menu_name: "题目设置",
                 menu_url: "/home/management/question",
                 icon: "",
                 chidPermissions: [

@@ -33,6 +33,7 @@ import question from "../Manage/paper_manage/question"
 import paper from  "../Manage/paper_manage/paper"
 import allot from  "../Manage/paper_manage/allot"
 import paperManage from  "../Manage/paper_manage/manage"
+import detail from  "../Manage/paper_manage/detail"
 
 import menuList from '../../menu/menuTab.js'
 
@@ -276,7 +277,8 @@ export default class index extends Component {
                                     <Route path="/home/management/question" component={question} exact></Route>
                                     <Route path="/home/management/paper" component={paper}></Route>
                                     <Route path="/home/management/paper_allot" component={allot} exact></Route>
-                                    <Route path="/home/management/paper_manage" component={paperManage} exact></Route>                               
+                                    <Route path="/home/management/paper_manage" component={paperManage} exact></Route>               
+                                    <Route path="/home/management/detailTable" component={detail} exact></Route>                
                                     
                                 </>
 

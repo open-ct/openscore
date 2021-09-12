@@ -87,7 +87,7 @@ export default class index extends Component {
         this.setState({
             questionValue: e
         })
-        Manage.distibuteInfo({ adminId: this.adminId, questionId: e })
+        Manage.distributeInfo({ adminId: this.adminId, questionId: e })
             .then((res) => {
                 if (res.data.status === "10000") {
                     this.setState({
@@ -100,7 +100,7 @@ export default class index extends Component {
                 console.log(e)
             })
     }
-    distibutePaper = () => {
+    distributePaper = () => {
         console.log(this.state.questionValue, this.state.testNumber, this.state.userNumber)
         if (this.state.questionValue != undefined && this.state.testNumber && this.state.userNumber) {
             Modal.confirm({
@@ -110,7 +110,7 @@ export default class index extends Component {
                 okText: '确认',
                 cancelText: '取消',
                 onOk: () => {
-                    Manage.distibutePaper({ adminId: this.adminId, questionId: this.state.questionValue, testNumber: Number(this.state.testNumber), userNumber: Number(this.state.userNumber) })
+                    Manage.distributePaper({ adminId: this.adminId, questionId: this.state.questionValue, testNumber: Number(this.state.testNumber), userNumber: Number(this.state.userNumber) })
                         .then((res) => {
                             // if (res.data.status === "10000") {
                                 this.setState({
@@ -132,6 +132,14 @@ export default class index extends Component {
         } else {
             message.warning('请将试卷分配信息填写完整！')
         }
+    }
+    goToDetail = () => {
+        if (this.state.subjectValue) {
+            this.props.history.push({pathname:"/home/management/detailTable",query:{subjectName:this.state.subjectValue}})
+        }else {
+            message.warning('请先选择科目！')
+        }
+        
     }
     render() {
         return (
@@ -200,7 +208,8 @@ export default class index extends Component {
                             </div>
                         </div>
                     </div>
-                    <Button type="primary" onClick={() => { this.distibutePaper() }}>确认</Button>
+                    <Button type="primary" onClick={() => { this.distributePaper() }}>确认</Button>
+                    <Button type="default" style={{ marginLeft: '20px' }} onClick={() => { this.goToDetail() }}>查看详情</Button>
                 </div>
             </DocumentTitle>
         )

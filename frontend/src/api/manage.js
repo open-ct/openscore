@@ -25,12 +25,20 @@ const Manage = {
     return axios.post('/marking/admin/questionBySubList', data)
   },
 
-  distibuteInfo(data) {
+  distributeInfo(data) {
     return axios.post('/marking/admin/distribution/info', data)
   },
-  distibutePaper(data) {
+
+  distributePaper(data) {
     return axios.post('/marking/admin/distribution', data)
   },
 
+  questionInfo(data) {
+    return axios.post('/marking/admin/topicList', data)
+  },
+  
+  paperInfo(data) {
+    return axios.post('/marking/admin/DistributionRecord', data)
+  },
 }
 export default Manage
