@@ -12,7 +12,6 @@ axios.defaults.headers['Content-Type'] = 'application/x-www-form-urlencoded;char
 const Manage = {
 
 
-
   questionImport(data) {
     return axios.post('/marking/admin/insertTopic', data)
   },

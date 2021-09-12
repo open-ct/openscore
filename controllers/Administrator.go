@@ -131,6 +131,7 @@ func (c *AdminApiController) ReadExcel(){
 
 	defer c.ServeJSON()
 	//var requestBody requests.ReadExcel
+//	c.Ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin",c.Ctx.Request.Header.Get("Origin"))
 	var resp Response
 	var  err error
 
@@ -721,7 +722,7 @@ func (c *AdminApiController) Pic() {
 	   //获取图片名
 	   picName := requestBody.PicName
        //获取图片地址（win版）
-	   src:="C:\\Users\\chen\\go\\src\\open-ct\\img\\"+picName
+	   src:=" C:\\Users\\yang\\Desktop\\阅卷系统\\img\\"+picName
 	   //linux版（）
        // var src := "/usr/workspace/src/open-ct/"+name
 
