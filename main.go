@@ -19,9 +19,10 @@ import (
 
 func main() {
 	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
-		AllowOrigins:     []string{"*"},
-		AllowMethods:     []string{"GET", "PUT", "PATCH", "POST"},
-		AllowHeaders:     []string{"Origin", "Access-Control-Allow-Origin", "Access-Control-Allow-Headers", "Content-Type"},
+		AllowOrigins: []string{"*"},
+		AllowMethods: []string{"GET", "PUT", "PATCH", "POST", "OPTIONS"},
+		// AllowHeaders:     []string{"Origin", "Access-Control-Allow-Origin", "Access-Control-Allow-Headers", "Content-Type"},
+		AllowHeaders:     []string{"Content-Type", "Access-Control-Allow-Headers", "X-Requested-With", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length", "Access-Control-Allow-Origin", "Access-Control-Allow-Headers", "Content-Type"},
 		AllowCredentials: true,
 	}))
@@ -34,9 +35,7 @@ func main() {
 	beego.BConfig.WebConfig.Session.SessionProviderConfig = "./tmp"
 	beego.BConfig.WebConfig.Session.SessionGCMaxLifetime = 3600 * 24 * 365
 
-
-
-//	http.Handle("/d/", http.StripPrefix("/d/", http.FileServer(http.Dir("d")))) // 正确
+	//	http.Handle("/d/", http.StripPrefix("/d/", http.FileServer(http.Dir("d")))) // 正确
 
 	//mux := http.NewServeMux()
 	//
@@ -54,8 +53,8 @@ func main() {
 	//if err != nil {
 	//	fmt.Println("服务器开启错误: ", err)
 
-		beego.Run()
-	}
+	beego.Run()
+}
 
 //func myWeb(w http.ResponseWriter, r *http.Request) {
 //	w.Header().Set("Access-Control-Allow-Origin", "*") //允许访问所有域
