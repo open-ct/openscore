@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"bufio"
+	"encoding/base64"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -129,33 +130,55 @@ func   UploadPic(name string,text  []string)(src string) {
 func (c *AdminApiController) ReadExcel(){
 
 	defer c.ServeJSON()
-	var requestBody requests.ReadExcel
+	//var requestBody requests.ReadExcel
 	var resp Response
 	var  err error
 
-	err =json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
-	if err!=nil {
+	//err =json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	//if err!=nil {
+	//	log.Println(err)
+	//	resp = Response{"10001","cannot unmarshal",err}
+	//	c.Data["json"] = resp
+	//	return
+	//}
+	//supervisorId := requestBody.SupervisorId
+	// filePath := requestBody.FilePath
+	//bytes := requestBody.Excel
+	//r := requests.ReadExcelBytes{}
+	_, header, err := c.GetFile("excel")
+	err = err
+	if err != nil {
+		log.Println(err)
 		resp = Response{"10001","cannot unmarshal",err}
 		c.Data["json"] = resp
 		return
 	}
-	//supervisorId := requestBody.SupervisorId
-	// filePath := requestBody.FilePath
-	bytes := requestBody.Excel
+	//bytes := r.Excel
+
 	//----------------------------------------------------
-
-
-
 	//bytes, err := os.ReadFile(filePath)
+	//
+	//
+	//file, err := os.Create("excelFile")
+	//if err!=nil {
+	//	log.Println(err)
+	//	resp = Response{"30000","excel 表导入错误",err}
+	//	c.Data["json"] = resp
+	//	return
+	//}
+	//_, err = file.Write(bytes)
+	//if err!=nil {
+	//	log.Println(err)
+	//	resp = Response{"30000","excel 表导入错误",err}
+	//	c.Data["json"] = resp
+	//	return
+	//}
 
-
-	file, err := os.Create("excelFile")
-	file.Write(bytes)
-
-
-	f, err := excelize.OpenFile("excelFile")
+	f, err := excelize.OpenFile(header.Filename)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
+		resp = Response{"30000","excel 表导入错误",err}
+		c.Data["json"] = resp
 		return
 	}
 
@@ -163,7 +186,9 @@ func (c *AdminApiController) ReadExcel(){
 	// Get all the rows in the Sheet1.
 	rows, err := f.GetRows("Sheet2")
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
+		resp = Response{"30000","excel 表导入错误",err}
+		c.Data["json"] = resp
 		return
 	}
 	
@@ -190,17 +215,34 @@ func (c *AdminApiController) ReadExcel(){
 				split := strings.Split(s, "\n")
 				src := UploadPic(rows[i][0]+rows[0][j], split)
 			    testPaperInfo.Pic_src=src
+				//查看大题试卷是否已经导入
+				has,err := testPaper.GetTestPaper(testId)
+				if err!=nil {
+					log.Println(err)
+				}
 
-				has, _ := testPaper.GetTestPaper(testId)
-
+				//导入大题试卷
 				if !has {
 					testPaper.Test_id=testId
 					testPaper.Question_id=questionId
 					testPaper.Candidate=name
-					 testPaper.Insert()
+					err = testPaper.Insert()
+					if err != nil {
+						log.Println(err)
+						resp = Response{"30001","试卷大题导入错误",err}
+						c.Data["json"] = resp
+						return
+					}
 				}
+				//导入小题试卷
 				testPaperInfo.Test_id=testId
-				testPaperInfo.Insert()
+				err = testPaperInfo.Insert()
+				if err != nil {
+					log.Println(err)
+					resp = Response{"30002","试卷小题导错误",err}
+					c.Data["json"] = resp
+					return
+				}
 
 			}
 
@@ -215,11 +257,23 @@ func (c *AdminApiController) ReadExcel(){
 	  var topic models.Topic
 		topic.Question_id=questionId
 		topic.Import_number=int64(len(rows)-1)
-		topic.Update()
+		err = topic.Update()
+		if err != nil {
+			log.Println(err)
+			resp = Response{"30003","大题导入试卷数更新错误",err}
+			c.Data["json"] = resp
+			return
+		}
 	}
 
-	 file.Close()
-	 os.Remove("excelFile")
+	//err = file.Close()
+	if err!=nil {
+		log.Println(err)
+	}
+	err = os.Remove("excelFile")
+	if err!=nil {
+		log.Println(err)
+	}
 	//------------------------------------------------
 	data := make(map[string]interface{})
 	data["data"] =nil
@@ -243,6 +297,7 @@ func (c *AdminApiController) QuestionBySubList() {
 
 	err =json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
 	if err!=nil {
+		log.Println(err)
 		resp = Response{"10001","cannot unmarshal",err}
 		c.Data["json"] = resp
 		return
@@ -254,7 +309,8 @@ func (c *AdminApiController) QuestionBySubList() {
 	topics  := make([]models.Topic,0)
 	err = models.FindTopicBySubNameList(&topics,subjectName)
 	if err!=nil {
-		resp  = Response{"30003","FindTopicBySubNameList err ",err}
+		log.Println(err)
+		resp  = Response{"30004","获取大题列表错误  ",err}
 		c.Data["json"] = resp
 		return
 	}
@@ -290,6 +346,7 @@ func (c *AdminApiController) InsertTopic(){
 
 		err =json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
 		if err!=nil {
+			log.Println(err)
 			resp = Response{"10001","cannot unmarshal",err}
 			c.Data["json"] = resp
 			return
@@ -306,10 +363,19 @@ func (c *AdminApiController) InsertTopic(){
 		//添加subject
 		var subject models.Subject
 		subject.SubjectName=subjectName
-	    flag ,_:= models.GetSubjectBySubjectName(&subject,subjectName)
+	    flag ,err:= models.GetSubjectBySubjectName(&subject,subjectName)
+		if err!=nil {
+		log.Println(err)
+		}
 	    subjectId := subject.SubjectId
 	if !flag {
 		err, subjectId = models.InsertSubject(&subject)
+		if err!=nil {
+			log.Println(err)
+			resp  = Response{"30005","科目导入错误  ",err}
+			c.Data["json"] = resp
+			return
+		}
 	}
 	//添加topic
 		var topic models.Topic
@@ -323,7 +389,8 @@ func (c *AdminApiController) InsertTopic(){
 
 		err, questionId:= models.InsertTopic(&topic)
 		if err!=nil {
-			resp  = Response{"30000","InsertTopic err ",err}
+			log.Println(err)
+			resp  = Response{"30006"," 大题参数导入错误 ",err}
 			c.Data["json"] = resp
 			return
 		}
@@ -340,14 +407,15 @@ func (c *AdminApiController) InsertTopic(){
 			subTopic.Question_id=questionId
 			err,questionDetailId:= models.InsertSubTopic(&subTopic)
 			if err!=nil {
-				resp  = Response{"30001","CreatSubTopic err ",err}
+				log.Println(err)
+				resp  = Response{"30007","小题参数导入错误  ",err}
 				c.Data["json"] = resp
 				return
 			}
 			addTopicDetailVOList[i].QuestionDetailId=questionDetailId
 		}
- addTopicVO.QuestionId=questionId
- addTopicVO.QuestionDetailIds=addTopicDetailVOList
+ 		addTopicVO.QuestionId=questionId
+ 		addTopicVO.QuestionDetailIds=addTopicDetailVOList
 		//----------------------------------------------------
 		data := make(map[string]interface{})
 		data["addTopicVO"] =addTopicVO
@@ -369,6 +437,7 @@ func (c *AdminApiController) SubjectList(){
 
 	err =json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
 	if err!=nil {
+		log.Println(err)
 		resp = Response{"10001","cannot unmarshal",err}
 		c.Data["json"] = resp
 		return
@@ -379,7 +448,8 @@ func (c *AdminApiController) SubjectList(){
 	subjects  := make([]models.Subject,0)
 	err = models.FindSubjectList(&subjects)
 	if err!=nil {
-		resp  = Response{"30002","FindSubjectList err ",err}
+		log.Println(err)
+		resp  = Response{"30008","科目列表获取错误  ",err}
 		c.Data["json"] = resp
 		return
 	}
@@ -413,6 +483,7 @@ func (c *AdminApiController) DistributionInfo(){
 
 	err =json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
 	if err!=nil {
+		log.Println(err)
 		resp = Response{"10001","cannot unmarshal",err}
 		c.Data["json"] = resp
 		return
@@ -427,11 +498,23 @@ func (c *AdminApiController) DistributionInfo(){
 	var topic models.Topic
 	topic.Question_id=questionId
 	err = topic.GetTopic(questionId)
+	if err!=nil {
+		log.Println(err)
+		resp  = Response{"30009","获取试卷导入数量错误  ",err}
+		c.Data["json"] = resp
+		return
+	}
 	importNumber:=topic.Import_number
 	distributionInfoVO.ImportTestNumber =importNumber
 
 	//获取在线人数
-	var onlineNumber ,_= models.CountOnlineNumber()
+	var onlineNumber ,err1= models.CountOnlineNumber()
+	if err1!=nil {
+		log.Println(err)
+		resp  = Response{"30010","获取可分配人数错误  ",err}
+		c.Data["json"] = resp
+		return
+	}
 	distributionInfoVO.OnlineNumber=onlineNumber
 
 
@@ -457,6 +540,7 @@ func (c *AdminApiController) Distribution(){
 
 	err =json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
 	if err!=nil {
+		log.Println(err)
 		resp = Response{"10001","cannot unmarshal",err}
 		c.Data["json"] = resp
 		return
@@ -471,18 +555,36 @@ func (c *AdminApiController) Distribution(){
 	//是否需要二次阅卷
 	var topic models.Topic
 	topic.Question_id=questionId
-	topic.GetTopic(questionId)
+	err = topic.GetTopic(questionId)
+	if err!=nil {
+		log.Println(err)
+		resp  = Response{"30011","试卷分配异常,无法获取试卷批改次数 ",err}
+		c.Data["json"] = resp
+		return
+	}
 	score_type := topic.Score_type
 
 	//查询相应试卷
 	papers := make([]models.TestPaper, 0)
-	models.FindUnDistributeTest(questionId,&papers)
+	err = models.FindUnDistributeTest(questionId, &papers)
+	if err!=nil {
+		log.Println(err)
+		resp  = Response{"30012","试卷分配异常，无法获取未分配试卷 ",err}
+		c.Data["json"] = resp
+		return
+	}
 	testPapers := cutTest(papers, testNumber)
 	//查找在线且未分配试卷的人
 	usersList := make([]models.User, 0)
-	models.FindUsers (&usersList)
+	err = models.FindUsers(&usersList)
+	if err!=nil {
+		log.Println(err)
+		resp  = Response{"30013","试卷分配异常，无法获取可分配阅卷员 ",err}
+		c.Data["json"] = resp
+		return
+	}
 	users := cutUser(usersList, userNumber)
-	//用户批改试卷计数器
+	//第一次分配试卷
 	countUser:=make([]int,userNumber)
 	var ii int
 	for i:=0 ;i<len(testPapers);{
@@ -493,16 +595,28 @@ func (c *AdminApiController) Distribution(){
 			}else {
 			//修改testPaper改为已分配
 			testPapers[ii].Correcting_status=1
-			testPapers[ii].Update()
+				err := testPapers[ii].Update()
+				if err!=nil {
+					log.Println(err)
+					resp  = Response{"30014","试卷第一次分配异常，无法更改试卷状态 ",err}
+					c.Data["json"] = resp
+					return
+				}
 
-			//添加试卷未批改记录
+				//添加试卷未批改记录
 			var underCorrectedPaper  models.UnderCorrectedPaper
 			underCorrectedPaper.Test_id=testPapers[ii].Test_id
 			underCorrectedPaper.Question_id=testPapers[ii].Question_id
 			underCorrectedPaper.Test_question_type=1
 			underCorrectedPaper.User_id=users[j].User_id
-			underCorrectedPaper.Save()
-			countUser[j]=countUser[j]+1
+				err = underCorrectedPaper.Save()
+				if err!=nil {
+					log.Println(err)
+					resp  = Response{"30015","试卷第一次分配异常，无法生成待批改试卷 ",err}
+					c.Data["json"] = resp
+					return
+				}
+				countUser[j]=countUser[j]+1
 			testNumber--
 			ii++
 			}
@@ -522,7 +636,13 @@ func (c *AdminApiController) Distribution(){
 				}else {
 					//修改testPaper改为已分配
 					testPapers[ii].Correcting_status=1
-					testPapers[ii].Update()
+					err := testPapers[ii].Update()
+					if err!=nil {
+						log.Println(err)
+						resp  = Response{"30016","试卷第二次分配异常，无法更改试卷状态 ",err}
+						c.Data["json"] = resp
+						return
+					}
 
 					//添加试卷未批改记录
 					var underCorrectedPaper  models.UnderCorrectedPaper
@@ -530,7 +650,13 @@ func (c *AdminApiController) Distribution(){
 					underCorrectedPaper.Question_id=testPapers[ii].Question_id
 					underCorrectedPaper.Test_question_type=2
 					underCorrectedPaper.User_id=users[j].User_id
-					underCorrectedPaper.Save()
+					err = underCorrectedPaper.Save()
+					if err!=nil {
+						log.Println(err)
+						resp  = Response{"30017","试卷第二次分配异常，无法更改试卷状态 ",err}
+						c.Data["json"] = resp
+						return
+					}
 					countUser[j]=countUser[j]+1
 					testNumber--
 					ii++
@@ -547,13 +673,25 @@ func (c *AdminApiController) Distribution(){
 		paperDistribution.Test_distribution_number=int64(countUser[i])
 		paperDistribution.User_id=users[i].User_id
 		paperDistribution.Question_id=questionId
-		paperDistribution.Save()
+		err := paperDistribution.Save()
+		if err!=nil {
+			log.Println(err)
+			resp  = Response{"30018","试卷分配异常，试卷分配添加异常 ",err}
+			c.Data["json"] = resp
+			return
+		}
 
 		//修改user变为已分配
 		var user models.User
 		user.IsDistribute=1
 		user.QuestionId=questionId
-		user.Update()
+		err = user.Update()
+		if err!=nil {
+			log.Println(err)
+			resp  = Response{"30019","试卷分配异常，用户分配状态更新失败 ",err}
+			c.Data["json"] = resp
+			return
+		}
 
 	}
 
@@ -574,6 +712,7 @@ func (c *AdminApiController) Pic() {
 	var  err error
 	err =json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
 	if err!=nil {
+		log.Println(err)
 		resp = Response{"10001","cannot unmarshal",err}
 		c.Data["json"] = resp
 		return
@@ -587,12 +726,23 @@ func (c *AdminApiController) Pic() {
        // var src := "/usr/workspace/src/open-ct/"+name
 
      //-------------------------------------
-	data, err := os.ReadFile(src)
-	c.Ctx.Output.Header("Content-Type", "image/jpeg")
-	c.Ctx.Output.Header("Content-Length", strconv.Itoa(len(data)))
-	c.Ctx.WriteString(string(data))
-	c.Ctx.ResponseWriter.WriteHeader(200)
-
+	bytes, err := os.ReadFile(src)
+	encoding := base64.StdEncoding.EncodeToString(bytes)
+	if err!=nil {
+		log.Println(err)
+		resp  = Response{"30020","图片显示异常 ",err}
+		c.Data["json"] = resp
+		return
+	}
+	//c.Ctx.Output.Header("Content-Type", "image/jpeg")
+	//c.Ctx.Output.Header("Content-Length", strconv.Itoa(len(data)))
+	//c.Ctx.WriteString(string(data))
+	//c.Ctx.ResponseWriter.WriteHeader(200)
+	//----------------------------
+	data := make(map[string]interface{})
+	data["encoding"] =encoding
+	resp = Response{"10000", "OK", data}
+	c.Data["json"] = resp
 }
 
 /**
@@ -609,7 +759,7 @@ func revers(users []models.User)  {
 /**
 截断数组函数
  */
-func cutTest(oldData []models.TestPaper, n int) (newData[]models.TestPaper) {
+func cutTest(oldData []models.TestPaper, n int) (newData[]models.TestPaper ) {
 	 newData1 := make([]models.TestPaper, n)
 	for i:=0 ;i<n;i++ {
 		newData1[i]=oldData[i]
@@ -637,6 +787,7 @@ func (c *AdminApiController) TopicList() {
 
 	err =json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
 	if err!=nil {
+		log.Println(err)
 		resp = Response{"10001","cannot unmarshal",err}
 		c.Data["json"] = resp
 		return
@@ -648,7 +799,8 @@ func (c *AdminApiController) TopicList() {
 	topics  := make([]models.Topic,0)
 	err = models.FindTopicList(&topics)
 	if err!=nil {
-		resp  = Response{"0000","FindTopicList err ",err}
+		log.Println(err)
+		resp  = Response{"30021","获取大题参数设置记录表失败  ",err}
 		c.Data["json"] = resp
 		return
 	}
@@ -666,6 +818,12 @@ func (c *AdminApiController) TopicList() {
 
 		subTopics := make([]models.SubTopic, 0)
 		models.FindSubTopicsByQuestionId(topics[i].Question_id,&subTopics)
+		if err!=nil {
+			log.Println(err)
+			resp  = Response{"30022","获取小题参数设置记录表失败  ",err}
+			c.Data["json"] = resp
+			return
+		}
 		subTopicVOS := make([]responses.SubTopicVO, len(subTopics))
 		for j:=0;j<len(subTopics);j++ {
 			subTopicVOS[j].SubTopicId=subTopics[j].Question_detail_id
@@ -695,6 +853,7 @@ func (c *AdminApiController) DistributionRecord() {
 
 	err =json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
 	if err!=nil {
+		log.Println(err)
 		resp = Response{"10001","cannot unmarshal",err}
 		c.Data["json"] = resp
 		return
@@ -706,7 +865,8 @@ func (c *AdminApiController) DistributionRecord() {
 	topics  := make([]models.Topic,0)
 	err = models.FindTopicBySubNameList(&topics,subjectName)
 	if err!=nil {
-		resp  = Response{"30003","FindTopicBySubNameList err ",err}
+		log.Println(err)
+		resp  = Response{"30023","获取试卷分配记录表失败  ",err}
 		c.Data["json"] = resp
 		return
 	}
@@ -717,10 +877,20 @@ func (c *AdminApiController) DistributionRecord() {
 		distributionRecordList[i].TopicId=topics[i].Question_id
 		distributionRecordList[i].TopicName=topics[i].Question_name
 		distributionRecordList[i].ImportNumber=topics[i].Import_number
-		distributionTestNumber,err1 :=models.CountTestDistributionNumberByQuestionId(topics[i].Question_id)
-		fmt.Println(err1)
-		distributionUserNumber ,err1:=models.CountUserDistributionNumberByQuestionId(topics[i].Question_id)
-		fmt.Println(err1)
+		distributionTestNumber,err :=models.CountTestDistributionNumberByQuestionId(topics[i].Question_id)
+		if err!=nil {
+			log.Println(err)
+			resp  = Response{"30024","获取试卷分配记录表失败，统计试卷已分配数失败  ",err}
+			c.Data["json"] = resp
+			return
+		}
+		distributionUserNumber ,err:=models.CountUserDistributionNumberByQuestionId(topics[i].Question_id)
+		if err!=nil {
+			log.Println(err)
+			resp  = Response{"30025","获取试卷分配记录表失败，统计用户已分配数失败  ",err}
+			c.Data["json"] = resp
+			return
+		}
 		distributionRecordList[i].DistributionUserNumber=distributionUserNumber
 		distributionRecordList[i].DistributionTestNumber=distributionTestNumber
 
