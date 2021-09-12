@@ -35,15 +35,16 @@ type Distribution struct {
 	UserNumber int `json:"userNumber"`
 
 }
-type ReadExcel struct {
-	AdminId string   `json:"adminId"`
-//	FilePath string  `json:"filePath"`
-
-	Excel []byte    `json:"excel"`
-
-
-
-}
+//type ReadExcel struct {
+//	AdminId string   `json:"adminId"`
+////	FilePath string  `json:"filePath"`
+//	Excel []byte    `json:"excel"`
+//}
+//
+//type ReadExcelBytes struct {
+//	AdminId string   ` form:"adminId"  binding:"required"`
+//	Excel []byte    `form:"excel"   binding:"required"`
+//}
 type ReadFile struct {
 	PicName string 	`json:"picName"`
 }
