@@ -10,16 +10,40 @@ import * as Util from "../../../../util/Util";
 const { Option } = Select;
 export default class index extends Component {
 
-    constructor(props) {
-        super(props);
-        // create a ref to store the textInput DOM element
-        this.myInput_name = React.createRef();
-        this.myInput_score = React.createRef();
-        this.myInput_type = React.createRef();
-    }
+    // constructor(props) {
+    //     super(props);
+    //     // create a ref to store the textInput DOM element
+    //     this.myInput_name = React.createRef();
+    //     this.myInput_score = React.createRef();
+    //     this.myInput_type = React.createRef();
+    // }
     adminId = "1"
     state = {
         questionList: [
+
+        ],
+        questionNo: 0,
+        subjectName: "语文",
+        topicName: undefined,
+        score: undefined,
+        error: undefined,
+        scoreType: 0,
+        topicDetails: [
+            {
+                topicDetailName: undefined,
+                detailScore: undefined,
+                DetailScoreTypes: undefined
+            }
+        ],
+        loading: false,
+        QuestionId: undefined,
+        QuestionDetailIds: [],
+        visible: false
+    }
+
+    componentDidMount() {
+        let questionList = [...this.state.questionList]
+        questionList.push(
             <div className="question-input" key={0}>
                 <div className="question-item">
                     小题名：<Input placeholder="请输入小题名" style={{ width: 120 }} onChange={e => {
@@ -52,28 +76,10 @@ export default class index extends Component {
                     }} />
                 </div>
             </div>
-        ],
-        questionNo: 0,
-        subjectName: "语文",
-        topicName: undefined,
-        score: undefined,
-        error: undefined,
-        scoreType: 0,
-        topicDetails: [
-            {
-                topicDetailName: undefined,
-                detailScore: undefined,
-                DetailScoreTypes: undefined
-            }
-        ],
-        loading: false,
-        QuestionId: undefined,
-        QuestionDetailIds: [],
-        visible: false
-    }
-
-    componentDidMount() {
-
+        )
+        this.setState({
+            questionList
+        })
     }
 
     questionAdd = () => {
@@ -92,7 +98,13 @@ export default class index extends Component {
                 <div className="question-item">
                     小题名：<Input placeholder="请输入小题名" style={{ width: 120 }} onChange={e => {
                         let topicDetails = [...this.state.topicDetails]
-                        topicDetails[questionNo].topicDetailName = e.target.value
+                        let addNo
+                        for (let i = 0; i < this.state.questionList.length; i++) {
+                            if (this.state.questionList[i].key === questionNo.toString()) {
+                                addNo = i
+                            }
+                        }
+                        topicDetails[addNo]['topicDetailName'] = e.target.value
                         console.log(topicDetails)
                         this.setState({
                             topicDetails
@@ -102,7 +114,13 @@ export default class index extends Component {
                 <div className="question-item">
                     小题满分：<Input placeholder="请输入分数" style={{ width: 120 }} onChange={e => {
                         let topicDetails = [...this.state.topicDetails]
-                        topicDetails[questionNo].detailScore = Number(e.target.value)
+                        let addNo
+                        for (let i = 0; i < this.state.questionList.length; i++) {
+                            if (this.state.questionList[i].key === questionNo.toString()) {
+                                addNo = i
+                            }
+                        }
+                        topicDetails[addNo]['detailScore'] = Number(e.target.value)
                         this.setState({
                             topicDetails
                         })
@@ -111,7 +129,13 @@ export default class index extends Component {
                 <div className="question-item">
                     分数分布：<Input placeholder="请输入分布" style={{ width: 120 }} onChange={e => {
                         let topicDetails = [...this.state.topicDetails]
-                        topicDetails[questionNo].DetailScoreTypes = e.target.value
+                        let addNo
+                        for (let i = 0; i < this.state.questionList.length; i++) {
+                            if (this.state.questionList[i].key === questionNo.toString()) {
+                                addNo = i
+                            }
+                        }
+                        topicDetails[addNo]['DetailScoreTypes'] = e.target.value
                         this.setState({
                             topicDetails
                         })
@@ -130,11 +154,11 @@ export default class index extends Component {
     questionDel = (questionNo) => {
         let deleteNo
         let topicDetails = [...this.state.topicDetails]
-        for (let i = 1; i < this.state.questionList.length; i++) {
+        for (let i = 0; i < this.state.questionList.length; i++) {
             console.log(this.state.questionList[i].key)
             if (this.state.questionList[i].key === questionNo.toString()) {
                 deleteNo = i
-                topicDetails[questionNo] = {}
+                topicDetails.splice(i,1)
             }
         }
         console.log(topicDetails)
@@ -200,7 +224,7 @@ export default class index extends Component {
     }
     hideModal = () => {
         this.setState({
-            questionNo: 0,
+            questionNo: -1,
             subjectName: "语文",
             topicName: undefined,
             score: undefined,
@@ -213,55 +237,13 @@ export default class index extends Component {
         })
         this.setState({
             topicDetails: [
-                {
-                    topicDetailName: undefined,
-                    detailScore: undefined,
-                    DetailScoreTypes: undefined
-                }
             ],
-            questionList : [
-                <div className="question-input" key={0}>
-                    <div className="question-item">
-                        小题名：<Input placeholder="请输入小题名" ref={this.myInput_name} style={{ width: 120 }} onChange={e => {
-                            console.log(e.target.value)
-                            console.log(this.myInput_name)
-                            let topicDetails = [...this.state.topicDetails]
-                            topicDetails[0].topicDetailName = e.target.value
-                            this.setState({
-                                topicDetails
-                            })
-
-                        }} />
-                    </div>
-                    <div className="question-item">
-                        小题满分：<Input placeholder="请输入分数" ref={this.myInput_score} style={{ width: 120 }} onChange={e => {
-                            let topicDetails = [...this.state.topicDetails]
-                            topicDetails[0].detailScore = Number(e.target.value)
-                            this.setState({
-                                topicDetails
-                            })
-
-                        }} />
-                    </div>
-                    <div className="question-item">
-                        分数分布：<Input placeholder="请输入分布" ref={this.myInput_type} style={{ width: 120 }} onChange={e => {
-                            let topicDetails = [...this.state.topicDetails]
-                            topicDetails[0].DetailScoreTypes = e.target.value
-                            this.setState({
-                                topicDetails
-                            })
-
-                        }} />
-                    </div>
-                </div>
+            questionList: [
             ]
-        }, () => {
-            this.myInput_name.current.state.value = undefined;
-            this.myInput_score.current.state.value = undefined;
-            this.myInput_type.current.state.value = undefined;
-            
         }
-
+            // this.myInput_name.current.state.value = undefined;
+            // this.myInput_score.current.state.value = undefined;
+            // this.myInput_type.current.state.value = undefined;
         )
         message.success("题目设置成功！")
     }
@@ -369,6 +351,7 @@ export default class index extends Component {
                     }
                     <Button type="primary" onClick={() => { this.confirmQuestionId() }} loading={this.state.loading}>确认</Button>
                     <Button type="default" style={{ marginLeft: '20px' }} onClick={() => { this.goToDetail() }}>查看详情</Button>
+                    <Button onClick={()=>{console.log(this.state.topicDetails,this.state.questionList)}}>...</Button>
                 </div>
             </DocumentTitle>
         )

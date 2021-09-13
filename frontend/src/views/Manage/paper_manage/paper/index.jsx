@@ -20,7 +20,7 @@ export default class index extends Component {
 
   render() {
     const props = {
-      name: 'file',
+      name: 'excel',
       action: 'http://localhost:8080/openct/marking/admin/readExcel',
       headers: {
         authorization: 'authorization-text',
