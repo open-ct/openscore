@@ -1,12 +1,14 @@
 package controllers
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"log"
 	"math"
 	"openscore/models"
 	"openscore/requests"
 	"openscore/responses"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -58,7 +60,19 @@ func (c *TestPaperApiController) Display() {
 		tempSubTopic := responses.SubTopicPlus{SubTopic: subTopic[i], Test_detail_id: testPaperInfo.Test_detail_id}
 
 		response.SubTopics = append(response.SubTopics, tempSubTopic)
-		response.TestInfos = append(response.TestInfos, testPaperInfo)
+		picName := testPaperInfo.Pic_src
+		src:="C:\\Users\\chen\\go\\src\\openscore\\img\\"+picName
+		bytes, err := os.ReadFile(src)
+		if err!=nil {
+			log.Println(err)
+			resp := Response{"30020", "get 图片显示异常 ", err}
+			c.Data["json"] = resp
+			return
+
+		}
+		encoding := base64.StdEncoding.EncodeToString(bytes)
+		tempTestPaperInfo :=responses.TestPaperInfoPlus{TestPaperInfo:testPaperInfo,PicCode:encoding }
+		response.TestInfos = append(response.TestInfos, tempTestPaperInfo)
 	}
 	response.QuestionId = topic.Question_id
 	response.QuestionName = topic.Question_name

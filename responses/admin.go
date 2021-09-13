@@ -22,6 +22,7 @@ type QuestionBySubListVO struct {
 }
 type DistributionInfoVO struct {
 	ImportTestNumber  int64
+	LeftTestNumber int
 	OnlineNumber int64
 }
 type TopicVO struct {
