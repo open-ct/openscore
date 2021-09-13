@@ -52,16 +52,16 @@ func init() {
 	  chen :管理员端
 	*/
 	//beego.Router("/openct/marking/admin/uploadPic",&controllers.AdminApiController{},"post:UploadPic")
-	beego.Router("/openct/marking/admin/readExcel", &controllers.AdminApiController{}, "post:ReadExcel")
+	beego.Router("/openct/marking/admin/readExcel",&controllers.AdminApiController{},"post:ReadExcel")
 	beego.Router("/openct/marking/admin/readExcel", &controllers.AdminApiController{}, "OPTIONS:ReadExcel")
-	beego.Router("/openct/marking/admin/distribution", &controllers.AdminApiController{}, "post:Distribution")
-	beego.Router("/openct/marking/admin/distribution/info", &controllers.AdminApiController{}, "post:DistributionInfo")
-	beego.Router("/openct/marking/admin/questionBySubList", &controllers.AdminApiController{}, "post:QuestionBySubList")
-	beego.Router("/openct/marking/admin/insertTopic", &controllers.AdminApiController{}, "post:InsertTopic")
-	beego.Router("/openct/marking/admin/subjectList", &controllers.AdminApiController{}, "post:SubjectList")
-	beego.Router("/openct/marking/admin/topicList", &controllers.AdminApiController{}, "post:TopicList")
-	beego.Router("/openct/marking/admin/DistributionRecord", &controllers.AdminApiController{}, "post:DistributionRecord")
+	beego.Router("/openct/marking/admin/distribution",&controllers.AdminApiController{},"post:Distribution")
+	beego.Router("/openct/marking/admin/distribution/info",&controllers.AdminApiController{},"post:DistributionInfo")
+	beego.Router("/openct/marking/admin/questionBySubList",&controllers.AdminApiController{},"post:QuestionBySubList")
+	beego.Router("/openct/marking/admin/insertTopic",&controllers.AdminApiController{},"post:InsertTopic")
+	beego.Router("/openct/marking/admin/subjectList",&controllers.AdminApiController{},"post:SubjectList")
+	beego.Router("/openct/marking/admin/topicList",&controllers.AdminApiController{},"post:TopicList")
+	beego.Router("/openct/marking/admin/DistributionRecord",&controllers.AdminApiController{},"post:DistributionRecord")
 
-	beego.Router("/openct/marking/admin/img", &controllers.AdminApiController{}, "post:Pic")
+	beego.Router("/openct/marking/admin/img",&controllers.AdminApiController{},"post:Pic")
 
 }
