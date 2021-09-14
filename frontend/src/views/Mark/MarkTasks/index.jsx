@@ -86,7 +86,7 @@ export default class index extends Component {
     if (this.state.currentPaper.testInfos != undefined) {
       testPaper = this.state.currentPaper.testInfos.map((item) => {
         return <div className="test-question-img" data-content-before={this.imgScore(item.test_detail_id)}>
-          <img src={item.pic_src} alt="加载失败" />
+          <img src={'data:image/jpg;base64,'+item.picCode} alt="加载失败" />
         </div>
       })
     }
@@ -261,9 +261,9 @@ export default class index extends Component {
         let Qustion_detail_id = Util.getTextByJs(this.state.selectId);
         let Question_detail_score = Util.getTextByJs(this.state.selectScore);
         if (value == 1) {
-          if (this.state.selectScore.length < 3) {
-            message.warning('请将分数打全')
-          } else {
+          // if (this.state.selectScore.length < 3) {
+          //   message.warning('请将分数打全')
+          // } else {
             Marking.testPoint({
               userId: this.userId,
               testId: this.state.currentPaper.testId,
@@ -281,7 +281,7 @@ export default class index extends Component {
               .catch((e) => {
                 console.log(e)
               })
-          }
+          // }
         } else if (value == 3) {
           console.log('3')
         } else {

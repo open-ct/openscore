@@ -61,7 +61,7 @@ func (c *TestPaperApiController) Display() {
 
 		response.SubTopics = append(response.SubTopics, tempSubTopic)
 		picName := testPaperInfo.Pic_src
-		src:="C:\\Users\\chen\\go\\src\\openscore\\img\\"+picName
+		src:="C:\\Users\\yang\\Desktop\\阅卷系统\\img\\"+picName
 		bytes, err := os.ReadFile(src)
 		if err!=nil {
 			log.Println(err)

@@ -90,8 +90,8 @@ export default class index extends Component {
     ]
     render() {
         return (
-            <DocumentTitle title="阅卷系统-平均分监控">
-                <div className="average-monitor-page" data-component="average-monitor-page">
+            <DocumentTitle title="阅卷系统-标准差监控">
+                <div className="standard-monitor-page" data-component="standard-monitor-page">
                     <div className="search-container">
                         <div className="question-select">
                             题目选择：<Select
