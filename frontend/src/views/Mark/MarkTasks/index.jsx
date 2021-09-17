@@ -12,6 +12,7 @@ const { Option } = Select;
 export default class index extends Component {
 
   userId = "1"
+
   state = {
     problemVisible: false,
     problemValue: 1,
@@ -28,6 +29,7 @@ export default class index extends Component {
   componentDidMount() {
     this.getAllPaper();
   }
+
   // 总试卷获取 
   getAllPaper = () => {
     Marking.testList({ userId: this.userId })
@@ -37,7 +39,6 @@ export default class index extends Component {
           this.setState(
             {
               papers,
-              testLength: res.data.data.papers.length
             }
           )
           this.getCurrentPaper();
@@ -47,6 +48,7 @@ export default class index extends Component {
         console.log(e)
       })
   }
+
   // 当前试卷
   getCurrentPaper = () => {
     Marking.testDisplay({ userId: this.userId, testId: this.state.papers[0] })
@@ -54,6 +56,7 @@ export default class index extends Component {
         if (res.data.status == "10000") {
           let currentPaper = res.data.data
           let subTopic = res.data.data.subTopic
+          let testLength = res.data.data.subTopic.length
           let markScore = []
           for (let i = 0; i < subTopic.length; i++) {
             markScore.push(subTopic[i].score_type.split('-'))
@@ -61,7 +64,8 @@ export default class index extends Component {
           this.setState({
             currentPaper,
             subTopic,
-            markScore
+            markScore,
+            testLength
           })
         }
       })
@@ -69,6 +73,7 @@ export default class index extends Component {
         console.log(e)
       })
   }
+
   // 打分展示
   imgScore = (item) => {
     let index
@@ -80,6 +85,7 @@ export default class index extends Component {
     console.log(this.state.selectScore[index])
     return this.state.selectScore[index]
   }
+
   // 阅卷区
   showTest = () => {
     let testPaper = null;
@@ -93,6 +99,7 @@ export default class index extends Component {
 
     return testPaper
   }
+
   render() {
     return (
       <DocumentTitle title="阅卷系统-评卷">
@@ -114,8 +121,8 @@ export default class index extends Component {
       </DocumentTitle>
     )
   }
-  // 评分区
 
+  // 评分区
   selectBox = (index) => {
     let selectList
     if (this.state.markScore.length != 0) {
@@ -160,7 +167,7 @@ export default class index extends Component {
   }
   select = (item, value) => {
     console.log(item)
-    if (this.state.selectId.length < 3) {
+    if (this.state.selectId.length < this.state.testLength) {
       this.setState({
         selectId: [...this.state.selectId, item],
         selectScore: [...this.state.selectScore, value]
@@ -261,9 +268,9 @@ export default class index extends Component {
         let Qustion_detail_id = Util.getTextByJs(this.state.selectId);
         let Question_detail_score = Util.getTextByJs(this.state.selectScore);
         if (value == 1) {
-          // if (this.state.selectScore.length < 3) {
-          //   message.warning('请将分数打全')
-          // } else {
+          if (this.state.selectScore.length < this.state.testLength) {
+            message.warning('请将分数打全')
+          } else {
             Marking.testPoint({
               userId: this.userId,
               testId: this.state.currentPaper.testId,
@@ -271,17 +278,20 @@ export default class index extends Component {
               testDetailId: Qustion_detail_id
             })
               .then((res) => {
-                this.setState({
-                  selectId: [],
-                  selectScore: [],
-                  currentPaper: {}
-                })
-                this.getAllPaper();
+                if (res.data.status == "10000") {
+                  this.setState({
+                    selectId: [],
+                    selectScore: [],
+                    currentPaper: {}
+                  })
+                  this.getAllPaper();
+                  message.success('打分成功')
+                }
               })
               .catch((e) => {
                 console.log(e)
               })
-          // }
+          }
         } else if (value == 3) {
           console.log('3')
         } else {

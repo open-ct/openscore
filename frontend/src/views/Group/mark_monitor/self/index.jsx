@@ -43,9 +43,11 @@ export default class index extends Component {
         },
 
     ]
+
     componentDidMount() {
         this.questionList();
     }
+    
     getOption = ()=>{ 
         let X_data=[]
         let Y1_data=[]

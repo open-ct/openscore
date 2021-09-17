@@ -23,7 +23,7 @@ export default class index extends Component {
 
         ],
         questionNo: 0,
-        subjectName: "语文",
+        subjectName: undefined,
         topicName: undefined,
         score: undefined,
         error: undefined,
@@ -225,7 +225,7 @@ export default class index extends Component {
     hideModal = () => {
         this.setState({
             questionNo: -1,
-            subjectName: "语文",
+            subjectName: undefined,
             topicName: undefined,
             score: undefined,
             error: undefined,
@@ -290,18 +290,11 @@ export default class index extends Component {
                         <div className="setting-box">
                             <div className="setting-input">
                                 <div className="subject-item">
-                                    科目选择：    <Select
-                                        defaultValue={this.state.subjectName}
-                                        style={{ width: 120 }}
-                                        onSelect={(e) => {
-                                            this.setState({
-                                                subjectName: e
-                                            })
-                                        }}>
-                                        <Option value="语文">语文</Option>
-                                        <Option value="数学">数学</Option>
-                                        <Option value="英语">英语</Option>
-                                    </Select>
+                                    科目选择：    <Input placeholder="请输入科目名" value={this.state.subjectName} style={{ width: 120 }} onChange={e => {
+                                        this.setState({
+                                            subjectName: e.target.value
+                                        })
+                                    }} />
                                 </div>
                                 <div className="subject-item">
                                     大题名：<Input placeholder="请输入大题名" value={this.state.topicName} style={{ width: 120 }} onChange={e => {
@@ -351,7 +344,6 @@ export default class index extends Component {
                     }
                     <Button type="primary" onClick={() => { this.confirmQuestionId() }} loading={this.state.loading}>确认</Button>
                     <Button type="default" style={{ marginLeft: '20px' }} onClick={() => { this.goToDetail() }}>查看详情</Button>
-                    <Button onClick={()=>{console.log(this.state.topicDetails,this.state.questionList)}}>...</Button>
                 </div>
             </DocumentTitle>
         )

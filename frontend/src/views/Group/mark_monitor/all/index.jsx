@@ -22,16 +22,19 @@ export default class index extends Component {
                     title: '题号',
                     width: 90,
                     dataIndex: 'QuestionId',
+                    fixed: 'left',
                 },
                 {
                     title: '题名',
                     width: 90,
                     dataIndex: 'QuestionName',
+                    fixed: 'left',
                 },
                 {
                     title: '任务总量',
                     width: 90,
                     dataIndex: 'ImportNumber',
+                    fixed: 'left',
                 },
 
             ]
@@ -76,27 +79,27 @@ export default class index extends Component {
             children: [
                 {
                     title: '一评完成量',
-                    width: 90,
+
                     dataIndex: 'FirstFinishedNumber',
                 },
                 {
                     title: '一评完成率',
-                    width: 90,
+
                     dataIndex: 'FirstFinishedRate',
                 },
                 {
                     title: '一评未完成量',
-                    width: 90,
+
                     dataIndex: 'FirstUnfinishedNumber',
                 },
                 {
                     title: '一评未完成率',
-                    width: 90,
+
                     dataIndex: 'FirstUnfinishedRate',
                 },
                 {
                     title: '状态',
-                    width: 90,
+
                     dataIndex: 'IsFirstFinished',
                 },
             ]
@@ -106,22 +109,22 @@ export default class index extends Component {
             children: [
                 {
                     title: '二评完成量',
-                    width: 90,
+
                     dataIndex: 'SecondFinishedNumber',
                 },
                 {
                     title: '二评完成率',
-                    width: 90,
+
                     dataIndex: 'SecondFinishedRate',
                 },
                 {
                     title: '二评未完成量',
-                    width: 90,
+
                     dataIndex: 'SecondUnfinishedNumber',
                 },
                 {
                     title: '二评未完成率',
-                    width: 90,
+
                     dataIndex: 'SecondUnfinishedRate',
                 },
                 {
@@ -340,6 +343,7 @@ export default class index extends Component {
                             pagination={{ position: ['bottomCenter'] }}
                             columns={this.columns}
                             dataSource={this.state.tableData}
+                            scroll={{x:4000}}
                         />
                     </div>
                 </div>

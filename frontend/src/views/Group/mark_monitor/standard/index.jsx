@@ -45,6 +45,7 @@ export default class index extends Component {
         }
         return selectList
     }
+    
     select = (e) => {
         let index
         for (let i = 0; i < this.state.questionList.length; i++) {
