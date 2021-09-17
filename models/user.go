@@ -2,6 +2,7 @@ package models
 
 import (
 	"log"
+	"math/rand"
 	"time"
 
 	"xorm.io/builder"
@@ -59,4 +60,15 @@ func FindUsers( u *[]User) error {
 		log.Println(err)
 	}
 	return err
+}
+func FindNewUserId(id1 string,id2 string,questionId int64) (newId string ){
+	var Ids []string
+	err := x.Table("user").Where("user_id !=?", id1).Where("user_id !=?", id2).Where("question_id=?",questionId).Where("status=?",1).Select("user_id").Find(&Ids)
+	if err!=nil {
+		log.Println("FindNewUserId err")
+		log.Println(err)
+	}
+	k:=rand.Intn(len(Ids)-1)
+	newId=Ids[k]
+	return  newId
 }

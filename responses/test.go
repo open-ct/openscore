@@ -24,11 +24,12 @@ type TestDisplay struct {
 }
 
 type TestList struct {
-	TestId []int64 `json:"papers"`
+	TestId []int64 `json:"TestIds"`
 }
 
 type TestAnswer struct {
-	Pic_src []string `json:"keyTest"`
+	Pics []string `json:"Pics"`
+
 }
 
 type ExampleList struct {
@@ -41,7 +42,7 @@ type TestReview struct {
 	ScoreTime []time.Time `json:"score_time"`
 }
 
-type ExampleDeatil struct {
-	QuestionName string                   `json:"quetsionName"`
+type ExampleDetail struct {
+	QuestionName string                   `json:"questionName"`
 	Test         [][]models.TestPaperInfo `json:"test"`
 }
