@@ -595,16 +595,37 @@ func (c *TestPaperApiController) ReviewPoint() {
 		c.Data["json"] = resp
 		return
 	}
+	//判断是否二次阅卷
+	var topic  models.Topic
+	topic.GetTopic(test.Question_id)
+	scoreType := topic.Score_type
+
 	num := 0
 	if test.Examiner_first_id == userId {
 		num = 0
 		test.Examiner_first_score = sum
+		if scoreType ==1 {
+			test.Final_score=sum
+		}
+		var record models.ScoreRecord
+		record.GetRecordByTestId(testId,userId)
+		record.Score=sum
+		record.Update()
+
 	} else if test.Examiner_second_id == userId {
 		num = 1
 		test.Examiner_second_score = sum
+		var record models.ScoreRecord
+		record.GetRecordByTestId(testId,userId)
+		record.Score=sum
+		record.Update()
 	} else {
 		num = 2
 		test.Examiner_third_score = sum
+		var record models.ScoreRecord
+		record.GetRecordByTestId(testId,userId)
+		record.Score=sum
+		record.Update()
 	}
 	err = test.Update()
 	if err != nil || test.Test_id == 0 {
@@ -619,6 +640,9 @@ func (c *TestPaperApiController) ReviewPoint() {
 		testInfo.GetTestPaperInfo(testInfoId)
 		if num == 0 {
 			testInfo.Examiner_first_score = scoreArr[i]
+			if scoreType ==1 {
+				testInfo.Final_score=scoreArr[i]
+			}
 		} else if num == 1 {
 			testInfo.Examiner_second_score = scoreArr[i]
 		} else {

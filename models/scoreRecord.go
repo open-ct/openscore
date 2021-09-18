@@ -26,7 +26,13 @@ func (s *ScoreRecord) GetTopic(id int64) error {
 	}
 	return err
 }
-
+func (s *ScoreRecord) GetRecordByTestId(testId int64,userId string) error {
+	has, err := x.Where(builder.Eq{"test_id": testId}).Where("user_id=?",userId).Where("test_record_type !=0").Get(s)
+	if !has || err != nil {
+		log.Println("could not find user")
+	}
+	return err
+}
 func (r *ScoreRecord) Save() error {
 	code, err := x.Insert(r)
 	if code == 0 || err != nil {
@@ -177,3 +183,11 @@ func CountTestByScore(question int64, score int64) (count int64,err1 error){
 	return count,err
 }
 
+func (s *ScoreRecord) Update() error {
+	code, err := x.Where(builder.Eq{"test_id": s.Test_id}).Update(s)
+	if code == 0 || err != nil {
+		log.Println("update ScoreRecord fail")
+		log.Printf("%+v", err)
+	}
+	return err
+}
