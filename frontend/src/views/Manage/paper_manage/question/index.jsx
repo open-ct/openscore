@@ -27,7 +27,7 @@ export default class index extends Component {
         topicName: undefined,
         score: undefined,
         error: undefined,
-        scoreType: 0,
+        scoreType: 1,
         topicDetails: [
             {
                 topicDetailName: undefined,
@@ -229,7 +229,7 @@ export default class index extends Component {
             topicName: undefined,
             score: undefined,
             error: undefined,
-            scoreType: 0,
+            scoreType: 1,
             loading: false,
             QuestionId: undefined,
             QuestionDetailIds: [],
@@ -326,8 +326,8 @@ export default class index extends Component {
                                         })
                                     }}
                                     defaultValue={this.state.scoreType}>
-                                    <Radio value={0}>否</Radio>
-                                    <Radio value={1}>是</Radio>
+                                    <Radio value={1}>否</Radio>
+                                    <Radio value={2}>是</Radio>
                                 </Radio.Group>
                             </div>
                         </div>

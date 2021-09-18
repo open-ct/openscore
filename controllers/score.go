@@ -61,6 +61,7 @@ func (c *TestPaperApiController) Display() {
 
 		response.SubTopics = append(response.SubTopics, tempSubTopic)
 		picName := testPaperInfo.Pic_src
+		//图片地址拼接 ，按服务器
 		src:="C:\\Users\\yang\\Desktop\\阅卷系统\\img\\"+picName
 		bytes, err := os.ReadFile(src)
 		if err!=nil {
@@ -68,7 +69,6 @@ func (c *TestPaperApiController) Display() {
 			resp := Response{"30020", "get 图片显示异常 ", err}
 			c.Data["json"] = resp
 			return
-
 		}
 		encoding := base64.StdEncoding.EncodeToString(bytes)
 		tempTestPaperInfo :=responses.TestPaperInfoPlus{TestPaperInfo:testPaperInfo,PicCode:encoding }
@@ -91,10 +91,10 @@ func (c *TestPaperApiController) List() {
 		return
 	}
 	log.Println(requestBody)
-
 	userId := requestBody.UserId
-
 	var response responses.TestList
+	//----------------------------------------------------
+
 	err = models.GetDistributedTestIdPaperByUserId(userId, &response.TestId)
 	if err != nil {
 		resp := Response{"10002", "get distribution fail", err}
@@ -124,11 +124,13 @@ func (c *TestPaperApiController) Point() {
 	}
 	log.Println(requestBody)
 	userId := requestBody.UserId
-	scoresstr := requestBody.Scores
+	scoresStr := requestBody.Scores
 	testId := requestBody.TestId
-	testDetailIdstr := requestBody.TestDetailId
-	scores := strings.Split(scoresstr, "-")
-	testDetailIds := strings.Split(testDetailIdstr, "-")
+	testDetailIdStr := requestBody.TestDetailId
+	scores := strings.Split(scoresStr, "-")
+	testDetailIds := strings.Split(testDetailIdStr, "-")
+	//-------------------------------------------------------
+	//score数组string转int
 	var scoreArr []int64
 	var sum int64 = 0
 	for _, i := range scores {
@@ -139,7 +141,7 @@ func (c *TestPaperApiController) Point() {
 		}
 		scoreArr = append(scoreArr, j)
 	}
-
+//获取该试卷大题 和抽象大题信息
 	var test models.TestPaper
 	var topic models.Topic
 	_,err = test.GetTestPaper(testId)
@@ -154,7 +156,7 @@ func (c *TestPaperApiController) Point() {
 		c.Data["json"] = resp
 		return
 	}
-
+//获取试卷未批改表信息（试卷批改状态类型）
 	var underTest models.UnderCorrectedPaper
 	err = underTest.GetUnderCorrectedPaper(userId, testId)
 	if err != nil || underTest.Question_id == 0 {
@@ -169,10 +171,10 @@ func (c *TestPaperApiController) Point() {
 		test.Examiner_first_id = userId
 		test.Examiner_first_score = sum
 		final = true
-	} else if topic.Score_type == 2 && test.Examiner_first_id == "-1" {
+	} else if underTest.Test_question_type == 2 && test.Examiner_first_id == "-1" {
 		test.Examiner_first_id = userId
 		test.Examiner_first_score = sum
-	} else if topic.Score_type == 2 && test.Examiner_second_id == "-1" {
+	} else if underTest.Test_question_type == 2 && test.Examiner_second_id == "-1" {
 		test.Examiner_second_id = userId
 		test.Examiner_second_score = sum
 		if math.Abs(float64(test.Examiner_second_score)-float64(test.Examiner_first_score)) <= float64(topic.Standard_error) {
@@ -181,7 +183,9 @@ func (c *TestPaperApiController) Point() {
 			final = true
 		} else {
 			newUnderTest := models.UnderCorrectedPaper{}
-			newUnderTest.User_id = "10000"
+			//随机 抽一个 人
+
+			newUnderTest.User_id =models.FindNewUserId(test.Examiner_first_id,test.Examiner_second_id,test.Question_id)
 			newUnderTest.Test_question_type = 3
 			newUnderTest.Test_id = underTest.Test_id
 			newUnderTest.Question_id = underTest.Question_id
@@ -193,11 +197,12 @@ func (c *TestPaperApiController) Point() {
 			}
 		}
 	}
-	if underTest.Test_question_type == 4 || underTest.Test_question_type == 5 {
-		test.Leader_id = userId
-		test.Leader_score = sum
-		final = true
-	} else if underTest.Test_question_type == 3 {
+	//if underTest.Test_question_type == 4 || underTest.Test_question_type == 5 {
+	//	test.Leader_id = userId
+	//	test.Leader_score = sum
+	//	final = true
+	//}
+	 if underTest.Test_question_type == 3 {
 		test.Examiner_third_id = userId
 		test.Examiner_third_score = sum
 		first := math.Abs(float64(test.Examiner_third_score - test.Examiner_first_score))
@@ -213,9 +218,11 @@ func (c *TestPaperApiController) Point() {
 		if small <= float64(topic.Standard_error) {
 			final = true
 		} else {
+			//应该可以去掉
 			test.Question_status = 2
 
 			newUnderTest := models.UnderCorrectedPaper{}
+			//阅卷组长类型默认 id 10000
 			newUnderTest.User_id = "10000"
 			newUnderTest.Test_question_type = 4
 			newUnderTest.Test_id = underTest.Test_id
@@ -331,6 +338,7 @@ func (c *TestPaperApiController) Problem() {
 		c.Data["json"] = resp
 		return
 	}
+	//********************阅卷组长类型默认10000***********
 	newUnderTest.User_id = "10000"
 	newUnderTest.Test_question_type = 6
 	newUnderTest.Problem_type = problemType
@@ -348,6 +356,7 @@ func (c *TestPaperApiController) Problem() {
 			c.Data["json"] = resp
 			return
 		}
+		//应该可以去掉
 		test.Question_status = 3
 		err = test.Update()
 		if err != nil {
@@ -398,17 +407,33 @@ func (c *TestPaperApiController) Answer() {
 	}
 
 	var as responses.TestAnswer
-	err = models.GetTestInfoPicListByTestId(answerTest.Test_id, &as.Pic_src)
+	var tempString []string
+	err = models.GetTestInfoPicListByTestId(answerTest.Test_id, &tempString)
 	if err != nil {
 		resp := Response{"10004", "get testPaperInfo fail", err}
 		c.Data["json"] = resp
 		return
 	}
+	//改成base64编码
+	for i:=0;i<len(tempString);i++ {
+		picName := tempString[i]
+		//图片地址拼接 ，按服务器
+		src:="C:\\Users\\yang\\Desktop\\阅卷系统\\img\\"+picName
+		bytes, err := os.ReadFile(src)
+		if err!=nil {
+			log.Println(err)
+			resp := Response{"30020", "get 图片显示异常 ", err}
+			c.Data["json"] = resp
+			return
+		}
+		encoding := base64.StdEncoding.EncodeToString(bytes)
+		as.Pics = append(as.Pics, encoding)
+	}
 	resp := Response{"10000", "ok", as}
 	c.Data["json"] = resp
 }
 
-func (c *TestPaperApiController) ExampleDeatil() {
+func (c *TestPaperApiController) ExampleDetail() {
 	defer c.ServeJSON()
 	var requestBody requests.ExampleDetail
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
@@ -419,6 +444,7 @@ func (c *TestPaperApiController) ExampleDeatil() {
 	}
 	testId := requestBody.ExampleTestId
 	log.Println(testId)
+	//____________________________________________________________
 	var test models.TestPaper
 	_,err = test.GetTestPaper(testId)
 	if err != nil {
@@ -448,7 +474,7 @@ func (c *TestPaperApiController) ExampleDeatil() {
 		c.Data["json"] = resp
 		return
 	}
-	var response responses.ExampleDeatil
+	var response responses.ExampleDetail
 	response.QuestionName = topic.Question_name
 	for i := 0; i < len(exampleTest); i++ {
 		var temp []models.TestPaperInfo
@@ -457,6 +483,20 @@ func (c *TestPaperApiController) ExampleDeatil() {
 			resp := Response{"10006", "get testPaperInfo fail", err}
 			c.Data["json"] = resp
 			return
+		}
+		//转64编码
+		for j:=0;j<len(temp);j++{
+			picName := temp[j].Pic_src
+			src:="C:\\Users\\yang\\Desktop\\阅卷系统\\img\\"+picName
+			bytes, err := os.ReadFile(src)
+			if err!=nil {
+				log.Println(err)
+				resp := Response{"30020", "get 图片显示异常 ", err}
+				c.Data["json"] = resp
+				return
+			}
+			encoding := base64.StdEncoding.EncodeToString(bytes)
+			temp[j].Pic_src=encoding
 		}
 		response.Test = append(response.Test, temp)
 	}
@@ -475,6 +515,7 @@ func (c *TestPaperApiController) ExampleList() {
 		return
 	}
 	testId := requestBody.TestId
+	//----------------------------------------------------------------------
 	var testPaper models.TestPaper
 	_,err = testPaper.GetTestPaper(testId)
 	if err != nil {
@@ -519,4 +560,76 @@ func (c *TestPaperApiController) Review() {
 	}
 	resp := Response{"10000", "ok", response}
 	c.Data["json"] = resp
+}
+func (c *TestPaperApiController) ReviewPoint() {
+	defer c.ServeJSON()
+	var requestBody requests.TestPoint
+	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	if err != nil {
+		resp := Response{"10001", "cannot unmarshal", err}
+		c.Data["json"] = resp
+		return
+	}
+	log.Println(requestBody)
+	userId := requestBody.UserId
+	scoresstr := requestBody.Scores
+	testId := requestBody.TestId
+	testDetailIdstr := requestBody.TestDetailId
+	scores := strings.Split(scoresstr, "-")
+	testDetailIds := strings.Split(testDetailIdstr, "-")
+	var scoreArr []int64
+	var sum int64 = 0
+	for _, i := range scores {
+		j, err := strconv.ParseInt(i, 10, 64)
+		sum += j
+		if err != nil {
+			panic(err)
+		}
+		scoreArr = append(scoreArr, j)
+	}
+
+	var test models.TestPaper
+	_,err = test.GetTestPaper(testId)
+	if err != nil || test.Test_id == 0 {
+		resp := Response{"10002", "get test paper fail", err}
+		c.Data["json"] = resp
+		return
+	}
+	num := 0
+	if test.Examiner_first_id == userId {
+		num = 0
+		test.Examiner_first_score = sum
+	} else if test.Examiner_second_id == userId {
+		num = 1
+		test.Examiner_second_score = sum
+	} else {
+		num = 2
+		test.Examiner_third_score = sum
+	}
+	err = test.Update()
+	if err != nil || test.Test_id == 0 {
+		resp := Response{"10003", "update test paper fail", err}
+		c.Data["json"] = resp
+		return
+	}
+
+	for i := 0; i < len(testDetailIds); i++ {
+		var testInfo models.TestPaperInfo
+		testInfoId, _ := strconv.ParseInt(testDetailIds[i], 10, 64)
+		testInfo.GetTestPaperInfo(testInfoId)
+		if num == 0 {
+			testInfo.Examiner_first_score = scoreArr[i]
+		} else if num == 1 {
+			testInfo.Examiner_second_score = scoreArr[i]
+		} else {
+			testInfo.Examiner_third_score = scoreArr[i]
+		}
+		err = testInfo.Update()
+		if err != nil || test.Test_id == 0 {
+			resp := Response{"10004", "update testinfo paper fail", err}
+			c.Data["json"] = resp
+			return
+		}
+	}
+	c.Data["json"] = Response{"10000", "ok", nil}
 }

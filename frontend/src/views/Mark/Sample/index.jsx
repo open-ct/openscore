@@ -10,7 +10,6 @@ export default class index extends Component {
   userId = "1"
   state = {
     papers: [],
-    testLength: 0,
     sampleList: [],
     samplePaper: []
   };
@@ -24,11 +23,10 @@ export default class index extends Component {
     Marking.testList({ userId: this.userId })
       .then((res) => {
         if (res.data.status === "10000") {
-          let papers = [...res.data.data.papers]
+          let papers = [...res.data.data.TestIds]
           this.setState(
             {
               papers,
-              testLength: res.data.data.papers.length
             }
           )
           this.getSampleList();
@@ -39,7 +37,7 @@ export default class index extends Component {
       })
   }
   getSampleList = () => {
-    Marking.testExampleList({ userId: this.userId, testId: 1 })
+    Marking.testExampleList({ userId: this.userId, testId: this.state.papers[0] })
       .then((res) => {
         if (res.data.status === "10000") {
           let sampleList = []
@@ -89,7 +87,7 @@ export default class index extends Component {
     let testPaper = null;
     if (this.state.samplePaper !== undefined || this.state.samplePaper !== null) {
       testPaper = this.state.samplePaper.map((item) => {
-        return <img src={item.pic_src} alt="加载失败" className="test-question-img"/>
+        return <img src={'data:image/jpg;base64,'+item.pic_src} alt="加载失败" className="test-question-img"/>
       })
     }
 

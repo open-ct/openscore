@@ -35,7 +35,7 @@ export default class index extends Component {
     Marking.testList({ userId: this.userId })
       .then((res) => {
         if (res.data.status == "10000") {
-          let papers = [...res.data.data.papers]
+          let papers = [...res.data.data.TestIds]
           this.setState(
             {
               papers,

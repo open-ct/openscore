@@ -135,6 +135,7 @@ export default class index extends Component {
         return selectList
     }
     selectTeacher = (e) => {
+        console.log(e)
         let index
         for (let i = 0; i < this.state.teacherList.length; i++) {
             if (this.state.teacherList[i].UserName === e) {

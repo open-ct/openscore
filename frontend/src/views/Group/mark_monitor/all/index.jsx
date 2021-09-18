@@ -1,6 +1,6 @@
 import React, { Component, useState } from 'react'
 import DocumentTitle from 'react-document-title'
-import { Modal, Dropdown, Button, message, Space, Tooltip, Select, Radio, Input, Table } from 'antd';
+import { Modal, Dropdown, Button, message, Space, Tooltip, Select, Radio, Input, Table, Progress  } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import './index.less'
 import group from "../../../../api/group";
@@ -53,20 +53,33 @@ export default class index extends Component {
                     dataIndex: 'FinishRate',
                 },
                 {
-                    title: '未完成量',
-                    width: 90,
-                    dataIndex: 'UnfinishedNumber',
-                },
-                {
-                    title: '未完成率',
-                    width: 90,
-                    dataIndex: 'UnfinishedRate',
-                },
-                {
                     title: '平均分（含零/除零）',
                     width: 90,
                     dataIndex: 'AverageScore',
                 },
+                {
+                    title: '完成量',
+                    width: 90,
+                    dataIndex: 'FinishNumber',
+                },
+                {
+                    title: '完成率',
+                    width: 90,
+                    dataIndex: 'FinishRate',
+                    render: (text, record) => {
+                        return (<Progress type="circle" percent={text*100} width={40} />)
+                    }
+                },
+                // {
+                //     title: '未完成量',
+                //     width: 90,
+                //     dataIndex: 'UnfinishedNumber',
+                // },
+                // {
+                //     title: '未完成率',
+                //     width: 90,
+                //     dataIndex: 'UnfinishedRate',
+                // },
                 {
                     title: '状态',
                     width: 90,
@@ -79,27 +92,30 @@ export default class index extends Component {
             children: [
                 {
                     title: '一评完成量',
-
+                    width: 90,
                     dataIndex: 'FirstFinishedNumber',
                 },
                 {
                     title: '一评完成率',
-
+                    width: 90,
                     dataIndex: 'FirstFinishedRate',
+                    render: (text, record) => {
+                        return (<Progress type="circle" percent={(text*100).toFixed(1)} width={40} />)
+                    }
                 },
-                {
-                    title: '一评未完成量',
-
-                    dataIndex: 'FirstUnfinishedNumber',
-                },
-                {
-                    title: '一评未完成率',
-
-                    dataIndex: 'FirstUnfinishedRate',
-                },
+                // {
+                //     title: '一评未完成量',
+                //     width: 90,
+                //     dataIndex: 'FirstUnfinishedNumber',
+                // },
+                // {
+                //     title: '一评未完成率',
+                //     width: 90,
+                //     dataIndex: 'FirstUnfinishedRate',
+                // },
                 {
                     title: '状态',
-
+                    width: 90,
                     dataIndex: 'IsFirstFinished',
                 },
             ]
@@ -109,24 +125,27 @@ export default class index extends Component {
             children: [
                 {
                     title: '二评完成量',
-
+                    width: 90,
                     dataIndex: 'SecondFinishedNumber',
                 },
                 {
                     title: '二评完成率',
-
+                    width: 90,
                     dataIndex: 'SecondFinishedRate',
+                    render: (text, record) => {
+                        return (<Progress type="circle" percent={(text*100).toFixed(1)} width={40} />)
+                    }
                 },
-                {
-                    title: '二评未完成量',
-
-                    dataIndex: 'SecondUnfinishedNumber',
-                },
-                {
-                    title: '二评未完成率',
-
-                    dataIndex: 'SecondUnfinishedRate',
-                },
+                // {
+                //     title: '二评未完成量',
+                //     width: 90,
+                //     dataIndex: 'SecondUnfinishedNumber',
+                // },
+                // {
+                //     title: '二评未完成率',
+                //     width: 90,
+                //     dataIndex: 'SecondUnfinishedRate',
+                // },
                 {
                     title: '状态',
                     width: 90,
@@ -146,17 +165,20 @@ export default class index extends Component {
                     title: '三评完成率',
                     width: 90,
                     dataIndex: 'ThirdFinishedRate',
+                    render: (text, record) => {
+                        return (<Progress type="circle" percent={(text*100).toFixed(1)} width={40} />)
+                    }
                 },
-                {
-                    title: '三评未完成量',
-                    width: 90,
-                    dataIndex: 'ThirdUnfinishedNumber',
-                },
-                {
-                    title: '三评未完成率',
-                    width: 90,
-                    dataIndex: 'ThirdUnfinishedRate',
-                },
+                // {
+                //     title: '三评未完成量',
+                //     width: 90,
+                //     dataIndex: 'ThirdUnfinishedNumber',
+                // },
+                // {
+                //     title: '三评未完成率',
+                //     width: 90,
+                //     dataIndex: 'ThirdUnfinishedRate',
+                // },
                 {
                     title: '状态',
                     width: 90,
@@ -186,17 +208,20 @@ export default class index extends Component {
                     title: '完成率',
                     width: 90,
                     dataIndex: 'ArbitramentFinishedRate',
+                    render: (text, record) => {
+                        return (<Progress type="circle" percent={(text*100).toFixed(1)} width={40} />)
+                    }
                 },
-                {
-                    title: '未完成量',
-                    width: 90,
-                    dataIndex: 'ArbitramentUnfinishedNumber',
-                },
-                {
-                    title: '未完成率',
-                    width: 90,
-                    dataIndex: 'ArbitramentUnfinishedRate',
-                },
+                // {
+                //     title: '未完成量',
+                //     width: 90,
+                //     dataIndex: 'ArbitramentUnfinishedNumber',
+                // },
+                // {
+                //     title: '未完成率',
+                //     width: 90,
+                //     dataIndex: 'ArbitramentUnfinishedRate',
+                // },
                 {
                     title: '状态',
                     width: 90,
@@ -227,17 +252,20 @@ export default class index extends Component {
                     title: '完成率',
                     width: 90,
                     dataIndex: 'ProblemUnfinishedRate',
+                    render: (text, record) => {
+                        return (<Progress type="circle" percent={(text*100).toFixed(1)} width={40} />)
+                    }
                 },
-                {
-                    title: '未完成量',
-                    width: 90,
-                    dataIndex: 'ProblemUnfinishedNumber',
-                },
-                {
-                    title: '未完成率',
-                    width: 90,
-                    dataIndex: 'ArbitramentUnfinishedRate',
-                },
+                // {
+                //     title: '未完成量',
+                //     width: 90,
+                //     dataIndex: 'ProblemUnfinishedNumber',
+                // },
+                // {
+                //     title: '未完成率',
+                //     width: 90,
+                //     dataIndex: 'ArbitramentUnfinishedRate',
+                // },
                 {
                     title: '状态',
                     width: 90,
@@ -261,7 +289,7 @@ export default class index extends Component {
                 console.log(e)
             })
     }
-     
+
     tableData = () => {
         group.allMonitor({ supervisorId: "2" })
             .then((res) => {
@@ -293,7 +321,7 @@ export default class index extends Component {
             selectList = this.state.questionList.map((item, i) => {
                 return <Option key={i} value={item.QuestionName} label={item.QuestionName}>{item.QuestionName}</Option>
             })
-            
+
         } else {
             return null
         }
@@ -343,7 +371,7 @@ export default class index extends Component {
                             pagination={{ position: ['bottomCenter'] }}
                             columns={this.columns}
                             dataSource={this.state.tableData}
-                            scroll={{x:4000}}
+                            scroll={{ x: 5000 }}
                         />
                     </div>
                 </div>

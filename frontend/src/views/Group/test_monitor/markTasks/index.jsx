@@ -21,6 +21,7 @@ export default class index extends Component {
         inpValu: '',
         currentPaper: {},
         subTopic: [],
+        testLength:0,
         markScore: [],
         keyTest: [],
         sampleList: [],
@@ -88,6 +89,7 @@ export default class index extends Component {
                 if (res.data.status == "10000") {
                     let currentPaper = res.data.data
                     let subTopic = res.data.data.subTopic
+                    let testLength = res.data.data.subTopic.length
                     let markScore = []
                     for (let i = 0; i < subTopic.length; i++) {
                         markScore.push(subTopic[i].score_type.split('-'))
@@ -95,7 +97,8 @@ export default class index extends Component {
                     this.setState({
                         currentPaper,
                         subTopic,
-                        markScore
+                        markScore,
+                        testLength
                     })
                 }
             })
@@ -136,7 +139,7 @@ export default class index extends Component {
     }
     select = (item, value) => {
         console.log(item)
-        if (this.state.selectId.length < 3) {
+        if (this.state.selectId.length < this.state.testLength) {
             this.setState({
                 selectId: [...this.state.selectId, item],
                 selectScore: [...this.state.selectScore, value]
@@ -249,7 +252,7 @@ export default class index extends Component {
                 let Qustion_detail_id = Util.getTextByJs(this.state.selectId);
                 let Question_detail_score = Util.getTextByJs(this.state.selectScore);
                 if (value == 1) {
-                    if (this.state.selectScore.length < 3) {
+                    if (this.state.selectScore.length < this.state.testLength) {
                         message.warning('请将分数打全')
                     } else {
                         group.MonitorPoint({

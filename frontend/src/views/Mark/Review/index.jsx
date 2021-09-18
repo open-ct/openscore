@@ -46,6 +46,7 @@ export default class index extends Component {
         console.log(e)
       })
   }
+
   columns = [
     {
       title: '序号',
@@ -164,6 +165,7 @@ export default class index extends Component {
     return (
       <Table
         columns={this.columns}
+        pagination={false}
         dataSource={this.state.reviewList}
         onRow={(record) => ({
           onClick: () => {
@@ -187,6 +189,7 @@ export default class index extends Component {
           let currentPaper = res.data.data
           let subTopic = res.data.data.subTopic
           let testInfos = res.data.data.testInfos
+          let testLength = res.data.data.subTopic.length
           let markScore = []
           let selectId = []
           let selectScore = []
@@ -209,7 +212,8 @@ export default class index extends Component {
             subTopic,
             markScore,
             selectId,
-            selectScore
+            selectScore,
+            testLength
           })
         }
       })
@@ -234,7 +238,7 @@ export default class index extends Component {
     if (this.state.currentPaper.testInfos != undefined) {
       testPaper = this.state.currentPaper.testInfos.map((item) => {
         return <div className="test-question-img" data-content-before={this.imgScore(item.test_detail_id)}>
-          <img src={item.pic_src} alt="加载失败" />
+          <img src={'data:image/jpg;base64,' + item.picCode} alt="加载失败" />
         </div>
       })
     }
@@ -311,7 +315,7 @@ export default class index extends Component {
   }
   select = (item, value) => {
     console.log(item)
-    if (this.state.selectId.length < 3) {
+    if (this.state.selectId.length < this.state.testLength) {
       this.setState({
         selectId: [...this.state.selectId, item],
         selectScore: [...this.state.selectScore, value]
@@ -419,14 +423,16 @@ export default class index extends Component {
             testDetailId: Qustion_detail_id
           })
             .then((res) => {
-              this.setState({
-                selectId: [],
-                selectScore: [],
-                currentPaper: {},
-                reviewVisible: true
-              })
-              message.success('回评成功');
-              this.props.history.push('/home/mark-tasks')
+              if (res.data.status == "10000") {
+                this.setState({
+                  selectId: [],
+                  selectScore: [],
+                  currentPaper: {},
+                  reviewVisible: true
+                })
+                message.success('回评成功');
+                this.props.history.push('/home/mark-tasks')
+              }
             })
             .catch((e) => {
               console.log(e)
@@ -470,7 +476,7 @@ export default class index extends Component {
             <Radio value={3}>其他错误</Radio>
           </Space>
         </Radio.Group>
-        <Input placeholder="请输入问题" onChange={this.handelChange.bind(this)}  style={{ marginTop: 10 }} />
+        <Input placeholder="请输入问题" onChange={this.handelChange.bind(this)} style={{ marginTop: 10 }} />
       </Modal>
     )
   }

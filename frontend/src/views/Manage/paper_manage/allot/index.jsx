@@ -20,7 +20,8 @@ export default class index extends Component {
         testNumber: undefined,
         userNumber: undefined,
         subjectValue: undefined,
-        questionValue: undefined
+        questionValue: undefined,
+        loading: false,
     }
 
     componentDidMount() {
@@ -110,10 +111,14 @@ export default class index extends Component {
                 okText: '确认',
                 cancelText: '取消',
                 onOk: () => {
+                    this.setState({
+                        loading: true
+                    })
                     Manage.distributePaper({ adminId: this.adminId, questionId: this.state.questionValue, testNumber: Number(this.state.testNumber), userNumber: Number(this.state.userNumber) })
                         .then((res) => {
                             // if (res.data.status === "10000") {
                                 this.setState({
+                                    loading: false,
                                     questionList: [],
                                     ImportTestNumber: undefined,
                                     OnlineNumber: undefined,
@@ -208,7 +213,7 @@ export default class index extends Component {
                             </div>
                         </div>
                     </div>
-                    <Button type="primary" onClick={() => { this.distributePaper() }}>确认</Button>
+                    <Button type="primary" onClick={() => { this.distributePaper() }} loading={this.state.loading}>确认</Button>
                     <Button type="default" style={{ marginLeft: '20px' }} onClick={() => { this.goToDetail() }}>查看详情</Button>
                 </div>
             </DocumentTitle>
