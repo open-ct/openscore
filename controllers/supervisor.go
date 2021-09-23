@@ -185,7 +185,6 @@ func (c *SupervisorApiController) TeacherMonitoring() {
 
 		var markingSpeed float64 =0
 		s := strconv.FormatInt(onlineTime, 10)
-		//f,_:= strconv.ParseFloat(fmt.Sprintf("%.2f", s), 64)
 		f,_:= strconv.ParseFloat(s, 64)
 		m:=f/60
 
@@ -708,7 +707,7 @@ func (c *SupervisorApiController) ArbitramentTest() {
 }
 
 /**
-15.总体进度（平均分没加）
+15.总体进度
 */
 func (c *SupervisorApiController) ScoreProgress() {
 	defer c.ServeJSON()
@@ -763,15 +762,18 @@ func (c *SupervisorApiController) ScoreProgress() {
 		var finishRate float64 = 0
 		if importNumberFloat != 0 {
 			finishRate = finishNumberFloat / importNumberFloat
+			finishRate,_= strconv.ParseFloat(fmt.Sprintf("%.2f", finishRate), 64)
 		}
 		scoreProgressVOList[i].FinishRate = finishRate
 		//未出成绩量
 		unfinishedNumberFloat := importNumberFloat - finishNumberFloat
 		scoreProgressVOList[i].UnfinishedNumber = unfinishedNumberFloat
+
 		//未出成绩率
 		var unfinishedRate float64 = 0
 		if (importNumberFloat != 0) {
 			unfinishedRate = unfinishedNumberFloat / importNumberFloat
+			unfinishedRate,_= strconv.ParseFloat(fmt.Sprintf("%.2f", unfinishedRate), 64)
 		}
 		scoreProgressVOList[i].UnfinishedRate = unfinishedRate
 		//是否全部完成
@@ -782,6 +784,104 @@ func (c *SupervisorApiController) ScoreProgress() {
 			isAllFinished = "完成"
 		}
 		scoreProgressVOList[i].IsAllFinished = isAllFinished
+
+		//分配人数
+		distributionUserNumber ,err:=models.CountUserDistributionNumberByQuestionId(questionId)
+		scoreProgressVOList[i].DistributionNumber= distributionUserNumber
+
+		//平均速度
+
+		var  speed float64
+ 		paperDistributions :=make([]models.PaperDistribution ,0)
+		err = models.FindPaperDistributionByQuestionId(&paperDistributions, questionId)
+		if err!=nil {
+			resp = Response{"20021","试卷分配信息获取失败  ",err}
+			c.Data["json"] = resp
+			return
+		}
+		for i:=0;i<len(paperDistributions);i++ {
+			//教师id
+			userId:= paperDistributions[i].User_id
+
+			//分配试卷数量
+
+			//试卷失败数
+			failCount,err1:= models.CountFailTestNumberByUserId(userId,questionId)
+			if err1!=nil {
+				resp = Response{"20024","获取试卷批改失败数 错误 ",err}
+				c.Data["json"] = resp
+				return
+			}
+
+
+
+
+			//试卷剩余未批改数
+			remainingTestNumber,err1 := models.CountRemainingTestNumberByUserId(questionId,userId)
+			if err1!=nil {
+				resp = Response{"20023","无法获取试卷未批改数",err}
+				c.Data["json"] = resp
+				return
+			}
+
+			//试卷完成数
+			finishCount := paperDistributions[i].Test_distribution_number-failCount-remainingTestNumber
+
+			//用户信息
+			user:=models.User{User_id: userId}
+			err = user.GetUser(userId)
+			if err!=nil {
+				resp = Response{"20001","无法获取用户信息",err}
+				c.Data["json"] = resp
+				return
+			}
+			//用户名
+
+			//是否在线
+			isOnline := user.UserType
+
+			//平均速度
+			var    onlineTime int64
+			if isOnline==1{
+				endingTime :=time.Now().Unix()
+				startTime:=user.Login_time.Unix()
+				tempTime := endingTime-startTime
+				fmt.Println(tempTime)
+
+				onlineTime = user.Online_time+int64(tempTime)
+			}else {
+				onlineTime= user.Online_time
+			}
+
+			var markingSpeed float64 =0
+			s := strconv.FormatInt(onlineTime, 10)
+			f,_:= strconv.ParseFloat(s, 64)
+			m:=f/60
+			if m!=0 {
+
+
+				markingSpeed= float64(finishCount)/m
+			}
+			speed = markingSpeed+speed
+
+		}
+		var averageSpeed =0.0
+		if (distributionUserNumber!=0) {
+			averageSpeed = speed/(float64(distributionUserNumber))
+			averageSpeed,_= strconv.ParseFloat(fmt.Sprintf("%.2f", averageSpeed), 64)
+		}
+
+		scoreProgressVOList[i].AverageSpeed= averageSpeed
+		//预计时间  未出成绩量/平均速度
+		var predictTime float64= 9999999
+		if averageSpeed!=0 {
+			predictTime = unfinishedNumberFloat/averageSpeed
+		}
+        predictTime=predictTime/60
+		predictTime,_= strconv.ParseFloat(fmt.Sprintf("%.1f", predictTime), 64)
+   		scoreProgressVOList[i].PredictTime=predictTime
+
+
 		//--------------------------------------------------
 		//一次评卷完成数
 		firstScoreNumber ,err1:= models.CountFirstScoreNumberByQuestionId(questionId)
@@ -797,6 +897,7 @@ func (c *SupervisorApiController) ScoreProgress() {
 		var firstScoreRate float64 = 0
 		if (importNumberFloat != 0) {
 			firstScoreRate = firstScoreNumberFloat / importNumberFloat
+			firstScoreRate,_= strconv.ParseFloat(fmt.Sprintf("%.2f", firstScoreRate), 64)
 		}
 		scoreProgressVOList[i].FirstFinishedRate = firstScoreRate
 		//未出第一次成绩量
@@ -806,14 +907,15 @@ func (c *SupervisorApiController) ScoreProgress() {
 		var firstUnfinishedRate float64 = 0
 		if (importNumberFloat != 0) {
 			firstUnfinishedRate = firstUnfinishedNumber / importNumberFloat
+			firstUnfinishedRate,_= strconv.ParseFloat(fmt.Sprintf("%.2f", firstUnfinishedRate), 64)
 		}
 		scoreProgressVOList[i].FirstUnfinishedRate = firstUnfinishedRate
 		//第一次阅卷是否全部完成
 		var isFirstFinished string
 		if firstUnfinishedNumber != 0 {
-			isAllFinished = "未完成"
+			isFirstFinished = "未完成"
 		} else {
-			isAllFinished = "完成"
+			isFirstFinished = "完成"
 		}
 		scoreProgressVOList[i].IsFirstFinished = isFirstFinished
 
@@ -830,9 +932,11 @@ func (c *SupervisorApiController) ScoreProgress() {
 		//二次评卷完成率
 		secondScoreNumberString := strconv.FormatInt(secondScoreNumber, 10)
 		secondScoreNumberFloat, _ := strconv.ParseFloat(secondScoreNumberString, 64)
+
 		var secondScoreRate float64 = 0
 		if (importNumberFloat != 0) {
 			secondScoreRate = secondScoreNumberFloat / importNumberFloat
+			secondScoreRate,_= strconv.ParseFloat(fmt.Sprintf("%.2f", secondScoreRate), 64)
 		}
 		scoreProgressVOList[i].SecondFinishedRate = secondScoreRate
 
@@ -843,6 +947,7 @@ func (c *SupervisorApiController) ScoreProgress() {
 		var secondUnfinishedRate float64 = 0
 		if (importNumberFloat != 0) {
 			secondUnfinishedRate = secondUnfinishedNumber / importNumberFloat
+			secondUnfinishedRate,_= strconv.ParseFloat(fmt.Sprintf("%.2f", secondUnfinishedRate), 64)
 		}
 		scoreProgressVOList[i].SecondUnfinishedRate = secondUnfinishedRate
 		//第二次阅卷是否全部完成
@@ -870,6 +975,7 @@ func (c *SupervisorApiController) ScoreProgress() {
 		var thirdScoreRate float64 = 0
 		if (importNumberFloat != 0) {
 			thirdScoreRate = thirdScoreNumberFloat / importNumberFloat
+			thirdScoreRate,_= strconv.ParseFloat(fmt.Sprintf("%.2f", thirdScoreRate), 64)
 		}
 		scoreProgressVOList[i].ThirdFinishedRate = thirdScoreRate
 
@@ -880,6 +986,7 @@ func (c *SupervisorApiController) ScoreProgress() {
 		var thirdUnfinishedRate float64 = 0
 		if (importNumberFloat != 0) {
 			thirdUnfinishedRate = thirdUnfinishedNumber / importNumberFloat
+			thirdUnfinishedRate,_= strconv.ParseFloat(fmt.Sprintf("%.2f", thirdUnfinishedRate), 64)
 		}
 		scoreProgressVOList[i].ThirdUnfinishedRate = thirdUnfinishedRate
 		//第三次阅卷是否全部完成
@@ -918,6 +1025,7 @@ func (c *SupervisorApiController) ScoreProgress() {
 		var arbitramentRate float64 = 0
 		if (importNumberFloat != 0) {
 			arbitramentRate = arbitramentNumberFloat / importNumberFloat
+			arbitramentRate,_= strconv.ParseFloat(fmt.Sprintf("%.2f", arbitramentRate), 64)
 		}
 		scoreProgressVOList[i].ArbitramentRate = arbitramentRate
 
@@ -927,6 +1035,7 @@ func (c *SupervisorApiController) ScoreProgress() {
 		var arbitramentFinishRate float64 = 0
 		if (arbitramentNumberFloat != 0) {
 			arbitramentFinishRate = arbitramentFinishNumberFloat / arbitramentNumberFloat
+			arbitramentFinishRate,_= strconv.ParseFloat(fmt.Sprintf("%.2f", arbitramentFinishRate), 64)
 		}
 		scoreProgressVOList[i].ArbitramentFinishedRate = arbitramentFinishRate
 
@@ -937,6 +1046,7 @@ func (c *SupervisorApiController) ScoreProgress() {
 		var arbitramentUnfinishedRate float64 = 0
 		if (arbitramentNumberFloat != 0) {
 			arbitramentUnfinishedRate = arbitramentUnFinishNumberFloat / arbitramentNumberFloat
+			arbitramentUnfinishedRate,_= strconv.ParseFloat(fmt.Sprintf("%.2f", arbitramentUnfinishedRate), 64)
 		}
 		scoreProgressVOList[i].ArbitramentUnfinishedRate = arbitramentUnfinishedRate
 		//仲裁卷是否全部完成
@@ -978,6 +1088,7 @@ func (c *SupervisorApiController) ScoreProgress() {
 		var problemRate float64 = 0
 		if (importNumberFloat != 0) {
 			problemRate = problemNumberFloat / importNumberFloat
+			problemRate,_= strconv.ParseFloat(fmt.Sprintf("%.2f", problemRate), 64)
 		}
 		scoreProgressVOList[i].ProblemRate = problemRate
 
@@ -988,6 +1099,7 @@ func (c *SupervisorApiController) ScoreProgress() {
 		var problemFinishRate float64 = 0
 		if (problemNumberFloat != 0) {
 			problemFinishRate = problemFinishNumberFloat / problemNumberFloat
+			problemFinishRate,_= strconv.ParseFloat(fmt.Sprintf("%.2f", problemFinishRate), 64)
 		}
 		scoreProgressVOList[i].ProblemFinishedRate = problemFinishRate
 
@@ -998,6 +1110,7 @@ func (c *SupervisorApiController) ScoreProgress() {
 		var problemUnfinishedRate float64 = 0
 		if (problemNumberFloat != 0) {
 			problemUnfinishedRate = problemUnfinishedNumberFloat / problemNumberFloat
+			problemUnfinishedRate,_= strconv.ParseFloat(fmt.Sprintf("%.2f", problemUnfinishedRate), 64)
 		}
 		scoreProgressVOList[i].ProblemUnfinishedRate = problemUnfinishedRate
 		//问题卷是否全部完成
@@ -1091,7 +1204,8 @@ func (c *SupervisorApiController) SupervisorPoint() {
 	//删除试卷待批改表 ，增加试卷记录表
 	var record models.ScoreRecord
 	var underTest models.UnderCorrectedPaper
-	err = models.GetUnderCorrectedPaperByUserIdAndTestId(&underTest, supervisorId, testId)
+
+	err = models.GetUnderCorrectedSupervisorPaperByTestQuestionTypeAndTestId(&underTest, testId)
 	if err!=nil {
 		resp = Response{"20012","GetUnderCorrectedPaperByUserIdAndTestId  fail",err}
 		c.Data["json"] = resp
@@ -1103,6 +1217,7 @@ func (c *SupervisorApiController) SupervisorPoint() {
 	record.User_id = supervisorId
 	record.Question_id=underTest.Question_id
 	record.Problem_type=underTest.Problem_type
+	record.Test_finish=1
 
 
 	err = record.Save()
@@ -1111,7 +1226,7 @@ func (c *SupervisorApiController) SupervisorPoint() {
 		c.Data["json"] = resp
 		return
 	}
-	err = underTest.Delete()
+	err = underTest.SupervisorDelete()
 	if err!=nil {
 		resp = Response{"20014","Delete  fail",err}
 		c.Data["json"] = resp

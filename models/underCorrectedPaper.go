@@ -32,6 +32,13 @@ func (u *UnderCorrectedPaper) Delete() error {
 	}
 	return err
 }
+func (u *UnderCorrectedPaper) SupervisorDelete() error {
+	code, err := x.Where(builder.Eq{"test_id": u.Test_id}).Where(" test_question_type =4 or  test_question_type =6").Delete(u)
+	if code == 0 || err != nil {
+		log.Println("delete fail")
+	}
+	return err
+}
 
 func (u *UnderCorrectedPaper) Save() error {
 	code, err := x.Insert(u)
@@ -91,6 +98,14 @@ func GetUnderCorrectedPaperByUserIdAndTestId(underCorrectedPaper * UnderCorrecte
 	}
  return err
 }
+func GetUnderCorrectedSupervisorPaperByTestQuestionTypeAndTestId(underCorrectedPaper * UnderCorrectedPaper ,testId int64) error {
+
+	_, err := x.Where("test_id =?", testId).Where(" test_question_type =4 or  test_question_type =6").Get(underCorrectedPaper)
+	if err!=nil {
+		log.Println("GetUnderCorrectedPaperByUserIdAndTestId err ")
+	}
+ return err
+}
 
 
 func FindArbitramentUnderCorrectedPaperByQuestionId(arbitramentUnderCorrectedPaper *[] UnderCorrectedPaper,questionId int64)error{
@@ -125,4 +140,12 @@ func FindProblemUnderCorrectedList(problemUnderCorrectedPaper *[] UnderCorrected
 		log.Println("FindProblemUnderCorrectedList err ")
 	}
  return err
+}
+func GetDistributedTestIdPaperByUserId(id string, up *[]int64) error {
+	err := x.Table("under_corrected_paper").Select("test_id").Where("user_id = ?", id).Where("test_question_type=1 or test_question_type=2 or test_question_type=3").Find(up)
+	if err != nil {
+		log.Panic(err)
+		log.Println("could not find any paper")
+	}
+	return err
 }

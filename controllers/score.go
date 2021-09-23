@@ -134,6 +134,7 @@ func (c *TestPaperApiController) Point() {
 	//score数组string转int
 	var scoreArr []int64
 	var sum int64 = 0
+	var record models.ScoreRecord
 	for _, i := range scores {
 		j, err := strconv.ParseInt(i, 10, 64)
 		sum += j
@@ -238,6 +239,7 @@ func (c *TestPaperApiController) Point() {
 	}
 	if final {
 		test.Final_score = sum
+		record.Test_finish=1
 	}
 	err = underTest.Delete()
 	if err != nil {
@@ -281,6 +283,7 @@ func (c *TestPaperApiController) Point() {
 		}
 		if final {
 			tempTest.Final_score = score
+
 		}
 		err = tempTest.Update()
 		if err != nil {
@@ -290,7 +293,7 @@ func (c *TestPaperApiController) Point() {
 		}
 	}
 
-	var record models.ScoreRecord
+
 	record.Score = sum
 	record.Question_id = topic.Question_id
 	record.Test_id = testId
@@ -585,6 +588,7 @@ func (c *TestPaperApiController) ReviewPoint() {
 	testDetailIds := strings.Split(testDetailIdstr, "-")
 	var scoreArr []int64
 	var sum int64 = 0
+	var record models.ScoreRecord
 	for _, i := range scores {
 		j, err := strconv.ParseInt(i, 10, 64)
 		sum += j
@@ -612,6 +616,7 @@ func (c *TestPaperApiController) ReviewPoint() {
 		test.Examiner_first_score = sum
 		if scoreType == 1 {
 			test.Final_score = sum
+			record.Test_finish=1
 		}
 		var record models.ScoreRecord
 		record.GetRecordByTestId(testId, userId)

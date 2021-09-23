@@ -30,14 +30,7 @@ func (t *Topic) GetTopic(id int64) error {
 	return err
 }
 
-func GetDistributedTestIdPaperByUserId(id string, up *[]int64) error {
-	err := x.Table("under_corrected_paper").Select("test_id").Where("user_id = ?", id).Where("test_question_type=1 or test_question_type=2 or test_question_type=3").Find(up)
-	if err != nil {
-		log.Panic(err)
-		log.Println("could not find any paper")
-	}
-	return err
-}
+
 func GetTopicList ( topics *[]Topic) error{
 	err := x.Find(topics)
 	if err!=nil {
