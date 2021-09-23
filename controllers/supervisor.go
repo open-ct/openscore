@@ -14,7 +14,7 @@ import (
 
 
 /**
- 9.大题选择列表 (用admin的 大题选择)
+ 9.大题选择列表
  */
 func (c *SupervisorApiController) QuestionList() {
 	defer c.ServeJSON()
@@ -28,11 +28,16 @@ func (c *SupervisorApiController) QuestionList() {
 		c.Data["json"] = resp
 		return
 	}
-	//supervisorId := requestBody.SupervisorId
+	supervisorId := requestBody.SupervisorId
 	//----------------------------------------------------
 	//获取大题列表
+	var user models.User
+	user.User_id=supervisorId
+	user.GetUser(supervisorId)
+	subjectName := user.Subject_name
+
 	topics  := make([]models.Topic,0)
-	err = models.GetTopicList(&topics)
+	err = models.FindTopicBySubNameList(&topics,subjectName)
     if err!=nil {
     	resp  = Response{"20000","GetTopicList err ",err}
 		c.Data["json"] = resp
@@ -1287,6 +1292,7 @@ func (c *SupervisorApiController) ScoreDeviation() {
 
 		}
 		sqrt := math.Sqrt(add)
+		sqrt,_= strconv.ParseFloat(fmt.Sprintf("%.2f", sqrt), 64)
 		ScoreDeviationVOList[i].DeviationScore=sqrt
 	}
 
