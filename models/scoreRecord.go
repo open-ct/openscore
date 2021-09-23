@@ -143,7 +143,7 @@ func CountThirdScoreNumberByQuestionId(questionId int64)(count int64,err error) 
 }
 func CountTestScoreNumberByUserId(userId string,questionId int64)(count int64,err1 error) {
 	record :=new (ScoreRecord)
-	count, err := x.Where("question_id = ?", questionId).Where("test_record_type!=0").Where("user_id=?", userId).Where("test_record_type=1 or test_record_type=2 or test_record_type=3").Count(record)
+	count, err := x.Where("question_id = ?", questionId).Where("test_record_type=1 or test_record_type=2 or test_record_type=3 ").Where("user_id=?", userId).Where("test_record_type=1 or test_record_type=2 or test_record_type=3").Count(record)
 	if err!=nil {
 		log.Println("CountFinishTestNumberByUserId err ")
 	}
@@ -151,7 +151,7 @@ func CountTestScoreNumberByUserId(userId string,questionId int64)(count int64,er
 }
 func SumFinishScore(userId string,questionId int64)(sum float64,err1 error) {
 	record :=new (ScoreRecord)
-	sum, err := x.Where("question_id = ?", questionId).Where("test_record_type!=0").Where("user_id=?", userId).Sum(record,"score")
+	sum, err := x.Where("question_id = ?", questionId).Where("test_record_type=1 or test_record_type=2 or test_record_type=3 ").Where("user_id=?", userId).Sum(record,"score")
 	if err!=nil {
 		log.Println("SumFinishScore err ")
 	}
