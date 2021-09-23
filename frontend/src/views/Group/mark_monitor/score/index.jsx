@@ -46,7 +46,7 @@ export default class index extends Component {
                 data: X_data
             },
             yAxis: {
-                name: '教师（%）'
+                name: '教师（占比）'
             },
             series: [{
                 name: '分数',
