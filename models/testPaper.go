@@ -26,7 +26,6 @@ type TestPaper struct {
 	Final_score_id             string `json:"finale_score_id"`
 	Pratice_error              int64  `json:"pratice_error"`
 	Correcting_status          int64  `json:"correcting_status"`
-
 }
 
 func (t *TestPaper) GetTestPaperByQuestionIdAndQuestionStatus(question_id int64, question_statue int64) error {
@@ -46,17 +45,17 @@ func GetTestPaperListByQuestionIdAndQuestionStatus(question_id int64, question_s
 	return err
 }
 
-func (t *TestPaper) GetTestPaper(id int64) (bool,error) {
+func (t *TestPaper) GetTestPaper(id int64) (bool, error) {
 	has, err := x.Where(builder.Eq{"test_id": id}).Get(t)
 	if !has || err != nil {
 		log.Println("could not find test paper")
 	}
-	return has,err
+	return has, err
 }
 
 func (t *TestPaper) Update() error {
-	code, err := x.Where(builder.Eq{"test_id": t.Test_id}).Update(t)
-	if code == 0 || err != nil {
+	code, err := x.Where(builder.Eq{"test_id": t.Test_id}).AllCols().Update(t)
+	if code == 0 && err != nil {
 		log.Println("update test paper fail")
 		log.Printf("%+v", err)
 	}
@@ -64,14 +63,14 @@ func (t *TestPaper) Update() error {
 }
 func (t *TestPaper) Insert() error {
 	code, err := x.Insert(t)
-	if code == 0 || err != nil {
+	if code == 0 && err != nil {
 		log.Println("insert test paper fail")
 		log.Printf("%+v", err)
 	}
 	return err
 }
 
-func FindTestPaperByQuestionId(question_id int64,  t *[]TestPaper) error {
+func FindTestPaperByQuestionId(question_id int64, t *[]TestPaper) error {
 	err := x.Where("question_id = ? and correcting_status = ?", question_id, 0).Find(t)
 	if err != nil {
 		log.Println("could not FindTestPaperByQuestionId ")
@@ -79,20 +78,19 @@ func FindTestPaperByQuestionId(question_id int64,  t *[]TestPaper) error {
 	}
 	return err
 }
-func  FindUnDistributeTest(id int64 , t*[]TestPaper) error {
-	 err := x.Where("question_id=?",id).Where("correcting_status=?",0).Find(t)
+func FindUnDistributeTest(id int64, t *[]TestPaper) error {
+	err := x.Where("question_id=?", id).Where("correcting_status=?", 0).Find(t)
 	if err != nil {
 		log.Println("could not GetUnDistributeTest")
 	}
 	return err
 }
 
-
-func CountTestDistributionNumberByQuestionId(questionId int64)(count int64,err error) {
-	testPaper :=new (TestPaper)
-	count, err1 := x.Where("question_id = ?", questionId).Where("correcting_status=?",1).Count(testPaper)
-	if err!=nil {
+func CountTestDistributionNumberByQuestionId(questionId int64) (count int64, err error) {
+	testPaper := new(TestPaper)
+	count, err1 := x.Where("question_id = ?", questionId).Where("correcting_status=?", 1).Count(testPaper)
+	if err != nil {
 		log.Println("CountTestDistributionNumberByQuestionId err ")
 	}
-	return count,err1
+	return count, err1
 }
