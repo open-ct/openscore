@@ -96,7 +96,7 @@ func (c *SupervisorApiController) UserInfo() {
 
 
 /**
- 8.教师监控页面 （标准差没加）
+ 8.教师监控页面
  */
 func (c *SupervisorApiController) TeacherMonitoring() {
 	defer c.ServeJSON()
@@ -312,7 +312,9 @@ for  ;i<=questionScore;i++{
 	number := score
 	numberString:=strconv.FormatInt(number,10)
 	numberFloat,_:=strconv.ParseFloat(numberString,64)
-	scoreDistributionList[i].Rate=numberFloat/countFloat
+	scoreDistribution:=numberFloat/countFloat
+	scoreDistribution,_= strconv.ParseFloat(fmt.Sprintf("%.2f", scoreDistribution), 64)
+	scoreDistributionList[i].Rate=scoreDistribution
 	}
 
 	//--------------------------------------------------
@@ -490,6 +492,7 @@ func (c *SupervisorApiController) AverageScore() {
 			}
 			averageScore=sum/finishCountFloat
 		}
+		averageScore,_= strconv.ParseFloat(fmt.Sprintf("%.2f", averageScore), 64)
 		scoreAverageVOList[i].Average=averageScore
 
 	}
