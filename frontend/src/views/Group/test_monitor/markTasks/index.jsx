@@ -12,7 +12,7 @@ export default class index extends Component {
     state = {
         type: '',
         paperButton: 1,
-        count: undefined,
+        count: 0,
         currentTestId: undefined,
         selectId: [],
         selectScore: [],
@@ -27,6 +27,7 @@ export default class index extends Component {
         sampleList: [],
         samplePaper: []
     }
+    
     componentDidMount() {
         if (this.props.match.params.type === "1") {
             this.setState({
@@ -293,7 +294,7 @@ export default class index extends Component {
         });
     }
     handleOk = () => {
-        if (this.state.problemValue == 2) {
+        if (this.state.problemValue == 3) {
             Marking.testProblem({
                 userId: this.userId,
                 testId: this.state.currentTestId,
@@ -395,7 +396,7 @@ export default class index extends Component {
             if (this.state.currentPaper.testInfos != undefined) {
                 testPaper = this.state.currentPaper.testInfos.map((item) => {
                     return <div className="test-question-img" data-content-before={this.imgScore(item.test_detail_id)}>
-                        <img src={item.pic_src} alt="加载失败" />
+                        <img src={'data:image/jpg;base64,' + item.picCode} alt="加载失败" />
                     </div>
                 })
             }
@@ -545,7 +546,7 @@ export default class index extends Component {
                         <div className="goBack" onClick={() => { window.history.back(-1) }}>
                             <ArrowLeftOutlined />
                             <span className="paperDetail">试卷详情</span>
-                            <span className="goBackPre">返回仲裁卷</span>
+                            <span className="goBackPre">返回{this.state.type}</span>
                         </div>
                         <div className="currentPaperNo">
                             试卷号：{this.state.currentTestId}

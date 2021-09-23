@@ -7,7 +7,9 @@ import Marking from "../../../api/marking";
 import * as Util from "../../../util/Util";
 const { Option } = Select;
 export default class index extends Component {
+  
   userId = "1"
+
   state = {
     reviewVisible: true,
     reviewList: [],
@@ -22,9 +24,11 @@ export default class index extends Component {
     subTopic: [],
     markScore: [],
   }
+
   componentDidMount() {
     this.getReviewList();
   }
+
   getReviewList = () => {
     Marking.testReview({ userId: this.userId })
       .then((res) => {
