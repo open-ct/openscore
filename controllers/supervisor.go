@@ -708,7 +708,7 @@ func (c *SupervisorApiController) ArbitramentTest() {
 }
 
 /**
-15.总体进度（平均分没加）
+15.总体进度
 */
 func (c *SupervisorApiController) ScoreProgress() {
 	defer c.ServeJSON()

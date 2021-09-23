@@ -42,7 +42,7 @@ func (r *ScoreRecord) Save() error {
 }
 
 func GetLatestRecords(userId string, records *[]ScoreRecord) error {
-	err := x.Limit(10).Table("score_record").Select("test_id, score, score_time").Where(builder.Eq{"user_id": userId}).Desc("record_id").Find(records)
+	err := x.Limit(10).Table("score_record").Select("test_id, score, score_time").Where(builder.Eq{"user_id": userId}).Where("test_question_type=1 or test_question_type=2 or test_question_type=3").Desc("record_id").Find(records)
 	if err != nil {
 		log.Panic(err)
 		log.Println("could not find any paper")
