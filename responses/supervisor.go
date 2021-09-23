@@ -93,9 +93,9 @@ type ScoreProgressVO struct {
 	UnfinishedRate float64
 	IsAllFinished string
 
-	userNumber int
+	DistributionNumber int64
 	AverageSpeed float64
-	predictTime  float64
+	PredictTime  float64
 
 	FirstFinishedNumber int64
 	FirstFinishedRate float64

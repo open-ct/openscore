@@ -16,6 +16,7 @@ type ScoreRecord struct {
 	Score            int64     `json:"score"`
 	Test_record_type int64     `json:"test_record_type"`
 	Problem_type     int64     `json:"problem_type" xorm:"default(-1)"`
+	Test_finish      int64 		`json:"testFinish"`
 
 }
 
@@ -117,30 +118,8 @@ func FindFinishTestByUserId(scoreRecord *[]ScoreRecord,userId string,questionId 
 	return err1
 }
 
-func CountFirstScoreNumberByQuestionId(questionId int64)(count int64 ,err error) {
-	record :=new (ScoreRecord)
-	count, err1:= x.Where("question_id = ?", questionId).Where("test_record_type=?",1).Count(record)
-	if err!=nil {
-		log.Println("CountFirstScoreNumberByQuestionId err ")
-	}
-	return count ,err1
-}
-func CountSecondScoreNumberByQuestionId(questionId int64)(count int64 ,err error) {
-	record :=new (ScoreRecord)
-	count, err1 := x.Where("question_id = ?", questionId).Where("test_record_type=?",2).Count(record)
-	if err!=nil {
-		log.Println("CountSecondScoreNumberByQuestionId err ")
-	}
-	return count,err1
-}
-func CountThirdScoreNumberByQuestionId(questionId int64)(count int64,err error) {
-	record :=new (ScoreRecord)
-	count, err1 := x.Where("question_id = ?", questionId).Where("test_record_type=?",3).Count(record)
-	if err!=nil {
-		log.Println("CountThirdScoreNumberByQuestionId err ")
-	}
-	return count,err1
-}
+
+
 func CountTestScoreNumberByUserId(userId string,questionId int64)(count int64,err1 error) {
 	record :=new (ScoreRecord)
 	count, err := x.Where("question_id = ?", questionId).Where("test_record_type=1 or test_record_type=2 or test_record_type=3 ").Where("user_id=?", userId).Where("test_record_type=1 or test_record_type=2 or test_record_type=3").Count(record)

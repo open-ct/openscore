@@ -32,6 +32,13 @@ func (u *UnderCorrectedPaper) Delete() error {
 	}
 	return err
 }
+func (u *UnderCorrectedPaper) SupervisorDelete() error {
+	code, err := x.Where(builder.Eq{"test_id": u.Test_id}).Where(" test_question_type =4 or  test_question_type =6").Delete(u)
+	if code == 0 || err != nil {
+		log.Println("delete fail")
+	}
+	return err
+}
 
 func (u *UnderCorrectedPaper) Save() error {
 	code, err := x.Insert(u)
@@ -86,6 +93,14 @@ func CountProblemUnFinishNumberByQuestionId(questionId int64 )(count int64,err e
 func GetUnderCorrectedPaperByUserIdAndTestId(underCorrectedPaper * UnderCorrectedPaper ,userId string,testId int64) error {
 
 	_, err := x.Where("user_id=?", userId).Where("test_id =?", testId).Where(" test_question_type !=?", 0).Get(underCorrectedPaper)
+	if err!=nil {
+		log.Println("GetUnderCorrectedPaperByUserIdAndTestId err ")
+	}
+ return err
+}
+func GetUnderCorrectedSupervisorPaperByTestQuestionTypeAndTestId(underCorrectedPaper * UnderCorrectedPaper ,testId int64) error {
+
+	_, err := x.Where("test_id =?", testId).Where(" test_question_type =4 or  test_question_type =6").Get(underCorrectedPaper)
 	if err!=nil {
 		log.Println("GetUnderCorrectedPaperByUserIdAndTestId err ")
 	}
