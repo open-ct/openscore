@@ -91,7 +91,7 @@ export default class index extends Component {
         reviewVisible: false,
       });
     } else {
-      if (this.state.problemValue == 2) {
+      if (this.state.problemValue == 3) {
         Marking.testProblem({
           userId: this.userId,
           testId: this.state.currentPaper.testId,

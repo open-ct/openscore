@@ -119,7 +119,7 @@ export default class index extends Component {
         if (this.state.currentPaper.testInfos != undefined) {
             testPaper = this.state.currentPaper.testInfos.map((item) => {
                 return <div className="test-question-img" data-content-before={this.imgScore(item.test_detail_id)}>
-                    <img src={item.pic_src} alt="加载失败" />
+                    <img src={'data:image/jpg;base64,'+item.picCode} alt="加载失败" />
                 </div>
             })
         }
