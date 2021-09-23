@@ -69,7 +69,7 @@ export default class index extends Component {
         {
             title: '在线情况',
             width: 120,
-            dataIndex: 'OnlineTime',
+            dataIndex: 'IsOnline',
         },
 
     ]
@@ -122,7 +122,7 @@ export default class index extends Component {
                             Validity: item.Validity,
                             StandardDeviation: item.StandardDeviation,
                             EvaluationIndex: item.EvaluationIndex,
-                            OnlineTime: item.OnlineTime = 0 ? "在线" : "离线"
+                            IsOnline: item.IsOnline === 1 ? "在线" : "离线"
                         })
                     }
                     this.setState({

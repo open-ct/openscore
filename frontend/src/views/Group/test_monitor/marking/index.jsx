@@ -21,7 +21,7 @@ export default class index extends Component {
         selectScore: [],
         subTopic: [],
         markScore: [],
-        TestId:undefined
+        TestId: undefined
     }
     componentDidMount() {
         if (this.props.location.state) {
@@ -38,7 +38,7 @@ export default class index extends Component {
                 userId: this.userId,
                 testId: this.state.currentPaper.testId,
                 problemType: this.state.problemValue,
-                problemMessage :this.state.inpValu
+                problemMessage: this.state.inpValu
             })
                 .then((res) => {
                     this.setState({
@@ -50,7 +50,7 @@ export default class index extends Component {
                 .catch((e) => {
                     console.log(e)
                 })
-        }else{
+        } else {
             Marking.testProblem({
                 userId: this.userId,
                 testId: this.state.currentPaper.testId,
@@ -119,7 +119,7 @@ export default class index extends Component {
         if (this.state.currentPaper.testInfos != undefined) {
             testPaper = this.state.currentPaper.testInfos.map((item) => {
                 return <div className="test-question-img" data-content-before={this.imgScore(item.test_detail_id)}>
-                    <img src={item.pic_src} alt="加载失败" />
+                    <img src={'data:image/jpg;base64,' + item.picCode} alt="加载失败" />
                 </div>
             })
         }
@@ -309,11 +309,13 @@ export default class index extends Component {
             problemValue: e.target.value,
         });
     }
+
     handelChange(e) {
         this.setState({
-          inpValu: e.target.value
+            inpValu: e.target.value
         })
-      }
+    }
+    
     problemModal() {
         const { problemValue } = this.state;
         return (
@@ -330,7 +332,7 @@ export default class index extends Component {
                         <Radio value={3}>其他错误</Radio>
                     </Space>
                 </Radio.Group>
-                <Input placeholder="请输入问题"  onChange={this.handelChange.bind(this)} style={{ marginTop: 10 }} />
+                <Input placeholder="请输入问题" onChange={this.handelChange.bind(this)} style={{ marginTop: 10 }} />
             </Modal>
         )
     }
