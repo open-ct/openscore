@@ -17,7 +17,7 @@ type UnderCorrectedPaper struct {
 }
 
 func (u *UnderCorrectedPaper) GetUnderCorrectedPaper(userId string, testId int64) error {
-	has, err := x.Where(builder.Eq{"test_id": testId, "user_id": userId}).Get(u)
+	has, err := x.Where("test_id=?",testId).Where("user_id =?",userId).Get(u)
 	if !has || err != nil {
 		log.Println("could not find under corrected paper")
 		log.Println(err)

@@ -339,8 +339,8 @@ func (c *TestPaperApiController) Problem() {
 		c.Data["json"] = resp
 		return
 	}
-	//********************阅卷组长类型默认10000***********
-	newUnderTest.User_id = "10000"
+
+	newUnderTest.User_id = userId
 	newUnderTest.Test_question_type = 6
 	newUnderTest.Problem_type = problemType
 	has, _ := newUnderTest.IsDuplicate()
@@ -357,7 +357,7 @@ func (c *TestPaperApiController) Problem() {
 			c.Data["json"] = resp
 			return
 		}
-		//应该可以去掉
+
 		test.Question_status = 3
 		err = test.Update()
 		if err != nil {
@@ -372,6 +372,7 @@ func (c *TestPaperApiController) Problem() {
 	record.User_id = userId
 	record.Question_id = test.Question_id
 	record.Test_record_type = 5
+	record.Problem_type=problemType
 	err = record.Save()
 	if err != nil {
 		resp := Response{"10006", "insert record fail", err}
