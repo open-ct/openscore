@@ -127,7 +127,7 @@ export default class index extends Component {
         let selectList
         if (this.state.teacherList.length != 0) {
             selectList = this.state.teacherList.map((item, i) => {
-                return <Option key={item.UserName} value={item.UserName} label={item.UserName}>{item.QuestionName}</Option>
+                return <Option key={item.UserName} value={item.UserName} label={item.UserName}>{item.UserName}</Option>
             })
         } else {
             return null

@@ -36,7 +36,7 @@ func (t *TestPaperInfo) GetTestPaperInfoByTestIdAndQuestionDetailId(testId int64
 
 func (t *TestPaperInfo) GetTestPaperInfo(id int64) error {
 	has, err := x.Where(builder.Eq{"test_detail_id": id}).Get(t)
-	if !has || err != nil {
+	if !has && err != nil {
 		log.Println("could not find test paper info")
 		log.Println(err)
 	}
@@ -44,8 +44,8 @@ func (t *TestPaperInfo) GetTestPaperInfo(id int64) error {
 }
 
 func (t *TestPaperInfo) Update() error {
-	code, err := x.Where(builder.Eq{"test_detail_id": t.Test_detail_id}).Update(t)
-	if code == 0 || err != nil {
+	code, err := x.Where(builder.Eq{"test_detail_id": t.Test_detail_id}).AllCols().Update(t)
+	if code == 0 && err != nil {
 		log.Println("update test paper info fail")
 		log.Println(err)
 	}

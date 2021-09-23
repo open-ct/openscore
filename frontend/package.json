@@ -9,6 +9,7 @@
     "antd": "^4.16.9",
     "axios": "^0.21.1",
     "customize-cra": "^1.0.0",
+    "dotenv-cli": "^4.0.0",
     "echarts": "^5.1.2",
     "echarts-for-react": "^3.0.1",
     "http-proxy-middleware": "^2.0.1",
