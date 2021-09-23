@@ -321,6 +321,7 @@ func (c *TestPaperApiController) Problem() {
 	userId := requestBody.UserId
 	problemType := requestBody.ProblemType
 	testId := requestBody.TestId
+	problemMessage := requestBody.ProblemMessage
 
 	var underTest models.UnderCorrectedPaper
 	var record models.ScoreRecord
@@ -343,6 +344,7 @@ func (c *TestPaperApiController) Problem() {
 	newUnderTest.User_id = userId
 	newUnderTest.Test_question_type = 6
 	newUnderTest.Problem_type = problemType
+	newUnderTest.Problem_message=problemMessage
 	has, _ := newUnderTest.IsDuplicate()
 	if !has {
 		err = newUnderTest.Save()

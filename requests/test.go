@@ -20,6 +20,7 @@ type TestProblem struct {
 	UserId      string `json:"userId"`
 	ProblemType int64  `json:"problemType"`
 	TestId      int64  `json:"testId"`
+	ProblemMessage string `json:"problemMessage"`
 }
 
 type TestAnswer struct {
