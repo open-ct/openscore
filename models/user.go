@@ -19,7 +19,7 @@ type User struct {
 	Email          string    `json:"email"`
 	Login_time     time.Time `json:"login_time"`
 	Exist_time     time.Time `json:"exist_time"`
-	Online_time    float64   `json:"online_time"`
+	Online_time    int64   `json:"online_time"`
 	Subject_name   string    `json:"subject_name"`
 	Status         int64     `json:"status"`
 	UserType       int64     `json:"userType"`

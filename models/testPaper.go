@@ -96,3 +96,11 @@ func CountTestDistributionNumberByQuestionId(questionId int64)(count int64,err e
 	}
 	return count,err1
 }
+func CountFailTestNumberByUserId(userId string,questionId int64)(count int64,err error) {
+	testPaper :=new (TestPaper)
+	count, err1 := x.Where("question_id = ?", questionId).Where("examiner_first_id=? or examiner_second_id=?",userId,userId).Where("question_status=2 or question_status=3 ").Count(testPaper)
+	if err!=nil {
+		log.Println("CountFailTestNumberByUserId err ")
+	}
+	return count,err1
+}

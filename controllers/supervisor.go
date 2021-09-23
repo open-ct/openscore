@@ -2,17 +2,19 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"math"
 	"openscore/models"
 	"openscore/requests"
 	"openscore/responses"
 	"strconv"
 	"strings"
+	"time"
 )
 
 
 /**
- 9.大题选择列表
+ 9.大题选择列表 (用admin的 大题选择)
  */
 func (c *SupervisorApiController) QuestionList() {
 	defer c.ServeJSON()
@@ -73,7 +75,7 @@ func (c *SupervisorApiController) UserInfo() {
     user := models.User{User_id: supervisorId}
 	err = user.GetUser(supervisorId)
 	if err!=nil {
-		resp = Response{"20001","could not found user",err}
+		resp = Response{"20001","获取用户信息失败",err}
 		c.Data["json"] = resp
 		return
 	}
@@ -115,7 +117,7 @@ func (c *SupervisorApiController) TeacherMonitoring() {
    paperDistributions :=make([]models.PaperDistribution ,0)
 	err = models.FindPaperDistributionByQuestionId(&paperDistributions, questionId)
 	if err!=nil {
-		resp = Response{"20021","FindPaperDistributionByQuestionId  fail",err}
+		resp = Response{"20021","试卷分配信息获取失败  ",err}
 		c.Data["json"] = resp
 		return
 	}
@@ -127,32 +129,10 @@ func (c *SupervisorApiController) TeacherMonitoring() {
        //分配试卷数量
 		testDistributionNumber:=paperDistributions[i].Test_distribution_number
 		teacherMonitoringList [i].TestDistributionNumber= testDistributionNumber
-		//testDistributionNumberString:=strconv.FormatInt(testDistributionNumber,10)
-		//testDistributionNumberFloat,_:=strconv.ParseFloat(testDistributionNumberString,64)
-
-		var finishScoreList []models.ScoreRecord
-		err = models.FindFinishTestNumberByUserId(&finishScoreList,userId, questionId)
-		if err!=nil {
-			resp = Response{"2027","FindFinishTestNumberByUserId fail",err}
-			c.Data["json"] = resp
-			return
-		}
-		var finishCount =len(finishScoreList)
-
-		teacherMonitoringList[i].TestSuccessNumber=(float64(finishCount))
-
-
-		remainingTestNumber,err1 := models.CountRemainingTestNumberByUserId(questionId,userId)
-		if err1!=nil {
-			resp = Response{"20023","CountRemainingTestNumberByUserId  fail",err}
-			c.Data["json"] = resp
-			return
-		}
-		teacherMonitoringList[i].TestRemainingNumber=remainingTestNumber
-
+		//试卷失败数
 		failCount,err1:= models.CountFailTestNumberByUserId(userId,questionId)
 		if err1!=nil {
-			resp = Response{"20024","CountFailTestNumberByUserId  fail",err}
+			resp = Response{"20024","获取试卷批改失败数 错误 ",err}
 			c.Data["json"] = resp
 			return
 		}
@@ -160,42 +140,76 @@ func (c *SupervisorApiController) TeacherMonitoring() {
 		failCountString:=strconv.FormatInt(failCount,10)
 		failCountFloat,_:=strconv.ParseFloat(failCountString,64)
 
-
-		user:=models.User{User_id: userId}
-		err = user.GetUser(userId)
-		if err!=nil {
-			resp = Response{"20001","could not found user",err}
+		//试卷剩余未批改数
+		remainingTestNumber,err1 := models.CountRemainingTestNumberByUserId(questionId,userId)
+		if err1!=nil {
+			resp = Response{"20023","无法获取试卷未批改数",err}
 			c.Data["json"] = resp
 			return
 		}
+		teacherMonitoringList[i].TestRemainingNumber=remainingTestNumber
+
+		//试卷完成数
+		finishCount := paperDistributions[i].Test_distribution_number-failCount-remainingTestNumber
+		teacherMonitoringList[i].TestSuccessNumber=(float64(finishCount))
+		//用户信息
+		user:=models.User{User_id: userId}
+		err = user.GetUser(userId)
+		if err!=nil {
+			resp = Response{"20001","无法获取用户信息",err}
+			c.Data["json"] = resp
+			return
+		}
+		//用户名
 		teacherMonitoringList[i].UserName=user.User_name
-  		onlineTime := user.Online_time
-		teacherMonitoringList[i].OnlineTime=onlineTime
+  		//是否在线
+		isOnline := user.UserType
+		teacherMonitoringList[i].IsOnline=isOnline
+		//平均速度
+		var    onlineTime int64
+		if isOnline==1{
+			endingTime :=time.Now().Unix()
+			startTime:=user.Login_time.Unix()
+			tempTime := endingTime-startTime
+			fmt.Println(tempTime)
+
+			onlineTime = user.Online_time+int64(tempTime)
+		}else {
+			onlineTime= user.Online_time
+		}
 
 		var markingSpeed float64 =0
-		if onlineTime!=0 {
-			markingSpeed =float64(finishCount)/onlineTime
+		s := strconv.FormatInt(onlineTime, 10)
+		//f,_:= strconv.ParseFloat(fmt.Sprintf("%.2f", s), 64)
+		f,_:= strconv.ParseFloat(s, 64)
+		m:=f/60
+
+		if m!=0 {
+
+			tempSpeed :=float64(finishCount)/m
+			markingSpeed,_= strconv.ParseFloat(fmt.Sprintf("%.2f", tempSpeed), 64)
 		}
 		teacherMonitoringList[i].MarkingSpeed=markingSpeed
-
+		//平均分
 		var averageScore float64 =0
 		if finishCount!=0 {
 			sum,err1:=models.SumFinishScore(userId,questionId)
 			if err1!=nil {
-				resp = Response{"20025","SumFinishScore  fail",err}
+				resp = Response{"20025","计算平均分失败",err}
 				c.Data["json"] = resp
 				return
 			}
 			averageScore=sum/float64(finishCount)
 		}
 		teacherMonitoringList[i].AverageScore=averageScore
-
+		//有效度
 		var validity  float64=0
 		if (float64(finishCount)+failCountFloat)!=0 {
 			validity =float64(finishCount)/(float64(finishCount)+failCountFloat)
+			validity,_= strconv.ParseFloat(fmt.Sprintf("%.2f", validity), 64)
 		}
 		teacherMonitoringList[i].Validity=validity
-
+		//自评率
 		selfTestCount ,err1 := models.CountSelfScore(userId,questionId)
 		if err1!=nil {
 			resp = Response{"20026","CountSelfScore  fail",err}
@@ -213,14 +227,18 @@ func (c *SupervisorApiController) TeacherMonitoring() {
 
 		//标准差
 		var add float64
-		for j:=0;j<finishCount;j++ {
+		var j int64
+
+		finishScoreList :=make([]models.ScoreRecord,0)
+		models.FindFinishTestByUserId(&finishScoreList,userId,questionId)
+		for j=0;j<(finishCount);j++ {
 			scoreJ :=finishScoreList[j].Score
 			tempJ :=math.Abs((float64(scoreJ))-averageScore)
 			add = add+math.Exp2(tempJ)
 
 		}
 		sqrt := math.Sqrt(add)
-
+		sqrt,_= strconv.ParseFloat(fmt.Sprintf("%.2f", sqrt), 64)
 		teacherMonitoringList[i].StandardDeviation=sqrt
 
 	}
@@ -453,17 +471,17 @@ func (c *SupervisorApiController) AverageScore() {
 		scoreAverageVOList[i].UserId=userId
 		scoreAverageVOList[i].UserName=userName
 
-		finishCount, err := models.CountFinishTestNumberByUserId(userId, questionId)
+		scoreNumber, err := models.CountTestScoreNumberByUserId(userId, questionId)
 		if err!=nil {
 			resp = Response{"20008","CountFinishTestNumberByUserId fail",err}
 			c.Data["json"] = resp
 			return
 		}
-		finishCountString:=strconv.FormatInt(finishCount,10)
+		finishCountString:=strconv.FormatInt(scoreNumber,10)
 		finishCountFloat,_:=strconv.ParseFloat(finishCountString,64)
 
 		var averageScore float64 =0
-		if finishCount!=0 {
+		if scoreNumber!=0 {
 			sum, err := models.SumFinishScore(userId, questionId)
 			if err!=nil {
 				resp = Response{"20009","SumFinishScore fail",err}
@@ -1077,7 +1095,7 @@ func (c *SupervisorApiController) SupervisorPoint() {
 	record.User_id = supervisorId
 	record.Question_id=underTest.Question_id
 	record.Problem_type=underTest.Problem_type
-	record.Test_finish=1
+
 
 	err = record.Save()
 	if err!=nil {
@@ -1239,7 +1257,7 @@ func (c *SupervisorApiController) ScoreDeviation() {
 
 
 		var finishScoreList []models.ScoreRecord
-		 err = models.FindFinishTestNumberByUserId(&finishScoreList,userId, questionId)
+		 err = models.FindFinishTestByUserId(&finishScoreList,userId, questionId)
 		if err!=nil {
 			resp = Response{"2027","FindFinishTestNumberByUserId fail",err}
 			c.Data["json"] = resp

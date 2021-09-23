@@ -16,7 +16,7 @@ type ScoreRecord struct {
 	Score            int64     `json:"score"`
 	Test_record_type int64     `json:"test_record_type"`
 	Problem_type     int64     `json:"problem_type" xorm:"default(-1)"`
-	Test_finish      int64      `json:"test_finish"`
+
 }
 
 func (s *ScoreRecord) GetTopic(id int64) error {
@@ -66,14 +66,14 @@ func CountSelfScore(userId string,questionId int64)(count int64,err error) {
 	}
 	return count ,err1
 }
-func CountFailTestNumberByUserId(userId string,questionId int64)(count int64,err error) {
-	record :=new (ScoreRecord)
-	count, err1 := x.Where("question_id = ?", questionId).Where("test_record_type=5").Where("user_id=?", userId).Count(record)
-	if err!=nil {
-		log.Println("CountFailTestNumberByUserId err ")
-	}
-	return count,err1
-}
+//func CountFailTestNumberByUserId(userId string,questionId int64)(count int64,err error) {
+//	record :=new (ScoreRecord)
+//	count, err1 := x.Where("question_id = ?", questionId).Where("test_record_type=5").Where("user_id=?", userId).Count(record)
+//	if err!=nil {
+//		log.Println("CountFailTestNumberByUserId err ")
+//	}
+//	return count,err1
+//}
 func CountProblemNumberByQuestionId(questionId int64)(count int64) {
 	record :=new (ScoreRecord)
 	count, err := x.Where("question_id = ?", questionId).Where("test_record_type=?",5).Count(record)
@@ -91,6 +91,14 @@ func CountArbitramentFinishNumberByQuestionId(questionId int64)(count int64,err 
 	return count,err1
 }
 
+//func CountFinishScoreNumberByUserId(userId string,questionId int64)(count int64 ,err error) {
+//	record :=new (ScoreRecord)
+//	count, err1 := x.Where("question_id = ?", questionId).Where("user_id =?",userId).Where("test_finish=1").Count(record)
+//	if err1!=nil {
+//		log.Println("CountFinishScoreNumberByUserId err ")
+//	}
+//	return count,err1
+//}
 
 
 func CountFinishScoreNumberByQuestionId(questionId int64)(count int64 ,err error) {
@@ -101,8 +109,8 @@ func CountFinishScoreNumberByQuestionId(questionId int64)(count int64 ,err error
 	}
 	return count,err1
 }
-func FindFinishTestNumberByUserId(scoreRecord *[]ScoreRecord,userId string,questionId int64)( err error) {
-	err1 := x.Where("question_id = ?", questionId).Where("user_id=?",userId).Where("test_finish=1").Find(scoreRecord)
+func FindFinishTestByUserId(scoreRecord *[]ScoreRecord,userId string,questionId int64)( err error) {
+	err1 := x.Where("question_id = ?", questionId).Where("user_id=?",userId).Where("test_record_type!=0").Where("test_record_type!=5").Find(scoreRecord)
 	if err!=nil {
 		log.Println("FindFinishTestNumberByUserId err ")
 	}
@@ -133,9 +141,9 @@ func CountThirdScoreNumberByQuestionId(questionId int64)(count int64,err error) 
 	}
 	return count,err1
 }
-func CountFinishTestNumberByUserId(userId string,questionId int64)(count int64,err1 error) {
+func CountTestScoreNumberByUserId(userId string,questionId int64)(count int64,err1 error) {
 	record :=new (ScoreRecord)
-	count, err := x.Where("question_id = ?", questionId).Where("test_finish=1").Where("user_id=?", userId).Count(record)
+	count, err := x.Where("question_id = ?", questionId).Where("test_record_type!=0").Where("user_id=?", userId).Count(record)
 	if err!=nil {
 		log.Println("CountFinishTestNumberByUserId err ")
 	}
