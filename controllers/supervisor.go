@@ -1252,13 +1252,13 @@ func (c *SupervisorApiController) ProblemUnmarkList() {
 		return
 	}
 	//supervisorId := requestBody.SupervisorId
-
+	questionId := requestBody.QuestionId
 	//------------------------------------------------
 
 
 	//根据大题号找到问题卷
 	problemUnderCorrectedPaper :=make([]models.UnderCorrectedPaper ,0)
-	models.FindProblemUnderCorrectedList(&problemUnderCorrectedPaper)
+	models.FindProblemUnderCorrectedPaperByQuestionId(&problemUnderCorrectedPaper,questionId)
 	if err!=nil {
 		resp = Response{"20027","FindProblemUnderCorrectedList  fail",err}
 		c.Data["json"] = resp
@@ -1299,12 +1299,13 @@ func (c *SupervisorApiController) ArbitramentUnmarkList() {
 		return
 	}
 	//supervisorId := requestBody.SupervisorId
+	questionId := requestBody.QuestionId
 
 	//------------------------------------------------
 
 	//找到仲裁卷
 	arbitramentUnderCorrectedPaper :=make([]models.UnderCorrectedPaper ,0)
-	err = models.FindAllArbitramentUnderCorrectedPaper(&arbitramentUnderCorrectedPaper)
+	err = models.FindAllArbitramentUnderCorrectedPaper(&arbitramentUnderCorrectedPaper,questionId)
 	if err!=nil {
 		resp = Response{"20026","FindAllArbitramentUnderCorrectedPaper  fail",err}
 		c.Data["json"] = resp

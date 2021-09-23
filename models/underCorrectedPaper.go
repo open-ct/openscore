@@ -116,9 +116,9 @@ func FindArbitramentUnderCorrectedPaperByQuestionId(arbitramentUnderCorrectedPap
 	}
    return err
 }
-func FindAllArbitramentUnderCorrectedPaper(arbitramentUnderCorrectedPaper *[] UnderCorrectedPaper)error{
+func FindAllArbitramentUnderCorrectedPaper(arbitramentUnderCorrectedPaper *[] UnderCorrectedPaper,questionId int64)error{
 
-	err := x.Where(" test_question_type =?", 4).Find(arbitramentUnderCorrectedPaper)
+	err := x.Where(" test_question_type =?", 4).Where("question_id= ?",questionId).Find(arbitramentUnderCorrectedPaper)
 	if err!=nil {
 		log.Println("FindAllArbitramentUnderCorrectedPaper err ")
 	}

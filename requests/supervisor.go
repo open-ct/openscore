@@ -47,9 +47,11 @@ type ScoreProgress struct {
 }
 type ArbitramentUnmarkList struct {
 	SupervisorId string   `joson:"supervisorId"`
+	QuestionId int64 	`json:"questionId"`
 }
 type ProblemUnmarkList struct {
 	SupervisorId string   `joson:"supervisorId"`
+	QuestionId int64 	`json:"questionId"`
 }
 type ScoreDeviation struct {
 	SupervisorId string   `joson:"supervisorId"`
