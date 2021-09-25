@@ -27,7 +27,7 @@ export default class index extends Component {
         sampleList: [],
         samplePaper: []
     }
-    
+
     componentDidMount() {
         if (this.props.match.params.type === "1") {
             this.setState({
@@ -263,20 +263,21 @@ export default class index extends Component {
                             testDetailId: Qustion_detail_id
                         })
                             .then((res) => {
-                                this.setState({
-                                    selectId: [],
-                                    selectScore: [],
-                                    currentPaper: {},
-                                    count: undefined,
-                                    currentTestId: undefined,
-                                })
-                                if (this.state.type === '仲裁卷') {
-                                    this.getArbitrationTestId();
-                                } else if (this.state.type === '问题卷') {
-
-                                    this.getProblemTestId()
-                                } else {
-                                }
+                                if (res.data.status == "10000") {
+                                    this.setState({
+                                        selectId: [],
+                                        selectScore: [],
+                                        currentPaper: {},
+                                        count: undefined,
+                                        currentTestId: undefined,
+                                    })
+                                    if (this.state.type === '仲裁卷') {
+                                        this.getArbitrationTestId();
+                                    } else if (this.state.type === '问题卷') {
+                                        this.getProblemTestId()
+                                    } else {
+                                    }
+                                } 
                             })
                             .catch((e) => {
                                 console.log(e)
@@ -404,14 +405,14 @@ export default class index extends Component {
             if (this.state.keyTest != undefined || this.state.keyTest != null) {
                 testPaper = this.state.keyTest.map((item) => {
                   return <div className="answer-question-img">
-                  <img src={item} alt="加载失败" />
+                  <img src={'data:image/jpg;base64,'+item} alt="加载失败" />
                   </div>
                 })
               }
         }else if(this.state.paperButton === 3) {
             if (this.state.samplePaper !== undefined || this.state.samplePaper !== null) {
                 testPaper = this.state.samplePaper.map((item) => {
-                  return <img src={item.pic_src} alt="加载失败" className="answer-question-img"/>
+                  return <img src={'data:image/jpg;base64,' + item.picCode} alt="加载失败" className="answer-question-img"/>
                 })
               }
         }

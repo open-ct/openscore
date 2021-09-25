@@ -36,7 +36,11 @@ export default class index extends Component {
                     dataIndex: 'ImportNumber',
                     fixed: 'left',
                 },
-
+                {
+                    title: '分配人数',
+                    width: 90,
+                    dataIndex: 'DistributionNumber',
+                },
             ]
         },
         {
@@ -84,6 +88,16 @@ export default class index extends Component {
                     title: '状态',
                     width: 90,
                     dataIndex: 'IsAllFinished',
+                },
+                {
+                    title: '平均速度（分钟）',
+                    width: 90,
+                    dataIndex: 'AverageSpeed',
+                },
+                {
+                    title: '预计时间（小时）',
+                    width: 90,
+                    dataIndex: 'PredictTime',
                 },
             ]
         },
@@ -321,7 +335,6 @@ export default class index extends Component {
             selectList = this.state.questionList.map((item, i) => {
                 return <Option key={i} value={item.QuestionName} label={item.QuestionName}>{item.QuestionName}</Option>
             })
-
         } else {
             return null
         }
