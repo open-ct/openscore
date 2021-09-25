@@ -35,12 +35,7 @@ export default class index extends Component {
             width: 150,
             dataIndex: 'current',
         },
-        {
-            title: '操作',
-            width: 150,
-            dataIndex: 'operation',
-            render: (text, record, index) => <Link to={{pathname: '/home/group/marking', state:{TestId: this.state.selfScoreRecordVOList[index].TestId}}}>自评</Link>
-        },
+
 
     ]
 

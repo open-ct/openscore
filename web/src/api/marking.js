@@ -53,6 +53,12 @@ const Marking = {
     testReviewPoint(data) {
         return  axios.post('/marking/score/test/review/point', data)
     },
+    testSelf(data) {
+        return  axios.post('/marking/score/self/list', data)
+    },
+    testSelfScore(data) {
+        return  axios.post('/marking/score/self/point', data)
+    },
     
 }
 

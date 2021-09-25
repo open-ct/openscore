@@ -16,6 +16,7 @@ import MarkTasks from '../Mark/MarkTasks'
 import Answer from '../Mark/Answer'
 import Sample from '../Mark/Sample'
 import Review from '../Mark/Review'
+import SelfMark from '../Mark/SelfMark'
 
 import all from '../Group/mark_monitor/all'
 import average from '../Group/mark_monitor/average'
@@ -260,7 +261,7 @@ export default class index extends Component {
                                     <Route path="/home/answer" component={Answer} exact></Route>
                                     <Route path="/home/sample" component={Sample} exact></Route>
                                     <Route path="/home/review" component={Review} exact></Route>
-
+                                    <Route path="/home/selfMark" component={SelfMark} exact></Route>
 
                                     <Route path="/home/markMonitor/all" component={all} exact></Route>
                                     <Route path="/home/markMonitor/average" component={average} exact></Route>

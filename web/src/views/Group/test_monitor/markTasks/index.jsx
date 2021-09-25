@@ -21,7 +21,7 @@ export default class index extends Component {
         inpValu: '',
         currentPaper: {},
         subTopic: [],
-        testLength:0,
+        testLength: 0,
         markScore: [],
         keyTest: [],
         sampleList: [],
@@ -41,8 +41,9 @@ export default class index extends Component {
             this.getProblemTestId()
         } else {
             this.setState({
-                type: '正评卷'
+                type: '自评卷'
             })
+            this.getSelfTestId()
         }
     }
 
@@ -81,8 +82,24 @@ export default class index extends Component {
                 console.log(e)
             })
     }
-    // 正评卷
 
+    // 自评卷
+    getSelfTestId = () => {
+        group.selfTestId({ supervisorId: "2" })
+            .then((res) => {
+                if (res.data.status == "10000") {
+                    let currentTestId = res.data.data.ProblemUnmarkVOList[0].TestId
+                    this.setState({
+                        count: res.data.data.ProblemUnmarkVOList.length,
+                        currentTestId
+                    })
+                    this.getCurrentPaper();
+                }
+            })
+            .catch((e) => {
+                console.log(e)
+            })
+    }
     // 当前试卷
     getCurrentPaper = () => {
         Marking.testDisplay({ userId: '2', testId: this.state.currentTestId })
@@ -199,16 +216,18 @@ export default class index extends Component {
                         this.showWarning(1)
                     }}>提交</Button>
                 </div>
-                <div className="push-paper" >
-                    <Button className="push-problem" style={{ width: 60 }} onClick={() => {
-                        this.showWarning(2)
-                    }}>问题卷</Button>
-                    <Button className="push-excellent" style={{ width: 60 }} onClick={() => {
-                        this.showWarning(3)
-                    }}>优秀卷</Button>
-                </div>
                 {
-                    this.problemModal()
+                    this.state.type !== "自评卷" ? <div className="push-paper" >
+                        <Button className="push-problem" style={{ width: 60 }} onClick={() => {
+                            this.showWarning(2)
+                        }}>问题卷</Button>
+                        <Button className="push-excellent" style={{ width: 60 }} onClick={() => {
+                            this.showWarning(3)
+                        }}>优秀卷</Button>
+                        {
+                            this.problemModal()
+                        }
+                    </div> : null
                 }
             </div>
         );
@@ -276,8 +295,9 @@ export default class index extends Component {
                                     } else if (this.state.type === '问题卷') {
                                         this.getProblemTestId()
                                     } else {
+                                        this.getSelfTestId()
                                     }
-                                } 
+                                }
                             })
                             .catch((e) => {
                                 console.log(e)
@@ -300,7 +320,7 @@ export default class index extends Component {
                 userId: this.userId,
                 testId: this.state.currentTestId,
                 problemType: this.state.problemValue,
-                problemMessage :this.state.inpValu
+                problemMessage: this.state.inpValu
             })
                 .then((res) => {
                     this.setState({
@@ -313,7 +333,7 @@ export default class index extends Component {
                     if (this.state.type === '仲裁卷') {
                         this.getArbitrationTestId();
                     } else if (this.state.type === '问题卷') {
-    
+
                         this.getProblemTestId()
                     } else {
                     }
@@ -321,7 +341,7 @@ export default class index extends Component {
                 .catch((e) => {
                     console.log(e)
                 })
-        }else{
+        } else {
             Marking.testProblem({
                 userId: this.userId,
                 testId: this.state.currentTestId,
@@ -338,7 +358,7 @@ export default class index extends Component {
                     if (this.state.type === '仲裁卷') {
                         this.getArbitrationTestId();
                     } else if (this.state.type === '问题卷') {
-    
+
                         this.getProblemTestId()
                     } else {
                     }
@@ -347,7 +367,7 @@ export default class index extends Component {
                     console.log(e)
                 })
         }
-        
+
         this.setState({
             problemVisible: false,
         });
@@ -361,9 +381,9 @@ export default class index extends Component {
     };
     handelChange(e) {
         this.setState({
-          inpValu: e.target.value
+            inpValu: e.target.value
         })
-      }
+    }
     onRidioChange = e => {
         console.log('radio checked', e.target.value);
         this.setState({
@@ -386,14 +406,14 @@ export default class index extends Component {
                         <Radio value={3}>其他错误</Radio>
                     </Space>
                 </Radio.Group>
-                <Input placeholder="请输入问题"  onChange={this.handelChange.bind(this)} style={{ marginTop: 10 }} />
+                <Input placeholder="请输入问题" onChange={this.handelChange.bind(this)} style={{ marginTop: 10 }} />
             </Modal>
         )
     }
     // 试卷区
     showTest = () => {
         let testPaper = null;
-        if (this.state.paperButton ===1) {
+        if (this.state.paperButton === 1) {
             if (this.state.currentPaper.testInfos != undefined) {
                 testPaper = this.state.currentPaper.testInfos.map((item) => {
                     return <div className="test-question-img" data-content-before={this.imgScore(item.test_detail_id)}>
@@ -401,20 +421,20 @@ export default class index extends Component {
                     </div>
                 })
             }
-        }else if(this.state.paperButton === 2) {
+        } else if (this.state.paperButton === 2) {
             if (this.state.keyTest != undefined || this.state.keyTest != null) {
                 testPaper = this.state.keyTest.map((item) => {
-                  return <div className="answer-question-img">
-                  <img src={'data:image/jpg;base64,'+item} alt="加载失败" />
-                  </div>
+                    return <div className="answer-question-img">
+                        <img src={'data:image/jpg;base64,' + item} alt="加载失败" />
+                    </div>
                 })
-              }
-        }else if(this.state.paperButton === 3) {
+            }
+        } else if (this.state.paperButton === 3) {
             if (this.state.samplePaper !== undefined || this.state.samplePaper !== null) {
                 testPaper = this.state.samplePaper.map((item) => {
-                  return <img src={'data:image/jpg;base64,' + item.picCode} alt="加载失败" className="answer-question-img"/>
+                    return <img src={'data:image/jpg;base64,' + item.picCode} alt="加载失败" className="answer-question-img" />
                 })
-              }
+            }
         }
         return testPaper
     }
@@ -466,79 +486,79 @@ export default class index extends Component {
     // 样卷
     getSampleList = () => {
         Marking.testExampleList({ userId: '1', testId: 1 })
-          .then((res) => {
-            if (res.data.status === "10000") {
-              let sampleList = []
-              for (let i = 0; i< res.data.data.exampleTestPapers.length; i++) {
-                sampleList.push({
-                  order: i,
-                  question_id: res.data.data.exampleTestPapers[i].test_id,
-                  question_name: res.data.data.exampleTestPapers[i].candidate,
-                  score: res.data.data.exampleTestPapers[i].final_score,
-                })
-              }
-              this.setState({
-                sampleList: sampleList
-              })
-            }
-          })
-          .catch((e) => {
-            console.log(e)
-          })
-      }
-    
-      columns = [
+            .then((res) => {
+                if (res.data.status === "10000") {
+                    let sampleList = []
+                    for (let i = 0; i < res.data.data.exampleTestPapers.length; i++) {
+                        sampleList.push({
+                            order: i,
+                            question_id: res.data.data.exampleTestPapers[i].test_id,
+                            question_name: res.data.data.exampleTestPapers[i].candidate,
+                            score: res.data.data.exampleTestPapers[i].final_score,
+                        })
+                    }
+                    this.setState({
+                        sampleList: sampleList
+                    })
+                }
+            })
+            .catch((e) => {
+                console.log(e)
+            })
+    }
+
+    columns = [
         {
-          title: '序号',
-          width: 90,
-          dataIndex: 'order',
+            title: '序号',
+            width: 90,
+            dataIndex: 'order',
         },
         {
-          title: '题号',
-          width: 90,
-          dataIndex: 'question_id',
+            title: '题号',
+            width: 90,
+            dataIndex: 'question_id',
         },
         {
-          title: '题名',
-          width: 90,
-          dataIndex: 'question_name',
+            title: '题名',
+            width: 90,
+            dataIndex: 'question_name',
         },
         {
-          title: '分数',
-          width: 90,
-          dataIndex: 'score',
+            title: '分数',
+            width: 90,
+            dataIndex: 'score',
         },
-    
-      ];
-      sampleTable() {
+
+    ];
+    sampleTable() {
         return (
-          <Table columns={this.columns}
-            dataSource={this.state.sampleList}
-            scroll={{ x: 400 }}
-            pagination={{ position: ['bottomCenter'] }}
-            onRow={(record) => ({
-              onClick: () => {
-                 this.selectRow(record);
-              },
-            })}
-          />
+            <Table columns={this.columns}
+                dataSource={this.state.sampleList}
+                scroll={{ x: 400 }}
+                pagination={{ position: ['bottomCenter'] }}
+                onRow={(record) => ({
+                    onClick: () => {
+                        this.selectRow(record);
+                    },
+                })}
+            />
         )
-      }
-      selectRow = (record) => {
+    }
+    selectRow = (record) => {
         console.log(record.order)
         Marking.testDetail({ userId: '1', exampleTestId: record.question_id })
-        .then((res) => {
-          if (res.data.status == "10000") {
-            this.setState({
-              samplePaper: res.data.data.test[record.order]
+            .then((res) => {
+                if (res.data.status == "10000") {
+                    this.setState({
+                        samplePaper: res.data.data.test[record.order]
+                    })
+                    console.log(this.state.samplePaper)
+                }
             })
-            console.log(this.state.samplePaper)
-          }
-        })
-        .catch((e) => {
-          console.log(e)
-        })
-      }
+            .catch((e) => {
+                console.log(e)
+            })
+    }
     render() {
         return (
             <DocumentTitle title={'试卷管理-' + this.state.type}>
@@ -569,14 +589,14 @@ export default class index extends Component {
                             }
                         </div>
                         <div className="mark-score">
-                            {this.state.paperButton===1?
+                            {this.state.paperButton === 1 ?
                                 this.renderScoreDropDown() : null
                             }
-                            {this.state.paperButton===1?
-                                this.renderPush() :null
+                            {this.state.paperButton === 1 ?
+                                this.renderPush() : null
                             }
-                            {this.state.paperButton===3?
-                                this.sampleTable() :null
+                            {this.state.paperButton === 3 ?
+                                this.sampleTable() : null
                             }
                         </div>
                     </div>
