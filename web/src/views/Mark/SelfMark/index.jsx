@@ -1,49 +1,47 @@
 import React, { Component, useState } from 'react'
 import DocumentTitle from 'react-document-title'
-import { Table, Modal, Dropdown, Button, message, Space, Tooltip, Select, Radio, Input } from 'antd';
-import { ExclamationCircleOutlined, } from '@ant-design/icons';
+import { Modal, Dropdown, Button, message, Space, Tooltip, Select, Radio, Input } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
+import Zmage from 'react-zmage'
+
 import './index.less'
-import Marking from "../../../api/marking";
+
 import * as Util from "../../../util/Util";
+import Marking from "../../../api/marking";
 const { Option } = Select;
 export default class index extends Component {
-  
+
   userId = "1"
 
   state = {
-    reviewVisible: true,
-    reviewList: [],
     problemVisible: false,
-    inpValu: '',
     problemValue: 1,
+    inpValu: '',
+    papers: [],
     currentPaper: {},
-    currentPaperNum: 0,
     testLength: 0,
     selectId: [],
     selectScore: [],
     subTopic: [],
     markScore: [],
-  }
+  };
 
   componentDidMount() {
-    this.getReviewList();
+    this.getAllPaper();
   }
 
-  getReviewList = () => {
-    Marking.testReview({ userId: this.userId })
+  // 总试卷获取 
+  getAllPaper = () => {
+    Marking.testSelf({ userId: this.userId })
       .then((res) => {
         if (res.data.status == "10000") {
-          let reviewList = []
-          for (let i = 0; i < res.data.data.testId.length; i++) {
-            reviewList.push({
-              order: i + 1,
-              test_id: res.data.data.testId[i],
-              score: res.data.data.score[i]
-            })
-          }
-          this.setState({
-            reviewList
-          })
+          let papers = [...res.data.data.TestIds]
+          this.setState(
+            {
+              papers,
+            }
+          )
+          this.getCurrentPaper();
         }
       })
       .catch((e) => {
@@ -51,172 +49,22 @@ export default class index extends Component {
       })
   }
 
-  columns = [
-    {
-      title: '序号',
-      dataIndex: 'order',
-    },
-    {
-      title: '试卷号',
-      dataIndex: 'test_id',
-    },
-    {
-      title: '分数',
-      dataIndex: 'score',
-    },
-  ];
-
-  render() {
-
-    return (
-      <DocumentTitle title="阅卷系统-自评">
-        <div className="selfMark-tasks-page" data-component="selfMark-tasks-page">
-          <div className="mark-paper">
-            {
-              this.showTest()
-            }
-          </div>
-          <div className="mark-score">
-            {
-              this.renderScoreDropDown()
-            }
-            {
-              this.renderPush()
-            }
-          </div>
-        </div>
-      </DocumentTitle>
-    )
-
-  }
-  handleOk = (value) => {
-    if (value == 1) {
-      this.setState({
-        reviewVisible: false,
-      });
-    } else {
-      if (this.state.problemValue == 3) {
-        Marking.testProblem({
-          userId: this.userId,
-          testId: this.state.currentPaper.testId,
-          problemType: this.state.problemValue,
-          problemMessage: this.state.inpValu
-        })
-          .then((res) => {
-            this.setState({
-              selectId: [],
-              selectScore: [],
-              reviewVisible: true
-            })
-            this.getReviewList();
-          })
-          .catch((e) => {
-            console.log(e)
-          })
-      } else {
-        Marking.testProblem({
-          userId: this.userId,
-          testId: this.state.currentPaper.testId,
-          problemType: this.state.problemValue
-        })
-          .then((res) => {
-            this.setState({
-              selectId: [],
-              selectScore: [],
-              reviewVisible: true
-            })
-            this.getReviewList();
-          })
-          .catch((e) => {
-            console.log(e)
-          })
-      }
-      this.setState({
-        problemVisible: false,
-      });
-    }
-
-  };
-
-  handleCancel = (value) => {
-    if (value == 1) {
-      this.setState({
-        reviewVisible: false,
-      });
-    } else {
-      this.setState({
-        problemVisible: false,
-      });
-    }
-  };
-  reviewModal() {
-    return (
-      <Modal
-        title="回评列表"
-        visible={this.state.reviewVisible}
-        onOk={() => this.handleOk(1)}
-        onCancel={() => { this.handleCancel(1) }}
-        width={800}
-        maskClosable={false}
-      >
-        {
-          this.reviewTable()
-        }
-      </Modal>
-    )
-  }
-  reviewTable() {
-    return (
-      <Table
-        columns={this.columns}
-        pagination={false}
-        dataSource={this.state.reviewList}
-        onRow={(record) => ({
-          onClick: () => {
-            this.selectRow(record);
-          },
-        })}
-      />
-    )
-  }
-  selectRow = (record) => {
-    this.getCurrentPaper(record.test_id)
-    this.setState({
-      reviewVisible: false
-    })
-  }
   // 当前试卷
-  getCurrentPaper = (test_id) => {
-    Marking.testDisplay({ userId: this.userId, testId: test_id })
+  getCurrentPaper = () => {
+    Marking.testDisplay({ userId: this.userId, testId: this.state.papers[0] })
       .then((res) => {
         if (res.data.status == "10000") {
           let currentPaper = res.data.data
           let subTopic = res.data.data.subTopic
-          let testInfos = res.data.data.testInfos
           let testLength = res.data.data.subTopic.length
           let markScore = []
-          let selectId = []
-          let selectScore = []
           for (let i = 0; i < subTopic.length; i++) {
             markScore.push(subTopic[i].score_type.split('-'))
-            selectId.push(testInfos[i].test_detail_id)
-            // 判断用户改卷
-            let userScore
-            if (this.userId == testInfos[i].examiner_first_id) {
-              userScore = testInfos[i].examiner_first_score
-            } else if (this.userId == testInfos[i].examiner_second_id) {
-              userScore = testInfos[i].examiner_second_score
-            } else if (this.userId == testInfos[i].examiner_second_id) {
-              userScore = testInfos[i].examiner_third_score
-            }
-            selectScore.push(userScore)
           }
           this.setState({
             currentPaper,
             subTopic,
             markScore,
-            selectId,
-            selectScore,
             testLength
           })
         }
@@ -225,6 +73,7 @@ export default class index extends Component {
         console.log(e)
       })
   }
+
   // 打分展示
   imgScore = (item) => {
     let index
@@ -236,19 +85,21 @@ export default class index extends Component {
     console.log(this.state.selectScore[index])
     return this.state.selectScore[index]
   }
+
   // 阅卷区
   showTest = () => {
     let testPaper = null;
     if (this.state.currentPaper.testInfos != undefined) {
       testPaper = this.state.currentPaper.testInfos.map((item) => {
         return <div className="test-question-img" data-content-before={this.imgScore(item.test_detail_id)}>
-          <img src={'data:image/jpg;base64,' + item.picCode} alt="加载失败" />
+          <img src={'data:image/jpg;base64,'+item.picCode} alt="加载失败" />
         </div>
       })
     }
 
     return testPaper
   }
+
   render() {
     return (
       <DocumentTitle title="阅卷系统-评卷">
@@ -265,16 +116,13 @@ export default class index extends Component {
             {
               this.renderPush()
             }
-            {
-              this.reviewModal()
-            }
           </div>
         </div>
       </DocumentTitle>
     )
   }
-  // 评分区
 
+  // 评分区
   selectBox = (index) => {
     let selectList
     if (this.state.markScore.length != 0) {
@@ -305,10 +153,10 @@ export default class index extends Component {
             filterSort={(optionA, optionB) =>
               optionA.label.localeCompare(optionB.label)
             }
-            defaultValue={this.state.selectScore[index]}
           >
             {
               this.selectBox(index)
+              // this.selectBox(item.question_detail_score)
             }
           </Select>
         </div>
@@ -355,6 +203,7 @@ export default class index extends Component {
       </div>
     );
   }
+
   renderPush() {
 
     return (
@@ -371,10 +220,10 @@ export default class index extends Component {
           <Button className="push-excellent" style={{ width: 60 }} onClick={() => {
             this.showWarning(3)
           }}>优秀卷</Button>
-        </div> */}
+        </div>
         {
-        //   this.problemModal()
-        }
+          this.problemModal()
+        } */}
       </div>
     );
   }
@@ -409,7 +258,6 @@ export default class index extends Component {
       }
       okContent = content + '提交后系统将记录该试卷';
     }
-
     Modal.confirm({
       title: title,
       icon: <ExclamationCircleOutlined />,
@@ -420,27 +268,30 @@ export default class index extends Component {
         let Qustion_detail_id = Util.getTextByJs(this.state.selectId);
         let Question_detail_score = Util.getTextByJs(this.state.selectScore);
         if (value == 1) {
-          Marking.testReviewPoint({
-            userId: this.userId,
-            testId: this.state.currentPaper.testId,
-            scores: Question_detail_score,
-            testDetailId: Qustion_detail_id
-          })
-            .then((res) => {
-              if (res.data.status == "10000") {
-                this.setState({
-                  selectId: [],
-                  selectScore: [],
-                  currentPaper: {},
-                  reviewVisible: true
-                })
-                message.success('回评成功');
-                this.props.history.push('/home/mark-tasks')
-              }
+          if (this.state.selectScore.length < this.state.testLength) {
+            message.warning('请将分数打全')
+          } else {
+            Marking.testSelfScore({
+              userId: this.userId,
+              testId: this.state.currentPaper.testId,
+              scores: Question_detail_score,
+              testDetailId: Qustion_detail_id
             })
-            .catch((e) => {
-              console.log(e)
-            })
+              .then((res) => {
+                if (res.data.status == "10000") {
+                  this.setState({
+                    selectId: [],
+                    selectScore: [],
+                    currentPaper: {}
+                  })
+                  this.getAllPaper();
+                  message.success('自评成功')
+                }
+              })
+              .catch((e) => {
+                console.log(e)
+              })
+          }
         } else if (value == 3) {
           console.log('3')
         } else {
@@ -453,36 +304,83 @@ export default class index extends Component {
     });
   }
 
-//   handelChange(e) {
-//     this.setState({
-//       inpValu: e.target.value
-//     })
-//   }
-//   onRidioChange = e => {
-//     console.log('radio checked', e.target.value);
-//     this.setState({
-//       problemValue: e.target.value,
-//     });
-//   }
-//   problemModal() {
-//     const { problemValue } = this.state;
-//     return (
-//       <Modal
-//         title="请选择问题卷类型"
-//         visible={this.state.problemVisible}
-//         onOk={() => this.handleOk(2)}
-//         onCancel={() => { this.handleCancel(2) }}
-//       >
-//         <Radio.Group onChange={this.onRidioChange} value={problemValue}>
-//           <Space direction="vertical">
-//             <Radio value={1}>图像不清</Radio>
-//             <Radio value={2}>答错题目</Radio>
-//             <Radio value={3}>其他错误</Radio>
-//           </Space>
-//         </Radio.Group>
-//         <Input placeholder="请输入问题" onChange={this.handelChange.bind(this)} style={{ marginTop: 10 }} />
-//       </Modal>
-//     )
-//   }
+  handleOk = () => {
+    if (this.state.problemValue == 3) {
+      Marking.testProblem({
+        userId: this.userId,
+        testId: this.state.currentPaper.testId,
+        problemType: this.state.problemValue,
+        problemMessage :this.state.inpValu
+      })
+        .then((res) => {
+          this.setState({
+            selectId: [],
+            selectScore: [],
+            currentPaper: {}
+          })
+          this.getAllPaper();
+        })
+        .catch((e) => {
+          console.log(e)
+        })
+    } else {
+      // Marking.testProblem({
+      //   userId: this.userId,
+      //   testId: this.state.currentPaper.testId,
+      //   problemType: this.state.problemValue
+      // })
+      //   .then((res) => {
+      //     this.setState({
+      //       selectId: [],
+      //       selectScore: [],
+      //       currentPaper: {}
+      //     })
+      //     this.getAllPaper();
+      //   })
+      //   .catch((e) => {
+      //     console.log(e)
+      //   })
+    }
+    // this.setState({
+    //   problemVisible: false,
+    // });
+  };
 
+  // handleCancel = () => {
+  //   console.log('Clicked cancel button');
+  //   this.setState({
+  //     problemVisible: false,
+  //   });
+  // };
+  // onRidioChange = e => {
+  //   console.log('radio checked', e.target.value);
+  //   this.setState({
+  //     problemValue: e.target.value,
+  //   });
+  // }
+  // handelChange(e) {
+  //   this.setState({
+  //     inpValu: e.target.value
+  //   })
+  // }
+  // problemModal() {
+  //   const { problemValue } = this.state;
+  //   return (
+  //     <Modal
+  //       title="请选择问题卷类型"
+  //       visible={this.state.problemVisible}
+  //       onOk={this.handleOk}
+  //       onCancel={this.handleCancel}
+  //     >
+  //       <Radio.Group onChange={this.onRidioChange} value={problemValue}>
+  //         <Space direction="vertical">
+  //           <Radio value={1}>图像不清</Radio>
+  //           <Radio value={2}>答错题目</Radio>
+  //           <Radio value={3}>其他错误</Radio>
+  //         </Space>
+  //       </Radio.Group>
+  //       <Input placeholder="请输入问题" onChange={this.handelChange.bind(this)} style={{ marginTop: 10 }} />
+  //     </Modal>
+  //   )
+  // }
 }
