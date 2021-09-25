@@ -25,10 +25,15 @@ export default class index extends Component {
         markScore: [],
         keyTest: [],
         sampleList: [],
-        samplePaper: []
+        samplePaper: [],
+        QuestionId: undefined,
     }
 
     componentDidMount() {
+        console.log(this.props.match.params)
+        this.setState({
+            QuestionId: parseInt(this.props.match.params.QuestionId)
+        })
         if (this.props.match.params.type === "1") {
             this.setState({
                 type: '仲裁卷'
@@ -49,7 +54,7 @@ export default class index extends Component {
 
     // 仲裁卷
     getArbitrationTestId = () => {
-        group.arbitrationTestId({ supervisorId: "2" })
+        group.arbitrationTestId({ supervisorId: "2",questionId:parseInt(this.props.match.params.QuestionId) })
             .then((res) => {
                 if (res.data.status == "10000") {
                     let currentTestId = res.data.data.arbitramentUnmarkListVOList[0].TestId
@@ -67,7 +72,7 @@ export default class index extends Component {
 
     // 问题卷
     getProblemTestId = () => {
-        group.problemTestId({ supervisorId: "2" })
+        group.problemTestId({ supervisorId: "2",questionId:parseInt(this.props.match.params.QuestionId) })
             .then((res) => {
                 if (res.data.status == "10000") {
                     let currentTestId = res.data.data.ProblemUnmarkVOList[0].TestId
@@ -85,12 +90,12 @@ export default class index extends Component {
 
     // 自评卷
     getSelfTestId = () => {
-        group.selfTestId({ supervisorId: "2" })
+        group.selfTestId({ supervisorId: "2",questionId:parseInt(this.props.match.params.QuestionId) })
             .then((res) => {
                 if (res.data.status == "10000") {
-                    let currentTestId = res.data.data.ProblemUnmarkVOList[0].TestId
+                    let currentTestId = res.data.data.selfUnmarkVOList[0].TestId
                     this.setState({
-                        count: res.data.data.ProblemUnmarkVOList.length,
+                        count: res.data.data.selfUnmarkVOList.length,
                         currentTestId
                     })
                     this.getCurrentPaper();

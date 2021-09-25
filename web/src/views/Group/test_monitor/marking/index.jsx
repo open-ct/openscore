@@ -17,7 +17,8 @@ export default class index extends Component {
     state = {
         questionList: [],
         tableData: [],
-        count: 0
+        count: 0,
+        questionIndex:0
     }
 
     questionList = () => {
@@ -102,12 +103,15 @@ export default class index extends Component {
                 index = i
             }
         }
+        this.setState({
+            questionIndex:index
+        })
         this.tableData(this.state.questionList[index].QuestionId)
     }
     // 选择区
 
     paperMark =() => {
-        this.props.history.push('/home/group/markTasks/3')
+        this.props.history.push('/home/group/markTasks/3/'+this.state.questionList[this.state.questionIndex].QuestionId)
     }
     render() {
         return (

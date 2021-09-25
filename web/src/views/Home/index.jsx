@@ -273,7 +273,7 @@ export default class index extends Component {
                                     <Route path="/home/group/arbitration" component={arbitration} exact></Route>
                                     <Route path="/home/group/marking" component={marking}></Route>
                                     <Route path="/home/group/problem" component={problem} exact></Route>
-                                    <Route path="/home/group/markTasks/:type" component={markTasks} exact></Route>
+                                    <Route path="/home/group/markTasks/:type/:QuestionId" component={markTasks} exact></Route>
                                     
                                     <Route path="/home/management/question" component={question} exact></Route>
                                     <Route path="/home/management/paper" component={paper}></Route>
