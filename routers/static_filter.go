@@ -1,10 +1,3 @@
-/*
- * @Author: Junlang
- * @Date: 2021-07-22 18:39:51
- * @LastEditTime: 2021-07-23 16:20:59
- * @LastEditors: Junlang
- * @FilePath: /openscore/web/src/Conf.js
- */
 // Copyright 2021 The casbin Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,11 +12,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const DefaultProgramName = "talent2021";
+package routers
 
-export const AuthConfig = {
-  serverUrl: "http://localhost:8000",
-  clientId: "9162cb3914b3f1559e9e",
-  appName: "application_1",
-  organizationName: "built-in",
-};
+import (
+	"net/http"
+	"openscore/util"
+	"strings"
+
+	"github.com/beego/beego/v2/server/web/context"
+)
+
+func StaticFilter(ctx *context.Context) {
+	urlPath := ctx.Request.URL.Path
+	if strings.HasPrefix(urlPath, "/api/") {
+		return
+	}
+
+	if strings.HasPrefix(urlPath, "/openct/") {
+		return
+	}
+
+	path := "web/build"
+	if urlPath == "/" {
+		path += "/index.html"
+	} else {
+		path += urlPath
+	}
+
+	if util.FileExist(path) {
+		http.ServeFile(ctx.ResponseWriter, ctx.Request, path)
+	} else {
+		http.ServeFile(ctx.ResponseWriter, ctx.Request, "web/build/index.html")
+	}
+}

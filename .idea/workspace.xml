@@ -2,10 +2,124 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="90d49d24-cd7e-4f14-b075-c6e5fe5ae2ce" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/routers/static_filter.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/casdoor/conf/app.conf" beforeDir="false" afterPath="$PROJECT_DIR$/casdoor/conf/app.conf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/conf/app.conf" beforeDir="false" afterPath="$PROJECT_DIR$/conf/app.conf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controllers/score.go" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/score.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/controllers/supervisor.go" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/supervisor.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/.env" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/.idea/frontend.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/config-overrides.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/public/favicon.ico" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/public/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/public/logo192.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/public/logo512.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/public/manifest.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/public/robots.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/App.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/App.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/Conf.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/Setting.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/api/group.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/api/manage.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/api/marking.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/api/request.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/asset/images/OpenCT_Logo.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/auth/Auth.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/auth/AuthCallback.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/auth/Util.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/backend/AccountBackend.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/logo.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/menu/menuTab.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/serviceWorker.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/setupProxy.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/util/Util.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Group/mark_monitor/all/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Group/mark_monitor/all/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Group/mark_monitor/average/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Group/mark_monitor/average/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Group/mark_monitor/score/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Group/mark_monitor/score/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Group/mark_monitor/self/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Group/mark_monitor/self/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Group/mark_monitor/standard/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Group/mark_monitor/standard/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Group/mark_monitor/teacher/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Group/mark_monitor/teacher/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Group/test_monitor/arbitration/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Group/test_monitor/arbitration/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Group/test_monitor/markTasks/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Group/test_monitor/markTasks/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Group/test_monitor/marking/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Group/test_monitor/marking/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Group/test_monitor/problem/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Group/test_monitor/problem/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Home/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Home/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Manage/paper_manage/allot/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Manage/paper_manage/allot/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Manage/paper_manage/detail/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Manage/paper_manage/detail/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Manage/paper_manage/manage/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Manage/paper_manage/manage/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Manage/paper_manage/paper/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Manage/paper_manage/paper/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Manage/paper_manage/question/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Manage/paper_manage/question/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Manage/user_manage/manage/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Manage/user_manage/manage/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Manage/user_manage/user/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Manage/user_manage/user/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Mark/Answer/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Mark/Answer/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Mark/MarkTasks/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Mark/MarkTasks/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Mark/Review/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Mark/Review/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Mark/Sample/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/Mark/Sample/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/yarn.lock" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lastupdate.tmp" beforeDir="false" afterPath="$PROJECT_DIR$/lastupdate.tmp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/scoreRecord.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/scoreRecord.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/models/underCorrectedPaper.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/underCorrectedPaper.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/requests/supervisor.go" beforeDir="false" afterPath="$PROJECT_DIR$/requests/supervisor.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requests/test.go" beforeDir="false" afterPath="$PROJECT_DIR$/requests/test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/responses/supervisor.go" beforeDir="false" afterPath="$PROJECT_DIR$/responses/supervisor.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routers/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/routers/router.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/package-lock.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/public/favicon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/public/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/public/manifest.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/public/redirect.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/App.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/App.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/Conf.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/Setting.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/WelcomePage.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/auth/Auth.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/auth/AuthCallback.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/auth/Util.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/backend/AccountBackend.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/index.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/logo.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/serviceWorker.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/setupTests.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/yarn.lock" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
