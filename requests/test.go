@@ -5,7 +5,11 @@ type TestDisplay struct {
 	TestId int64  `json:"testId"`
 }
 
-type TetsList struct {
+type TestList struct {
+	UserId string `json:"userId"`
+}
+
+type TeacherSelfMarkList struct {
 	UserId string `json:"userId"`
 }
 
