@@ -81,6 +81,10 @@ type  ArbitramentUnmarkListVO struct {
 }
 type  SelfMarkListVO struct {
 	TestId int64
+	Score int64
+	SelfScore int64
+	Userid string
+	Name string
 }
 
 type ScoreProgressVO struct {

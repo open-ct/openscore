@@ -75,3 +75,19 @@ func GetTestInfoPicListByTestId(id int64, as *[]string) error {
 	}
 	return err
 }
+
+func FindTestPaperInfoByQuestionDetailId(questionDetailId int64,  t *[]TestPaperInfo) error {
+	err := x.Where("question_detail_id = ?", questionDetailId).Find(t)
+	if err != nil {
+		log.Println("could not FindTestPaperInfoByQuestionId ")
+		log.Println(err)
+	}
+	return err
+}
+func (u *TestPaperInfo) Delete() error {
+	_, err := x.Where(builder.Eq{"test_id": u.Test_id}).Delete(u)
+	if  err != nil {
+		log.Println("delete fail")
+	}
+	return err
+}

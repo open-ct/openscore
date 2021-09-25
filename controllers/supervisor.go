@@ -417,11 +417,19 @@ func (c *SupervisorApiController) SelfScore() {
 	//求教师名和转化输出
   	for i:=0 ;i<len(selfScoreRecord);i++ {
   		testId :=selfScoreRecord[i].Test_id
-		var testScoreRecord models.ScoreRecord
-  		models.GetTestScoreRecordByTestIdAndUserId(&testScoreRecord,testId,examinerId)
+  		var test models.TestPaper
+  		test.GetTestPaperByTestId(testId)
+		if test.Examiner_first_id== examinerId{
+			selfScoreRecordVOList[i].Score =test.Examiner_first_score
+			selfScoreRecordVOList[i].SelfScore=test.Examiner_first_self_score
+		}else  if test.Examiner_second_id==examinerId {
+			selfScoreRecordVOList[i].Score=test.Examiner_second_score
+			selfScoreRecordVOList[i].SelfScore=test.Examiner_second_self_score
+		}else  if test.Examiner_third_id==examinerId {
+			selfScoreRecordVOList[i].Score =test.Examiner_third_score
+			selfScoreRecordVOList[i].SelfScore=test.Examiner_third_self_score
+		}
   	    selfScoreRecordVOList[i].TestId=testId
-  	    selfScoreRecordVOList[i].Score=testScoreRecord.Score
-  	    selfScoreRecordVOList[i].SelfScore=selfScoreRecord[i].Score
 
 	}
 
@@ -1455,7 +1463,26 @@ func (c *SupervisorApiController) SelfMarkList() {
 
 	for i:=0 ;i<len(selfMarkPaper);i++ {
 		//存testId
-		var testId = selfMarkPaper[i].Test_id
+		 testId := selfMarkPaper[i].Test_id
+		 selfScoreId := selfMarkPaper[i].Self_score_id
+		 var  test models.TestPaper
+		 test.GetTestPaperByTestId(testId)
+
+
+		if test.Examiner_first_id==selfScoreId {
+			selfMarkVOList[i].Score =test.Examiner_first_score
+			selfMarkVOList[i].SelfScore=test.Examiner_first_self_score
+		}else  if test.Examiner_second_id==selfScoreId {
+			selfMarkVOList[i].Score=test.Examiner_second_score
+			selfMarkVOList[i].SelfScore=test.Examiner_second_self_score
+		}else  if test.Examiner_third_id==selfScoreId {
+			selfMarkVOList[i].Score =test.Examiner_third_score
+			selfMarkVOList[i].SelfScore=test.Examiner_third_self_score
+		}
+		selfMarkVOList[i].Userid=selfScoreId
+		var user models.User
+		user.GetUser(selfScoreId)
+		selfMarkVOList[i].Name=user.User_name
 		selfMarkVOList[i].TestId=testId
 	}
 
