@@ -157,6 +157,14 @@ func FindProblemUnderCorrectedPaperByQuestionId(problemUnderCorrectedPaper *[] U
 	}
  return err
 }
+func FindSelfUnderCorrectedPaperByQuestionId(selfUnderCorrectedPaper *[] UnderCorrectedPaper,questionId int64) error{
+
+	err := x.Where("question_id=?", questionId).Where(" test_question_type =?", 7).Find(selfUnderCorrectedPaper)
+	if err!=nil {
+		log.Println("FindSelfUnderCorrectedPaperByQuestionId err ")
+	}
+ return err
+}
 func FindSelfMarkPaperByQuestionId(selfMarkUnderCorrectedPaper *[]UnderCorrectedPaper,questionId int64) error{
 
 	err := x.Where("question_id=?", questionId).Where(" test_question_type =?", 7).Find(selfMarkUnderCorrectedPaper)

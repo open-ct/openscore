@@ -947,8 +947,9 @@ func (c *AdminApiController) DeleteTest(){
 		testPaperInfos :=make([]models.TestPaperInfo,0)
 		models.FindTestPaperInfoByQuestionDetailId(subTopic.Question_detail_id,&testPaperInfos)
 			for k:=0;k<len(testPaperInfos);k++ {
-				//imgSrc :=testPaperInfos[k].Pic_src
-				//删除图片
+				picName :=testPaperInfos[k].Pic_src
+				src := "./img/" + picName
+				os.Remove(src)
 				testPaperInfos[k].Delete()
 			}
 		}

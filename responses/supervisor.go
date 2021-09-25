@@ -59,6 +59,9 @@ type ProblemUnderCorrectedPaperVO struct {
 type ProblemUnmarkListVO struct {
 	TestId int64
 }
+type SelfUnmarkListVO struct {
+	TestId int64
+}
 
 type  ArbitramentTestVO struct {
 	TestId int64

@@ -48,6 +48,7 @@ func init() {
 	beego.Router("/openct/marking/supervisor/point", &controllers.SupervisorApiController{}, "post:SupervisorPoint")
 	beego.Router("/openct/marking/supervisor/arbitrament/unmark/list", &controllers.SupervisorApiController{}, "post:ArbitramentUnmarkList")
 	beego.Router("/openct/marking/supervisor/selfMark/list", &controllers.SupervisorApiController{}, "post:SelfMarkList")
+	beego.Router("/openct/marking/supervisor/selfMark/unmark/list", &controllers.SupervisorApiController{}, "post:SelfUnmarkList")
 	beego.Router("/openct/marking/supervisor/problem/unmark/list", &controllers.SupervisorApiController{}, "post:ProblemUnmarkList")
 	beego.Router("/openct/marking/supervisor/score/deviation", &controllers.SupervisorApiController{}, "post:ScoreDeviation")
 
