@@ -815,6 +815,7 @@ func (c *TestPaperApiController) SelfMarkPoint() {
 		if math.Abs(float64(sum-test.Examiner_first_score))>float64(standardError) {
 			var newUnderTest models.UnderCorrectedPaper
 			newUnderTest.User_id="10000"
+			newUnderTest.Self_score_id=userId
 			newUnderTest.Test_id=testId
 			newUnderTest.Question_id=test.Question_id
 			newUnderTest.Test_question_type=7
@@ -895,6 +896,7 @@ func (c *TestPaperApiController) SelfMarkPoint() {
 			var newUnderTest models.UnderCorrectedPaper
 			newUnderTest.User_id="10000"
 			newUnderTest.Test_id=testId
+			newUnderTest.Self_score_id=userId
 			newUnderTest.Question_id=test.Question_id
 			newUnderTest.Test_question_type=7
 			newUnderTest.Save()
@@ -976,6 +978,7 @@ func (c *TestPaperApiController) SelfMarkPoint() {
 			newUnderTest.User_id="10000"
 			newUnderTest.Test_id=testId
 			newUnderTest.Question_id=test.Question_id
+			newUnderTest.Self_score_id=userId
 			newUnderTest.Test_question_type=7
 			newUnderTest.Save()
 		}

@@ -915,3 +915,54 @@ func (c *AdminApiController) DistributionRecord() {
 
 
 
+/**
+试卷删除
+*/
+
+func (c *AdminApiController) DeleteTest(){
+
+	defer c.ServeJSON()
+	var requestBody requests.DeleteTest
+	var resp Response
+	var  err error
+
+	err =json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	if err!=nil {
+		log.Println(err)
+		resp = Response{"10001","cannot unmarshal",err}
+		c.Data["json"] = resp
+		return
+	}
+	//adminId := requestBody.AdminId
+	questionId := requestBody.QuestionId
+
+	//----------------------------------------------------
+	count, err := models.CountUnScoreTestNumberByQuestionId(questionId)
+	if count==0 {
+		models.DeleteAllTest(questionId)
+		subTopics:=make([]models.SubTopic,0)
+		models.FindSubTopicsByQuestionId(questionId,&subTopics)
+		for j:=0 ;j<len(subTopics);j++ {
+			subTopic:= subTopics[j]
+		testPaperInfos :=make([]models.TestPaperInfo,0)
+		models.FindTestPaperInfoByQuestionDetailId(subTopic.Question_detail_id,&testPaperInfos)
+			for k:=0;k<len(testPaperInfos);k++ {
+				//imgSrc :=testPaperInfos[k].Pic_src
+				//删除图片
+				testPaperInfos[k].Delete()
+			}
+		}
+
+	}else {
+		resp  = Response{"30030","试卷未批改完不能删除  ",err}
+		c.Data["json"] = resp
+		return
+	}
+
+	//----------------------------------------------------
+	data := make(map[string]interface{})
+	data["data"] =nil
+	resp = Response{"10000", "OK", data}
+	c.Data["json"] = resp
+
+}

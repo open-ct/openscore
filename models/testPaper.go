@@ -9,7 +9,7 @@ import (
 type TestPaper struct {
 	Test_id                    int64  `json:"test_id" xorm:"pk autoincr"`
 	Question_id                int64  `json:"question_id"`
-	Candidate                  string `json:"candidate"`
+	Candidate           		       string `json:"candidate"`
 	Question_status            int64  `json:"question_status"`
 	Examiner_first_id          string `json:"examiner_first_id" xorm:"default('-1')"`
 	Examiner_first_score       int64  `json:"examiner_first_score" xorm:"default(-1)"`
@@ -33,6 +33,13 @@ func (t *TestPaper) GetTestPaperByQuestionIdAndQuestionStatus(question_id int64,
 	has, err := x.Where("question_id = ? and question_status = ?", question_id, question_statue).Get(t)
 	if !has || err != nil {
 		log.Println("could not specific test")
+	}
+	return err
+}
+func (t *TestPaper) GetTestPaperByTestId(testId int64) error {
+	has, err := x.Where("test_id = ?", testId).Get(t)
+	if !has || err != nil {
+		log.Println("could not GetTestPaperByTestId")
 	}
 	return err
 }
@@ -72,7 +79,15 @@ func (t *TestPaper) Insert() error {
 }
 
 func FindTestPaperByQuestionId(question_id int64,  t *[]TestPaper) error {
-	err := x.Where("question_id = ? and correcting_status = ?", question_id, 0).Find(t)
+	err := x.Where("question_id = ?", question_id).Find(t)
+	if err != nil {
+		log.Println("could not FindTestPaperByQuestionId ")
+		log.Println(err)
+	}
+	return err
+}
+func FindTestPapersByTestId(testId,  t *[]TestPaper) error {
+	err := x.Where("question_id = ?", testId).Find(t)
 	if err != nil {
 		log.Println("could not FindTestPaperByQuestionId ")
 		log.Println(err)
@@ -127,4 +142,11 @@ func CountThirdScoreNumberByQuestionId(questionId int64)(count int64,err error) 
 		log.Println("CountThirdScoreNumberByQuestionId err ")
 	}
 	return count,err1
+}
+func  DeleteAllTest(questionId int64) error {
+	_, err := x.Delete(&TestPaper{Question_id:questionId})
+	if  err != nil {
+		log.Println("delete fail")
+	}
+	return err
 }

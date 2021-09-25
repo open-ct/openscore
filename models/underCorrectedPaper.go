@@ -14,6 +14,7 @@ type UnderCorrectedPaper struct {
 	Test_question_type int64  `json:"test_question_type"`
 	Problem_type       int64  `json:"problem_type" xorm:"default(-1)"`
 	Problem_message    string  `json:"test_message"`
+	Self_score_id    string  `json:"self_score_id"`
 }
 
 func (u *UnderCorrectedPaper) GetUnderCorrectedPaper(userId string, testId int64) error {
@@ -93,6 +94,14 @@ func CountProblemUnFinishNumberByQuestionId(questionId int64 )(count int64,err e
 	count, err1 := x.Where("question_id = ?", questionId).Where("test_question_type=6").Count(underCorrectedPaper)
 	if err!=nil {
 		log.Println("CountProblemUnFinishNumberByQuestionId err ")
+	}
+	return count,err1
+}
+func CountUnScoreTestNumberByQuestionId(questionId int64 )(count int64,err error) {
+	underCorrectedPaper:=new (UnderCorrectedPaper)
+	count, err1 := x.Where("question_id = ?", questionId).Count(underCorrectedPaper)
+	if err!=nil {
+		log.Println("CountUnScoreTestNumberByQuestionId err ")
 	}
 	return count,err1
 }

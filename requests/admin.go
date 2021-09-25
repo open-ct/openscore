@@ -27,6 +27,10 @@ type DistributionInfo struct {
 	AdminId string   `json:"adminId"`
 	QuestionId int64  `json:"questionId"`
 }
+type DeleteTest struct {
+	AdminId string   `json:"adminId"`
+	QuestionId int64  `json:"questionId"`
+}
 
 type Distribution struct {
 	AdminId string   `json:"adminId"`
@@ -35,16 +39,7 @@ type Distribution struct {
 	UserNumber int `json:"userNumber"`
 
 }
-//type ReadExcel struct {
-//	AdminId string   `json:"adminId"`
-////	FilePath string  `json:"filePath"`
-//	Excel []byte    `json:"excel"`
-//}
-//
-//type ReadExcelBytes struct {
-//	AdminId string   ` form:"adminId"  binding:"required"`
-//	Excel []byte    `form:"excel"   binding:"required"`
-//}
+
 type ReadFile struct {
 	PicName string 	`json:"picName"`
 }
