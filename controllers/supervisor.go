@@ -1252,13 +1252,13 @@ func (c *SupervisorApiController) ProblemUnmarkList() {
 		return
 	}
 	//supervisorId := requestBody.SupervisorId
-
+	questionId := requestBody.QuestionId
 	//------------------------------------------------
 
 
 	//根据大题号找到问题卷
 	problemUnderCorrectedPaper :=make([]models.UnderCorrectedPaper ,0)
-	models.FindProblemUnderCorrectedList(&problemUnderCorrectedPaper)
+	models.FindProblemUnderCorrectedPaperByQuestionId(&problemUnderCorrectedPaper,questionId)
 	if err!=nil {
 		resp = Response{"20027","FindProblemUnderCorrectedList  fail",err}
 		c.Data["json"] = resp
@@ -1299,12 +1299,13 @@ func (c *SupervisorApiController) ArbitramentUnmarkList() {
 		return
 	}
 	//supervisorId := requestBody.SupervisorId
+	questionId := requestBody.QuestionId
 
 	//------------------------------------------------
 
 	//找到仲裁卷
 	arbitramentUnderCorrectedPaper :=make([]models.UnderCorrectedPaper ,0)
-	err = models.FindAllArbitramentUnderCorrectedPaper(&arbitramentUnderCorrectedPaper)
+	err = models.FindAllArbitramentUnderCorrectedPaper(&arbitramentUnderCorrectedPaper,questionId)
 	if err!=nil {
 		resp = Response{"20026","FindAllArbitramentUnderCorrectedPaper  fail",err}
 		c.Data["json"] = resp
@@ -1420,3 +1421,52 @@ func (c *SupervisorApiController) ScoreDeviation() {
 
 }
 
+/**
+22.自评卷列表
+*/
+func (c *SupervisorApiController) SelfMarkList() {
+	defer c.ServeJSON()
+	var requestBody requests.SelfMarkList
+	var resp Response
+	var  err error
+
+	err=json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	if err!=nil {
+		resp = Response{"10001","cannot unmarshal",err}
+		c.Data["json"] = resp
+		return
+	}
+	//supervisorId := requestBody.SupervisorId
+	questionId := requestBody.QuestionId
+
+	//------------------------------------------------
+
+	//找到自评卷
+	selfMarkPaper :=make([]models.UnderCorrectedPaper ,0)
+	err = models.FindSelfMarkPaperByQuestionId(&selfMarkPaper,questionId)
+	if err!=nil {
+		resp = Response{"20026","FindAllArbitramentUnderCorrectedPaper  fail",err}
+		c.Data["json"] = resp
+		return
+	}
+	//输出标准
+	selfMarkVOList := make([]responses.SelfMarkListVO,len(selfMarkPaper))
+
+
+	for i:=0 ;i<len(selfMarkPaper);i++ {
+		//存testId
+		var testId = selfMarkPaper[i].Test_id
+		selfMarkVOList[i].TestId=testId
+	}
+
+
+
+
+	//--------------------------------------------------
+
+	data := make(map[string]interface{})
+	data["selfMarkVOList"] =selfMarkVOList
+	resp = Response{"10000", "OK", data}
+	c.Data["json"] = resp
+
+}
