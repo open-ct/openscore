@@ -17,7 +17,7 @@ export default class index extends Component {
     state = {
         questionList: [],
         tableData: [],
-        count: undefined
+        count: 0
     }
 
     questionList = () => {
@@ -37,64 +37,29 @@ export default class index extends Component {
     }
     columns = [
         {
+            title: '用户Id',
+            width: 150,
+            dataIndex: 'Userid',
+        },
+        {
+            title: '用户名',
+            width: 150,
+            dataIndex: 'Name',
+        },
+        {
             title: '试卷号',
             width: 150,
             dataIndex: 'TestId',
         },
         {
-            title: '阅卷人一账号',
+            title: '上次评分',
             width: 150,
-            dataIndex: 'ExaminerFirstId',
+            dataIndex: 'Score',
         },
         {
-            title: '阅卷人一名称',
+            title: '本次评分',
             width: 150,
-            dataIndex: 'ExaminerFirstName',
-        },
-        {
-            title: '阅卷人一分数',
-            width: 150,
-            dataIndex: 'ExaminerFirstScore',
-        },
-        {
-            title: '阅卷人二账号',
-            width: 150,
-            dataIndex: 'ExaminerSecondId',
-        },
-        {
-            title: '阅卷人二名称',
-            width: 150,
-            dataIndex: 'ExaminerSecondName',
-        },
-        {
-            title: '阅卷人二分数',
-            width: 150,
-            dataIndex: 'ExaminerSecondScore',
-        },
-        {
-            title: '阅卷人三账号',
-            width: 150,
-            dataIndex: 'ExaminerThirdId',
-        },
-        {
-            title: '阅卷人三名称',
-            width: 150,
-            dataIndex: 'ExaminerThirdName',
-        },
-        {
-            title: '阅卷人三分数',
-            width: 150,
-            dataIndex: 'ExaminerThirdScore',
-        },
-        {
-            title: '标准误差',
-            width: 150,
-            dataIndex: 'StandardError',
-        },
-        {
-            title: '实际误差',
-            width: 150,
-            dataIndex: 'PracticeError',
+            dataIndex: 'SelfScore',
         },
 
     ]
@@ -104,13 +69,13 @@ export default class index extends Component {
             .then((res) => {
                 if (res.data.status == "10000") {
                     let tableData = [];
-                    for (let i = 0; i < res.data.data.arbitramentTestVOList.length; i++) {
-                        let item = res.data.data.arbitramentTestVOList[i]
+                    for (let i = 0; i < res.data.data.selfMarkVOList.length; i++) {
+                        let item = res.data.data.selfMarkVOList[i]
                         tableData.push(item)
                     }
                     this.setState({
                         tableData,
-                        count: res.data.data.count
+                        count: res.data.data.selfMarkVOList.length
                     })
                 }
             })
