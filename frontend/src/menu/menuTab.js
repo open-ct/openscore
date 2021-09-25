@@ -38,6 +38,15 @@ export default [
         ]
     },
     {
+        key: "selfMark",
+        userPermission: "阅卷员",
+        menu_name: "自评",
+        menu_url: "/home/selfMark",
+        icon: "SolutionOutlined",
+        chidPermissions: [
+        ]
+    },
+    {
         key: "mark_monitor",
         userPermission: "组长",
         menu_name: "评卷监控",
