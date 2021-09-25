@@ -72,7 +72,7 @@ const group = {
   },
 
   selfTestId(data) {
-    return axios.post('/marking/supervisor/arbitrament/unmark/list', data)
+    return axios.post('/marking/supervisor/selfMark/unmark/list', data)
   },
 
 
