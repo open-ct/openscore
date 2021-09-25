@@ -1290,6 +1290,52 @@ func (c *SupervisorApiController) ProblemUnmarkList() {
 	c.Data["json"] = resp
 
 }
+/**
+20.自评卷列表
+ */
+func (c *SupervisorApiController) SelfUnmarkList() {
+	defer c.ServeJSON()
+	var requestBody requests.SelfUnmarkList
+	var resp Response
+	var  err error
+
+	err=json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	if err!=nil {
+		resp = Response{"10001","cannot unmarshal",err}
+		c.Data["json"] = resp
+		return
+	}
+	//supervisorId := requestBody.SupervisorId
+	questionId := requestBody.QuestionId
+	//------------------------------------------------
+
+
+	//根据大题号找到自评卷
+	selfUnderCorrectedPaper :=make([]models.UnderCorrectedPaper ,0)
+	models.FindSelfUnderCorrectedPaperByQuestionId(&selfUnderCorrectedPaper,questionId)
+	if err!=nil {
+		resp = Response{"20027","FindSelfUnderCorrectedPaperByQuestionId  fail",err}
+		c.Data["json"] = resp
+		return
+	}
+	//输出标准
+	selfUnmarkVOList := make([]responses.SelfUnmarkListVO,len(selfUnderCorrectedPaper))
+
+	//求阅卷输出
+	for i:=0 ;i<len(selfUnderCorrectedPaper);i++ {
+		//存testId
+		selfUnmarkVOList[i].TestId=selfUnderCorrectedPaper[i].Test_id
+	}
+
+	//--------------------------------------------------
+
+	data := make(map[string]interface{})
+	data["selfUnmarkVOList"] =selfUnmarkVOList
+
+	resp = Response{"10000", "OK", data}
+	c.Data["json"] = resp
+
+}
 
 /**
 21.仲裁卷列表

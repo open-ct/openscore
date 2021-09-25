@@ -57,6 +57,10 @@ type ProblemUnmarkList struct {
 	SupervisorId string   `joson:"supervisorId"`
 	QuestionId int64 	`json:"questionId"`
 }
+type SelfUnmarkList struct {
+	SupervisorId string   `joson:"supervisorId"`
+	QuestionId int64 	`json:"questionId"`
+}
 type ScoreDeviation struct {
 	SupervisorId string   `joson:"supervisorId"`
 	QuestionId int64  `joson:"questionId"`
