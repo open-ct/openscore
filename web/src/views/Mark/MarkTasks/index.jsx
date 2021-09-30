@@ -34,7 +34,7 @@ export default class index extends Component {
   getAllPaper = () => {
     Marking.testList({ userId: this.userId })
       .then((res) => {
-        if (res.data.status == "10000") {
+        if (res.data.status === "10000") {
           let papers = [...res.data.data.TestIds]
           this.setState(
             {
@@ -42,6 +42,10 @@ export default class index extends Component {
             }
           )
           this.getCurrentPaper();
+        }else if(res.data.status === "10003") {
+          if (res.data.msg == "there is no paper to correct") {
+            message.warning('没有试卷待批改')
+          }
         }
       })
       .catch((e) => {

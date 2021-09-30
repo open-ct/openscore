@@ -12,7 +12,7 @@ export default class index extends Component {
     componentDidMount() {
         this.questionList();
     }
-
+    
     // 选择区
     state = {
         questionList: [],

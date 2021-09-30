@@ -52,11 +52,6 @@ export default class index extends Component {
                     dataIndex: 'FinishNumber',
                 },
                 {
-                    title: '出成绩率',
-                    width: 90,
-                    dataIndex: 'FinishRate',
-                },
-                {
                     title: '平均分（含零/除零）',
                     width: 90,
                     dataIndex: 'AverageScore',
