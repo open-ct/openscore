@@ -27,12 +27,12 @@ export default class index extends Component {
             dataIndex: 'TestDistributionNumber',
         },
         {
-            title: '正评数量',
+            title: '阅卷完成数',
             width: 120,
             dataIndex: 'TestSuccessNumber',
         },
         {
-            title: '无效数量',
+            title: '阅卷失败数量',
             width: 120,
             dataIndex: 'TestProblemNumber',
         },
@@ -45,6 +45,11 @@ export default class index extends Component {
             title: '评卷速度（秒/份）',
             width: 180,
             dataIndex: 'MarkingSpeed',
+        },
+        {
+            title: '预计时间（小时）',
+            width: 120,
+            dataIndex: 'PredictTime',
         },
         {
             title: '平均分',
@@ -62,11 +67,6 @@ export default class index extends Component {
             dataIndex: 'StandardDeviation',
         },
         {
-            title: '自评指数',
-            width: 120,
-            dataIndex: 'EvaluationIndex',
-        },
-        {
             title: '在线情况',
             width: 120,
             dataIndex: 'IsOnline',
@@ -79,7 +79,7 @@ export default class index extends Component {
             .then((res) => {
                 if (res.data.status == "10000") {
                     this.setState({
-                        userInfo: res.data.userInfo
+                        userInfo: res.data.data.userInfo
                     })
                     console.log(res.data.data.userInfo)
                 }
@@ -90,7 +90,7 @@ export default class index extends Component {
     }
 
     questionList = () => {
-        group.questionList({ supervisorId: "2" })
+        group.questionList({ adminId: "1",subjectName: JSON.parse(localStorage.getItem('userInfo')).SubjectName})
             .then((res) => {
                 if (res.data.status == "10000") {
                     this.setState({
@@ -121,7 +121,7 @@ export default class index extends Component {
                             AverageScore: item.AverageScore,
                             Validity: item.Validity,
                             StandardDeviation: item.StandardDeviation,
-                            EvaluationIndex: item.EvaluationIndex,
+                            PredictTime: item.PredictTime,
                             IsOnline: item.IsOnline === 1 ? "在线" : "离线"
                         })
                     }

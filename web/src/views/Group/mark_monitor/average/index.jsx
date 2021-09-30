@@ -16,11 +16,12 @@ export default class index extends Component {
     state = {
         questionList: [],
         tableData: [],
-        fullScore: undefined
+        fullScore: undefined,
+        averageScore: undefined
     }
 
     questionList = () => {
-        group.questionList({ supervisorId: "2" })
+        group.questionList({ adminId: "1",subjectName: JSON.parse(localStorage.getItem('userInfo')).SubjectName})
             .then((res) => {
                 if (res.data.status == "10000") {
                     this.setState({
@@ -69,7 +70,8 @@ export default class index extends Component {
                     }
                     this.setState({
                         tableData,
-                        fullScore: res.data.data.fullScore
+                        fullScore: res.data.data.fullScore,
+                        averageScore:res.data.data.questionAverageScore
                     })
                 }
             })
@@ -84,7 +86,7 @@ export default class index extends Component {
             dataIndex: 'UserName',
         },
         {
-            title: '小题平均分',
+            title: '平均分',
             width: 180,
             dataIndex: 'Average',
         }
@@ -130,6 +132,9 @@ export default class index extends Component {
                         <div className="question-score">
                             满分：{this.state.fullScore}
                         </div>
+                        <div className="question-score">
+                            平均分：{this.state.averageScore}
+                        </div>
                     </div>
                     <div className="display-container">
                         <div className="display-table">
@@ -141,7 +146,7 @@ export default class index extends Component {
                         </div>
                         <div className="progress">
                             <div className="progress-header">
-                                <span>教师</span><span>小题平均分</span>
+                                <span>教师</span><span>平均分</span>
                             </div>
                             {
                                 this.progressItem()

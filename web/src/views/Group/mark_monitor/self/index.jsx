@@ -26,16 +26,30 @@ export default class index extends Component {
             dataIndex: 'order',
         },
         {
-            title: '上次评分',
+            title: '评分',
             width: 150,
-            dataIndex: 'last',
+            dataIndex: 'Score',
         },
         {
-            title: '本次评分',
+            title: '自评',
             width: 150,
-            dataIndex: 'current',
+            dataIndex: 'SelfScore',
         },
-
+        {
+            title: '实际误差',
+            width: 150,
+            dataIndex: 'Error',
+        },
+        {
+            title: '标准误差',
+            width: 150,
+            dataIndex: 'StandardError',
+        },
+        {
+            title: '是否合格',
+            width: 150,
+            dataIndex: 'IsQualified',
+        },
 
     ]
 
@@ -51,10 +65,10 @@ export default class index extends Component {
             X_data.push(this.state.tableData[i].order)
         }
         for (let i = 0; i < this.state.tableData.length; i++) {
-            Y1_data.push(this.state.tableData[i].last)
+            Y1_data.push(this.state.tableData[i].Score)
         }
         for (let i = 0; i < this.state.tableData.length; i++) {
-            Y2_data.push(this.state.tableData[i].current)
+            Y2_data.push(this.state.tableData[i].SelfScore)
         }
         let option = {
             xAxis: {
@@ -78,7 +92,7 @@ export default class index extends Component {
         return option;
     };
     questionList = () => {
-        group.questionList({ supervisorId: "2" })
+        group.questionList({ adminId: "1",subjectName: JSON.parse(localStorage.getItem('userInfo')).SubjectName})
             .then((res) => {
                 if (res.data.status == "10000") {
                     this.setState({
@@ -164,8 +178,11 @@ export default class index extends Component {
                         let item = res.data.data.selfScoreRecordVOList[i]
                         tableData.push({
                             order : `${i+1}(${item.TestId})`,
-                            last : item.Score,
-                            current : item.SelfScore
+                            Score : item.Score,
+                            SelfScore : item.SelfScore,
+                            Error : item.Error,
+                            IsQualified : item.IsQualified===0?"不合格":"合格",
+                            StandardError : item.StandardError,
                          })
                     }
                     this.setState({
