@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+
 	"math"
 	"openscore/models"
 	"openscore/requests"
@@ -13,51 +14,51 @@ import (
 )
 
 
-/**
- 9.大题选择列表
- */
-func (c *SupervisorApiController) QuestionList() {
-	defer c.ServeJSON()
-	var requestBody requests.QuestionList
-	var resp Response
-	var  err error
-
-	err =json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
-	if err!=nil {
-		resp = Response{"10001","cannot unmarshal",err}
-		c.Data["json"] = resp
-		return
-	}
-	supervisorId := requestBody.SupervisorId
-	//----------------------------------------------------
-	//获取大题列表
-	var user models.User
-	user.User_id=supervisorId
-	user.GetUser(supervisorId)
-	subjectName := user.Subject_name
-
-	topics  := make([]models.Topic,0)
-	err = models.FindTopicBySubNameList(&topics,subjectName)
-    if err!=nil {
-    	resp  = Response{"20000","GetTopicList err ",err}
-		c.Data["json"] = resp
-		return
-	}
-
-	var questions = make([]responses.QuestionListVO,len(topics))
-	for i := 0; i < len(topics); i++ {
-
-		questions[i].QuestionId=topics[i].Question_id
-		questions[i].QuestionName=topics[i].Question_name
-
-	}
-
-	//----------------------------------------------------
-	data := make(map[string]interface{})
-	data["questionsList"] =questions
-	resp = Response{"10000", "OK", data}
-	c.Data["json"] = resp
-}
+///**
+// 9.大题选择列表
+// */
+//func (c *SupervisorApiController) QuestionList() {
+//	defer c.ServeJSON()
+//	var requestBody requests.QuestionList
+//	var resp Response
+//	var  err error
+//
+//	err =json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+//	if err!=nil {
+//		resp = Response{"10001","cannot unmarshal",err}
+//		c.Data["json"] = resp
+//		return
+//	}
+//	supervisorId := requestBody.SupervisorId
+//	//----------------------------------------------------
+//	//获取大题列表
+//	var user models.User
+//	user.User_id=supervisorId
+//	user.GetUser(supervisorId)
+//	subjectName := user.Subject_name
+//
+//	topics  := make([]models.Topic,0)
+//	err = models.FindTopicBySubNameList(&topics,subjectName)
+//    if err!=nil {
+//    	resp  = Response{"20000","GetTopicList err ",err}
+//		c.Data["json"] = resp
+//		return
+//	}
+//
+//	var questions = make([]responses.QuestionListVO,len(topics))
+//	for i := 0; i < len(topics); i++ {
+//
+//		questions[i].QuestionId=topics[i].Question_id
+//		questions[i].QuestionName=topics[i].Question_name
+//
+//	}
+//
+//	//----------------------------------------------------
+//	data := make(map[string]interface{})
+//	data["questionsList"] =questions
+//	resp = Response{"10000", "OK", data}
+//	c.Data["json"] = resp
+//}
 
 /**
  10.用户登入信息表
@@ -170,30 +171,33 @@ func (c *SupervisorApiController) TeacherMonitoring() {
   		//是否在线
 		isOnline := user.UserType
 		teacherMonitoringList[i].IsOnline=isOnline
-		//平均速度
+		//在线时间
 		var    onlineTime int64
 		if isOnline==1{
 			endingTime :=time.Now().Unix()
 			startTime:=user.Login_time.Unix()
 			tempTime := endingTime-startTime
-			fmt.Println(tempTime)
-
-			onlineTime = user.Online_time+int64(tempTime)
+			onlineTime = user.Online_time+(tempTime)
 		}else {
 			onlineTime= user.Online_time
 		}
+		//平均速度  (秒/份)
+		var markingSpeed float64 =99999999
+		s1 := strconv.FormatInt(onlineTime, 10)
+		s,_:= strconv.ParseFloat(s1, 64)
 
-		var markingSpeed float64 =0
-		s := strconv.FormatInt(onlineTime, 10)
-		f,_:= strconv.ParseFloat(s, 64)
-		m:=f/60
-
-		if m!=0 {
-
-			tempSpeed :=float64(finishCount)/m
+		if finishCount!=0 {
+			tempSpeed :=s/float64(finishCount)
 			markingSpeed,_= strconv.ParseFloat(fmt.Sprintf("%.2f", tempSpeed), 64)
 		}
 		teacherMonitoringList[i].MarkingSpeed=markingSpeed
+		//预计时间 (小时)
+
+		predictTime:= markingSpeed * float64(remainingTestNumber)
+		predictTime=predictTime/3600
+		predictTime,_= strconv.ParseFloat(fmt.Sprintf("%.2f", predictTime), 64)
+		teacherMonitoringList[i].PredictTime=predictTime
+
 		//平均分
 		var averageScore float64 =0
 		if finishCount!=0 {
@@ -205,6 +209,7 @@ func (c *SupervisorApiController) TeacherMonitoring() {
 			}
 			averageScore=sum/float64(finishCount)
 		}
+
 		teacherMonitoringList[i].AverageScore=averageScore
 		//有效度
 		var validity  float64=0
@@ -213,29 +218,27 @@ func (c *SupervisorApiController) TeacherMonitoring() {
 			validity,_= strconv.ParseFloat(fmt.Sprintf("%.2f", validity), 64)
 		}
 		teacherMonitoringList[i].Validity=validity
-		//自评率
-		selfTestCount ,err1 := models.CountSelfScore(userId,questionId)
-		if err1!=nil {
-			resp = Response{"20026","CountSelfScore  fail",err}
-			c.Data["json"] = resp
-			return
-		}
-		selfTestCountString:=strconv.FormatInt(selfTestCount,10)
-		selfTestCountFloat,_:=strconv.ParseFloat(selfTestCountString,64)
-
-		var selfScoreRate float64=0
-		if finishCount!=0 {
-			selfScoreRate= selfTestCountFloat/float64(finishCount)
-		}
-		teacherMonitoringList[i].EvaluationIndex=selfScoreRate
+		////自评率
+		//selfTestCount ,err1 := models.CountSelfScore(userId,questionId)
+		//if err1!=nil {
+		//	resp = Response{"20026","CountSelfScore  fail",err}
+		//	c.Data["json"] = resp
+		//	return
+		//}
+		//selfTestCountString:=strconv.FormatInt(selfTestCount,10)
+		//selfTestCountFloat,_:=strconv.ParseFloat(selfTestCountString,64)
+		//
+		//var selfScoreRate float64=0
+		//if finishCount!=0 {
+		//	selfScoreRate= selfTestCountFloat/float64(finishCount)
+		//}
+		//teacherMonitoringList[i].EvaluationIndex=selfScoreRate
 
 		//标准差
 		var add float64
-		var j int64
-
 		finishScoreList :=make([]models.ScoreRecord,0)
 		models.FindFinishTestByUserId(&finishScoreList,userId,questionId)
-		for j=0;j<(finishCount);j++ {
+		for j:=0;j<len(finishScoreList);j++ {
 			scoreJ :=finishScoreList[j].Score
 			tempJ :=math.Abs((float64(scoreJ))-averageScore)
 			add = add+math.Exp2(tempJ)
@@ -307,17 +310,20 @@ scoreDistributionList := make([]responses.ScoreDistributionVO,questionScore+1)
 var i int64=0
 for  ;i<=questionScore;i++{
     scoreDistributionList[i].Score=i
-	score, err := models.CountTestByScore(questionId, i)
+	number, err := models.CountTestByScore(questionId, i)
 	if err!=nil {
 		resp = Response{"20004","CountTestByScore err",err}
 		c.Data["json"] = resp
 		return
 	}
-	number := score
+
 	numberString:=strconv.FormatInt(number,10)
 	numberFloat,_:=strconv.ParseFloat(numberString,64)
-	scoreDistribution:=numberFloat/countFloat
-	scoreDistribution,_= strconv.ParseFloat(fmt.Sprintf("%.2f", scoreDistribution), 64)
+	scoreDistribution := 0.00
+	if countFloat!=0{
+		scoreDistribution=numberFloat/countFloat
+		scoreDistribution,_= strconv.ParseFloat(fmt.Sprintf("%.2f", scoreDistribution), 64)
+	}
 	scoreDistributionList[i].Rate=scoreDistribution
 	}
 
@@ -419,17 +425,46 @@ func (c *SupervisorApiController) SelfScore() {
   		testId :=selfScoreRecord[i].Test_id
   		var test models.TestPaper
   		test.GetTestPaperByTestId(testId)
+
+  		//求大题信息 标准误差
+		var topic models.Topic
+		topic.GetTopic(test.Question_id)
+  		standardError := topic.Standard_error
+		var error float64
 		if test.Examiner_first_id== examinerId{
 			selfScoreRecordVOList[i].Score =test.Examiner_first_score
 			selfScoreRecordVOList[i].SelfScore=test.Examiner_first_self_score
+			selfScoreRecordVOList[i].StandardError=standardError
+
+			error =math.Abs(float64(selfScoreRecordVOList[i].Score-selfScoreRecordVOList[i].SelfScore))
+			if error<=float64(standardError) {
+				selfScoreRecordVOList[i].IsQualified=1
+			} else {
+				selfScoreRecordVOList[i].IsQualified=0
+			}
 		}else  if test.Examiner_second_id==examinerId {
 			selfScoreRecordVOList[i].Score=test.Examiner_second_score
 			selfScoreRecordVOList[i].SelfScore=test.Examiner_second_self_score
+			selfScoreRecordVOList[i].StandardError=standardError
+			error =math.Abs(float64(selfScoreRecordVOList[i].Score-selfScoreRecordVOList[i].SelfScore))
+			if error<=float64(standardError) {
+				selfScoreRecordVOList[i].IsQualified=1
+			} else {
+				selfScoreRecordVOList[i].IsQualified=0
+			}
 		}else  if test.Examiner_third_id==examinerId {
 			selfScoreRecordVOList[i].Score =test.Examiner_third_score
 			selfScoreRecordVOList[i].SelfScore=test.Examiner_third_self_score
+			selfScoreRecordVOList[i].StandardError=standardError
+			error =math.Abs(float64(selfScoreRecordVOList[i].Score-selfScoreRecordVOList[i].SelfScore))
+			if error<=float64(standardError) {
+				selfScoreRecordVOList[i].IsQualified=1
+			} else {
+				selfScoreRecordVOList[i].IsQualified=0
+			}
 		}
   	    selfScoreRecordVOList[i].TestId=testId
+  	    selfScoreRecordVOList[i].Error=error
 
 	}
 
@@ -437,6 +472,7 @@ func (c *SupervisorApiController) SelfScore() {
 
 	data := make(map[string]interface{})
 	data["selfScoreRecordVOList"] =selfScoreRecordVOList
+
 	resp = Response{"10000", "OK", data}
 	c.Data["json"] = resp
 
@@ -469,7 +505,8 @@ func (c *SupervisorApiController) AverageScore() {
 	}
 	//输出标准
 	scoreAverageVOList := make([]responses.ScoreAverageVO,len(paperDistributions))
-
+	 var sumAllTestScore =0.0
+	 var count  = 0.0
 	//求教师名和转化输出
   	for i:=0 ;i<len(paperDistributions);i++ {
 		//求userId 和userName
@@ -493,9 +530,9 @@ func (c *SupervisorApiController) AverageScore() {
 		}
 		finishCountString:=strconv.FormatInt(scoreNumber,10)
 		finishCountFloat,_:=strconv.ParseFloat(finishCountString,64)
-
+		count = count + finishCountFloat
 		var averageScore float64 =0
-		if scoreNumber!=0 {
+		if finishCountFloat!=0 {
 			sum, err := models.SumFinishScore(userId, questionId)
 			if err!=nil {
 				resp = Response{"20009","SumFinishScore fail",err}
@@ -503,9 +540,11 @@ func (c *SupervisorApiController) AverageScore() {
 				return
 			}
 			averageScore=sum/finishCountFloat
+			sumAllTestScore = sumAllTestScore+sum
 		}
 		averageScore,_= strconv.ParseFloat(fmt.Sprintf("%.2f", averageScore), 64)
 		scoreAverageVOList[i].Average=averageScore
+
 
 	}
 	var topic =models.Topic{Question_id: questionId}
@@ -516,6 +555,11 @@ func (c *SupervisorApiController) AverageScore() {
 		return
 	}
 	var fullScore =topic.Question_score
+	var  questionAverageScore = 0.0
+	if count !=0 {
+		questionAverageScore = sumAllTestScore/count
+	}
+	questionAverageScore,_= strconv.ParseFloat(fmt.Sprintf("%.2f", questionAverageScore), 64)
 
 
 	//--------------------------------------------------
@@ -523,6 +567,7 @@ func (c *SupervisorApiController) AverageScore() {
 	data := make(map[string]interface{})
 	data["scoreAverageVOList"] =scoreAverageVOList
 	data["fullScore"] =fullScore
+	data["questionAverageScore"] =questionAverageScore
 	resp = Response{"10000", "OK", data}
 	c.Data["json"] = resp
 
@@ -719,7 +764,7 @@ func (c *SupervisorApiController) ArbitramentTest() {
 */
 func (c *SupervisorApiController) ScoreProgress() {
 	defer c.ServeJSON()
-	var requestBody requests.ArbitramentTest
+	var requestBody requests.ScoreProgress
 	var resp Response
 	var  err error
 
@@ -730,11 +775,12 @@ func (c *SupervisorApiController) ScoreProgress() {
 		return
 	}
 	//supervisorId := requestBody.SupervisorId
+	subject := requestBody.Subject
 
 	//----------------------------------------------------
-	//获取大题列表
+	//根据科目获取大题列表
 	topics :=make([]models.Topic ,0)
-	err = models.GetTopicList(&topics)
+	err = models.FindTopicBySubNameList(&topics,subject)
 	if err!=nil {
 		resp  = Response{"20000","GetTopicList err ",err}
 		c.Data["json"] = resp
@@ -750,18 +796,22 @@ func (c *SupervisorApiController) ScoreProgress() {
 		//获取大题名
 		questionName := topics[i].Question_name
 		scoreProgressVOList[i].QuestionName = questionName
+		//自评率
+		scoreProgressVOList[i].SelfScoreRate=topics[i].SelfScoreRate
+
 		//获取 任务总量
 		importNumber := topics[i].Import_number
 		scoreProgressVOList[i].ImportNumber = importNumber
 
 		//出成绩量
-		finishNumber,err1 := models.CountFinishScoreNumberByQuestionId(questionId)
-		if err1!=nil {
+		finishNumber, err := models.CountFinishScoreNumberByQuestionId(questionId)
+		if err!=nil {
 			resp = Response{"20013","CountFinishScoreNumberByQuestionId  fail",err}
 			c.Data["json"] = resp
 			return
 		}
 		scoreProgressVOList[i].FinishNumber = finishNumber
+
 		//出成绩率
 		finishNumberString := strconv.FormatInt(finishNumber, 10)
 		finishNumberFloat, _ := strconv.ParseFloat(finishNumberString, 64)
@@ -792,102 +842,90 @@ func (c *SupervisorApiController) ScoreProgress() {
 			isAllFinished = "完成"
 		}
 		scoreProgressVOList[i].IsAllFinished = isAllFinished
+		//在线人数
+		var users = make([]models.User ,0)
+		models.FindUserNumberByQuestionId(&users,questionId)
+		usersNumber := len(users)
+		scoreProgressVOList[i].DistributionUserNumber=int64(usersNumber)
 
-		//分配人数
-		distributionUserNumber ,err:=models.CountUserDistributionNumberByQuestionId(questionId)
-		scoreProgressVOList[i].DistributionNumber= distributionUserNumber
 
+		//-------------------------------------------------------------------------------
 		//平均速度
+		   var onlineUserNumber int64 =0
+		   //全部用户在线时间
+			var totalUserOnlineTime int64=0
+		  //当前在线用户在线时间
+		    var currentUserOnlineTime int64 =0
+		 //全部用户批改量
+		   var totalUserFinishNumber  =0
+		 //当前在线用户批改试卷量
+		 	var currentUserFinishNumber =0
+ 		 //全部用户批改试卷总分
+ 		   	var totalUserScoreSum int64=0
+		 //当前用户 批改试卷总分
+		    var currentUserScoreSum int64=0
 
-		var  speed float64
- 		paperDistributions :=make([]models.PaperDistribution ,0)
-		err = models.FindPaperDistributionByQuestionId(&paperDistributions, questionId)
-		if err!=nil {
-			resp = Response{"20021","试卷分配信息获取失败  ",err}
-			c.Data["json"] = resp
-			return
+ 		   for i:=0;i<usersNumber;i++{
+                  userId :=users[i].User_id
+                  isOnline :=users[i].Status
+                  userOnlineTime  := users[i].Online_time
+			      userRecord :=make([]models.ScoreRecord ,0)
+			      models.FindFinishTestByUserId(&userRecord ,userId,questionId)
+			      tempFinishNumber :=len(userRecord)
+			       var tempScore int64= 0
+			   for j:=0;j<len(userRecord);j++ {
+				  tempScore=tempScore+userRecord[j].Score
+			   }
+			   if isOnline==1 {
+				  //计算时间
+				   endingTime :=time.Now().Unix()
+				   startTime:=users[i].Login_time.Unix()
+				   tempTime := endingTime-startTime
+				   userOnlineTime = userOnlineTime+(tempTime)
+
+				   currentUserOnlineTime=currentUserOnlineTime+userOnlineTime
+				   //计算在线任务量和分数
+				   currentUserFinishNumber =currentUserFinishNumber+tempFinishNumber
+				   currentUserScoreSum =currentUserScoreSum+tempScore
+				   onlineUserNumber=onlineUserNumber+1
+			   }
+			   //计算时间
+			   totalUserOnlineTime =totalUserOnlineTime+userOnlineTime
+			   //计算任务量和分数
+			   totalUserFinishNumber =totalUserFinishNumber+ tempFinishNumber
+			   totalUserScoreSum=totalUserScoreSum+tempScore
+		   }
+ 		//平均分
+ 		var averageScore = 0.0
+		if  totalUserFinishNumber!=0  {
+           averageScore=float64(totalUserScoreSum)/float64(totalUserFinishNumber)
 		}
-		for i:=0;i<len(paperDistributions);i++ {
-			//教师id
-			userId:= paperDistributions[i].User_id
-
-			//分配试卷数量
-
-			//试卷失败数
-			failCount,err1:= models.CountFailTestNumberByUserId(userId,questionId)
-			if err1!=nil {
-				resp = Response{"20024","获取试卷批改失败数 错误 ",err}
-				c.Data["json"] = resp
-				return
-			}
-
-
-
-
-			//试卷剩余未批改数
-			remainingTestNumber,err1 := models.CountRemainingTestNumberByUserId(questionId,userId)
-			if err1!=nil {
-				resp = Response{"20023","无法获取试卷未批改数",err}
-				c.Data["json"] = resp
-				return
-			}
-
-			//试卷完成数
-			finishCount := paperDistributions[i].Test_distribution_number-failCount-remainingTestNumber
-
-			//用户信息
-			user:=models.User{User_id: userId}
-			err = user.GetUser(userId)
-			if err!=nil {
-				resp = Response{"20001","无法获取用户信息",err}
-				c.Data["json"] = resp
-				return
-			}
-			//用户名
-
-			//是否在线
-			isOnline := user.UserType
-
-			//平均速度
-			var    onlineTime int64
-			if isOnline==1{
-				endingTime :=time.Now().Unix()
-				startTime:=user.Login_time.Unix()
-				tempTime := endingTime-startTime
-				fmt.Println(tempTime)
-
-				onlineTime = user.Online_time+int64(tempTime)
-			}else {
-				onlineTime= user.Online_time
-			}
-
-			var markingSpeed float64 =0
-			s := strconv.FormatInt(onlineTime, 10)
-			f,_:= strconv.ParseFloat(s, 64)
-			m:=f/60
-			if m!=0 {
-
-
-				markingSpeed= float64(finishCount)/m
-			}
-			speed = markingSpeed+speed
-
+		//在线用户平均分
+		scoreProgressVOList[i].AverageScore=averageScore
+		var currentAverageScore =0.0
+		if currentUserFinishNumber!=0 {
+			currentAverageScore =float64(currentUserScoreSum)/float64(currentUserFinishNumber)
 		}
-		var averageSpeed =0.0
-		if (distributionUserNumber!=0) {
-			averageSpeed = speed/(float64(distributionUserNumber))
-			averageSpeed,_= strconv.ParseFloat(fmt.Sprintf("%.2f", averageSpeed), 64)
+		scoreProgressVOList[i].OnlineAverageScore=currentAverageScore
+		// 阅卷速度
+		var scoreSpeed =999999999.0
+		if  totalUserFinishNumber!=0 {
+			scoreSpeed= float64(totalUserOnlineTime)/float64(totalUserFinishNumber)
 		}
+		scoreProgressVOList[i].AverageSpeed=scoreSpeed
+		//在线阅卷速度
+		var  onlineScoreSpeed = 99999999.0
+		if  currentUserFinishNumber!=0 {
+			onlineScoreSpeed= float64(currentUserOnlineTime)/float64(currentUserFinishNumber)
+		}
+		scoreProgressVOList[i].OnlineAverageSpeed=onlineScoreSpeed
+		//  在线人数 预估时间
+		scoreProgressVOList[i].OnlinePredictTime = onlineScoreSpeed*unfinishedNumberFloat
+		//全部人数预估时间
+		scoreProgressVOList[i].PredictTime=scoreSpeed*unfinishedNumberFloat
+       //
+       scoreProgressVOList[i].OnlineUserNumber=onlineUserNumber
 
-		scoreProgressVOList[i].AverageSpeed= averageSpeed
-		//预计时间  未出成绩量/平均速度
-		var predictTime float64= 9999999
-		if averageSpeed!=0 {
-			predictTime = unfinishedNumberFloat/averageSpeed
-		}
-        predictTime=predictTime/60
-		predictTime,_= strconv.ParseFloat(fmt.Sprintf("%.1f", predictTime), 64)
-   		scoreProgressVOList[i].PredictTime=predictTime
 
 
 		//--------------------------------------------------
@@ -1185,6 +1223,7 @@ func (c *SupervisorApiController) SupervisorPoint() {
 		testInfo.Leader_id=supervisorId
         testInfo.Leader_score=score
         testInfo.Final_score=score
+        testInfo.Final_score_id=supervisorId
 		err = testInfo.Update()
 		if err != nil {
 			resp := Response{"10009", "update testPaper fail", err}
@@ -1203,6 +1242,7 @@ func (c *SupervisorApiController) SupervisorPoint() {
 	test.Leader_id = supervisorId
 	test.Leader_score = sum
 	test.Final_score = sum
+	test.Final_score_id=supervisorId
 	err = test.Update()
 	if err != nil {
 		resp := Response{"10007", "update test fail", err}
@@ -1225,7 +1265,8 @@ func (c *SupervisorApiController) SupervisorPoint() {
 	record.User_id = supervisorId
 	record.Question_id=underTest.Question_id
 	record.Problem_type=underTest.Problem_type
-	record.Test_finish=1
+	if (underTest.Test_question_type!=7 ){record.Test_finish=1}
+
 
 
 	err = record.Save()
@@ -1417,6 +1458,8 @@ func (c *SupervisorApiController) ScoreDeviation() {
 	}
 	//输出标准
 	ScoreDeviationVOList := make([]responses.ScoreDeviationVO,len(paperDistributions))
+	userScoreNumbers :=make([]int ,len(paperDistributions))
+	var count =0
 
 	//求教师名和转化输出
 	for i:=0 ;i<len(paperDistributions);i++ {
@@ -1442,7 +1485,8 @@ func (c *SupervisorApiController) ScoreDeviation() {
 			return
 		}
 		var finishCount =len(finishScoreList)
-
+		userScoreNumbers[i]=finishCount
+        count = count + finishCount
 
 		var averageScore float64 =0
 		if finishCount!=0 {
@@ -1454,6 +1498,7 @@ func (c *SupervisorApiController) ScoreDeviation() {
 			}
 			averageScore=math.Abs(sum/(float64(finishCount)))
 		}
+
 		var add float64
 		for j:=0;j<finishCount;j++ {
 			scoreJ :=finishScoreList[j].Score
@@ -1465,14 +1510,19 @@ func (c *SupervisorApiController) ScoreDeviation() {
 		sqrt,_= strconv.ParseFloat(fmt.Sprintf("%.2f", sqrt), 64)
 		ScoreDeviationVOList[i].DeviationScore=sqrt
 	}
+	QuestionScoreDeviation := 0.0
+	for j:=0;j<len(ScoreDeviationVOList);j++{
+		QuestionScoreDeviation=QuestionScoreDeviation+(ScoreDeviationVOList[j].DeviationScore*(float64(userScoreNumbers[j])/float64(count)))
+		QuestionScoreDeviation,_= strconv.ParseFloat(fmt.Sprintf("%.2f", QuestionScoreDeviation), 64)
+	}
 
 	//--------------------------------------------------
 
 	data := make(map[string]interface{})
 	data["ScoreDeviationVOList"] =ScoreDeviationVOList
+	data["QuestionScoreDeviation"] =QuestionScoreDeviation
 	resp = Response{"10000", "OK", data}
 	c.Data["json"] = resp
-
 }
 
 /**
@@ -1494,7 +1544,10 @@ func (c *SupervisorApiController) SelfMarkList() {
 	questionId := requestBody.QuestionId
 
 	//------------------------------------------------
-
+    //找到大题标准误差
+    var topic models.Topic
+	topic.GetTopic(questionId)
+	standardError := topic.Standard_error
 	//找到自评卷
 	selfMarkPaper :=make([]models.UnderCorrectedPaper ,0)
 	err = models.FindSelfMarkPaperByQuestionId(&selfMarkPaper,questionId)
@@ -1511,6 +1564,7 @@ func (c *SupervisorApiController) SelfMarkList() {
 		//存testId
 		 testId := selfMarkPaper[i].Test_id
 		 selfScoreId := selfMarkPaper[i].Self_score_id
+
 		 var  test models.TestPaper
 		 test.GetTestPaperByTestId(testId)
 
@@ -1518,6 +1572,7 @@ func (c *SupervisorApiController) SelfMarkList() {
 		if test.Examiner_first_id==selfScoreId {
 			selfMarkVOList[i].Score =test.Examiner_first_score
 			selfMarkVOList[i].SelfScore=test.Examiner_first_self_score
+
 		}else  if test.Examiner_second_id==selfScoreId {
 			selfMarkVOList[i].Score=test.Examiner_second_score
 			selfMarkVOList[i].SelfScore=test.Examiner_second_self_score
@@ -1528,8 +1583,11 @@ func (c *SupervisorApiController) SelfMarkList() {
 		selfMarkVOList[i].Userid=selfScoreId
 		var user models.User
 		user.GetUser(selfScoreId)
+
 		selfMarkVOList[i].Name=user.User_name
 		selfMarkVOList[i].TestId=testId
+		selfMarkVOList[i].StandardError=standardError
+		selfMarkVOList[i].Error=math.Abs(float64(selfMarkVOList[i].Score-selfMarkVOList[i].SelfScore))
 	}
 
 

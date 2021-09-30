@@ -35,7 +35,7 @@ func init() {
 	/**
 	  chen :阅卷组长端
 	*/
-	beego.Router("/openct/marking/supervisor/question/list", &controllers.SupervisorApiController{}, "post:QuestionList")
+	//beego.Router("/openct/marking/supervisor/question/list", &controllers.SupervisorApiController{}, "post:QuestionList")
 	beego.Router("/openct/marking/supervisor/user/info", &controllers.SupervisorApiController{}, "post:UserInfo")
 	beego.Router("/openct/marking/supervisor/teacher/monitoring", &controllers.SupervisorApiController{}, "post:TeacherMonitoring")
 	beego.Router("/openct/marking/supervisor/score/distribution", &controllers.SupervisorApiController{}, "post:ScoreDistribution")

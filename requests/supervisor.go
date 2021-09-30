@@ -1,7 +1,7 @@
 package requests
-type QuestionList struct {
-	SupervisorId string   `joson:"supervisorId"`
-}
+//type QuestionList struct {
+//	SupervisorId string   `joson:"supervisorId"`
+//}
 type UserInfo struct {
 	SupervisorId string   `joson:"supervisorId"`
 }
@@ -44,6 +44,7 @@ type SupervisorPoint struct {
 
 type ScoreProgress struct {
 	SupervisorId string   `joson:"supervisorId"`
+	Subject string `json:"subject"`
 }
 type ArbitramentUnmarkList struct {
 	SupervisorId string   `joson:"supervisorId"`

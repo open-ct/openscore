@@ -3,9 +3,19 @@
   <component name="ChangeListManager">
     <list default="true" id="90d49d24-cd7e-4f14-b075-c6e5fe5ae2ce" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/casdoor/conf/app.conf" beforeDir="false" afterPath="$PROJECT_DIR$/casdoor/conf/app.conf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/controllers/Administrator.go" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/Administrator.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controllers/score.go" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/score.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/controllers/supervisor.go" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/supervisor.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lastupdate.tmp" beforeDir="false" afterPath="$PROJECT_DIR$/lastupdate.tmp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/scoreRecord.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/scoreRecord.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/testPaper.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/testPaper.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/topic.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/topic.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/models/underCorrectedPaper.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/underCorrectedPaper.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requests/admin.go" beforeDir="false" afterPath="$PROJECT_DIR$/requests/admin.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/requests/supervisor.go" beforeDir="false" afterPath="$PROJECT_DIR$/requests/supervisor.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/responses/supervisor.go" beforeDir="false" afterPath="$PROJECT_DIR$/responses/supervisor.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routers/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/routers/router.go" afterDir="false" />
@@ -185,9 +195,9 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/controllers/score.go</url>
-          <line>708</line>
-          <option name="timeStamp" value="3" />
+          <url>file://$PROJECT_DIR$/controllers/supervisor.go</url>
+          <line>777</line>
+          <option name="timeStamp" value="6" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

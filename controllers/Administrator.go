@@ -518,7 +518,7 @@ func (c *AdminApiController) DistributionInfo(){
 	}
 	distributionInfoVO.LeftTestNumber=len(papers)
 	//获取在线人数
-	var onlineNumber ,err1= models.CountOnlineNumber()
+	var onlineNumber ,err1= models.CountOnlineNumberUnDistribute()
 	if err1!=nil {
 		log.Println(err)
 		resp  = Response{"30010","获取可分配人数错误  ",err}

@@ -8,6 +8,7 @@ type AddTopic struct {
 	Error int64  `json:"error"`
 	SubjectName string  `json:"subjectName"`
 	TopicDetails []AddTopicDetail `json:"topicDetails"`
+	SelfScoreRate  int64 `json:"self_score_rate"`
 }
 type  AddTopicDetail struct {
 	TopicDetailName string  `json:"topicDetailName"`

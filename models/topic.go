@@ -20,6 +20,7 @@ type Topic struct {
 	Import_number  int64     `json:"import_number"`
 	Import_time    time.Time `json:"import_time"`
 	Subject_Id    int64  	 `json:"subject_id"`
+	SelfScoreRate  int64     `json:"self_score_rate"`
 }
 
 func (t *Topic) GetTopic(id int64) error {
