@@ -221,7 +221,7 @@ func (c *TestPaperApiController) Point() {
 		if small <= float64(topic.Standard_error) {
 			final = true
 		} else {
-			//应该可以去掉
+
 			test.Question_status = 2
 
 			newUnderTest := models.UnderCorrectedPaper{}

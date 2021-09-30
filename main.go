@@ -32,7 +32,7 @@ func main() {
 		ExposeHeaders:    []string{"Content-Length", "Access-Control-Allow-Origin", "Access-Control-Allow-Headers", "Content-Type"},
 		AllowCredentials: true,
 	}))
-	beego.SetStaticPath("/static", "frontend/build/static")
+	beego.SetStaticPath("/static", "web/build/static")
 	// beego.InsertFilter("/", beego.BeforeRouter, routers.TransparentStatic) // must has this for default page
 	// beego.InsertFilter("/*", beego.BeforeRouter, routers.TransparentStatic)
 	beego.InsertFilter("*", beego.BeforeRouter, routers.StaticFilter)

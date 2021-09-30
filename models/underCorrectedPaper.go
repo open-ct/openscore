@@ -75,7 +75,7 @@ func GetDistributedPaperByUserId(id string, up *[]UnderCorrectedPaper) error {
 }
 func CountRemainingTestNumberByUserId(questionId int64 ,userId string)(count int64,err error) {
 	underCorrectedPaper:=new (UnderCorrectedPaper)
-	count, err1 := x.Where("question_id = ?", questionId).Where("user_id=?",userId).Count(underCorrectedPaper)
+	count, err1 := x.Where("question_id = ?", questionId).Where("user_id=?",userId).Where("test_question_type=1 or test_question_type=2").Count(underCorrectedPaper)
 	if err!=nil {
 		log.Println("CountRemainingTestNumberByUserId err ")
 	}

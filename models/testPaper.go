@@ -119,30 +119,7 @@ func CountFailTestNumberByUserId(userId string,questionId int64)(count int64,err
 	}
 	return count,err1
 }
-func CountFirstScoreNumberByQuestionId(questionId int64)(count int64 ,err error) {
-	testPaper :=new (TestPaper)
-	count, err1:= x.Where("question_id = ?", questionId).Where("examiner_first_id !=null").Count(testPaper)
-	if err!=nil {
-		log.Println("CountFirstScoreNumberByQuestionId err ")
-	}
-	return count ,err1
-}
-func CountSecondScoreNumberByQuestionId(questionId int64)(count int64 ,err error) {
-	testPaper :=new (TestPaper)
-	count, err1 := x.Where("question_id = ?", questionId).Where("examiner_second_id !=null").Count(testPaper)
-	if err!=nil {
-		log.Println("CountSecondScoreNumberByQuestionId err ")
-	}
-	return count,err1
-}
-func CountThirdScoreNumberByQuestionId(questionId int64)(count int64,err error) {
-	testPaper :=new (TestPaper)
-	count, err1 := x.Where("question_id = ?", questionId).Where("examiner_third_id !=null").Count(testPaper)
-	if err!=nil {
-		log.Println("CountThirdScoreNumberByQuestionId err ")
-	}
-	return count,err1
-}
+
 func  DeleteAllTest(questionId int64) error {
 	_, err := x.Delete(&TestPaper{Question_id:questionId})
 	if  err != nil {
