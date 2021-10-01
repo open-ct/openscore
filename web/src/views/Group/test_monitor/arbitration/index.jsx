@@ -22,7 +22,7 @@ export default class index extends Component {
     }
 
     questionList = () => {
-        group.questionList({ supervisorId: "2" })
+        group.questionList({ adminId: "1",subjectName: JSON.parse(localStorage.getItem('userInfo')).SubjectName})
             .then((res) => {
                 if (res.data.status == "10000") {
                     this.setState({
