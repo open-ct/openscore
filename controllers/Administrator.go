@@ -130,21 +130,8 @@ func   UploadPic(name string,text  []string)(src string) {
 func (c *AdminApiController) ReadExcel(){
 	c.Ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin", c.Ctx.Request.Header.Get("Origin"))
 	defer c.ServeJSON()
-	//var requestBody requests.ReadExcel
 	var resp Response
 	var  err error
-
-	//err =json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
-	//if err!=nil {
-	//	log.Println(err)
-	//	resp = Response{"10001","cannot unmarshal",err}
-	//	c.Data["json"] = resp
-	//	return
-	//}
-	//supervisorId := requestBody.SupervisorId
-	// filePath := requestBody.FilePath
-	//bytes := requestBody.Excel
-	//r := requests.ReadExcelBytes{}
 	_, header, err := c.GetFile("excel")
 	err = err
 	if err != nil {
@@ -153,26 +140,8 @@ func (c *AdminApiController) ReadExcel(){
 		c.Data["json"] = resp
 		return
 	}
-	//bytes := r.Excel
 
 	//----------------------------------------------------
-	//bytes, err := os.ReadFile(filePath)
-	//
-	//
-	//file, err := os.Create("excelFile")
-	//if err!=nil {
-	//	log.Println(err)
-	//	resp = Response{"30000","excel 表导入错误",err}
-	//	c.Data["json"] = resp
-	//	return
-	//}
-	//_, err = file.Write(bytes)
-	//if err!=nil {
-	//	log.Println(err)
-	//	resp = Response{"30000","excel 表导入错误",err}
-	//	c.Data["json"] = resp
-	//	return
-	//}
 
 	f, err := excelize.OpenFile(header.Filename)
 	if err != nil {
@@ -225,6 +194,7 @@ func (c *AdminApiController) ReadExcel(){
 				if !has {
 					testPaper.Test_id=testId
 					testPaper.Question_id=questionId
+					testPaper.Question_status=1
 					testPaper.Candidate=name
 					err = testPaper.Insert()
 					if err != nil {
@@ -266,7 +236,261 @@ func (c *AdminApiController) ReadExcel(){
 		}
 	}
 
-	//err = file.Close()
+
+	if err!=nil {
+		log.Println(err)
+	}
+	err = os.Remove("excelFile")
+	if err!=nil {
+		log.Println(err)
+	}
+	//------------------------------------------------
+	data := make(map[string]interface{})
+	data["data"] =nil
+	resp = Response{"10000", "OK", data}
+	c.Data["json"] = resp
+
+
+}
+/**
+2.样卷导入
+ */
+
+func (c *AdminApiController) ReadExampleExcel(){
+	c.Ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin", c.Ctx.Request.Header.Get("Origin"))
+	defer c.ServeJSON()
+	var resp Response
+	var  err error
+	_, header, err := c.GetFile("excel")
+	err = err
+	if err != nil {
+		log.Println(err)
+		resp = Response{"10001","cannot unmarshal",err}
+		c.Data["json"] = resp
+		return
+	}
+
+	//----------------------------------------------------
+
+	f, err := excelize.OpenFile(header.Filename)
+	if err != nil {
+		log.Println(err)
+		resp = Response{"30000","excel 表导入错误",err}
+		c.Data["json"] = resp
+		return
+	}
+
+
+	// Get all the rows in the Sheet1.
+	rows, err := f.GetRows("Sheet2")
+	if err != nil {
+		log.Println(err)
+		resp = Response{"30000","excel 表导入错误",err}
+		c.Data["json"] = resp
+		return
+	}
+
+
+	for i:=1;i<len(rows);i++ {
+		for j:=1;j<len(rows[i]);j++ {
+
+			if i>=1&&j>=3 {
+				//准备数据
+			    testIdStr:=rows[i][0]
+			    testId, _ := strconv.ParseInt(testIdStr, 10, 64)
+			    questionIds := strings.Split(rows[0][j], "-")
+			    questionIdStr:=questionIds[0]
+			    questionId, _ := strconv.ParseInt(questionIdStr, 10, 64)
+			    questionDetailIdStr:=questionIds[3]
+				questionDetailId, _ := strconv.ParseInt(questionDetailIdStr, 10, 64)
+				name:=rows[i][2]
+				//填充数据
+				var testPaperInfo  models.TestPaperInfo
+				var testPaper models.TestPaper
+
+				testPaperInfo.Question_detail_id=questionDetailId
+				s:=rows[i][j]
+				split := strings.Split(s, "\n")
+				src := UploadPic(rows[i][0]+rows[0][j], split)
+			    testPaperInfo.Pic_src=src
+				//查看大题试卷是否已经导入
+				has,err := testPaper.GetTestPaper(testId)
+				if err!=nil {
+					log.Println(err)
+				}
+
+				//导入大题试卷
+				if !has {
+					testPaper.Test_id=testId
+					testPaper.Question_id=questionId
+					testPaper.Question_status=6
+					testPaper.Candidate=name
+					err = testPaper.Insert()
+					if err != nil {
+						log.Println(err)
+						resp = Response{"30001","试卷大题导入错误",err}
+						c.Data["json"] = resp
+						return
+					}
+				}
+				//导入小题试卷
+				testPaperInfo.Test_id=testId
+				err = testPaperInfo.Insert()
+				if err != nil {
+					log.Println(err)
+					resp = Response{"30002","试卷小题导错误",err}
+					c.Data["json"] = resp
+					return
+				}
+
+			}
+
+		}
+
+	}
+	//获取选项名 存导入试卷数
+	for k:=3;k<len(rows[0]);k++ {
+		questionIds := strings.Split(rows[0][k], "-")
+		questionIdStr:=questionIds[0]
+		questionId, _ := strconv.ParseInt(questionIdStr, 10, 64)
+	  var topic models.Topic
+		topic.Question_id=questionId
+		topic.Import_number=int64(len(rows)-1)
+		err = topic.Update()
+		if err != nil {
+			log.Println(err)
+			resp = Response{"30003","大题导入试卷数更新错误",err}
+			c.Data["json"] = resp
+			return
+		}
+	}
+
+
+	if err!=nil {
+		log.Println(err)
+	}
+	err = os.Remove("excelFile")
+	if err!=nil {
+		log.Println(err)
+	}
+	//------------------------------------------------
+	data := make(map[string]interface{})
+	data["data"] =nil
+	resp = Response{"10000", "OK", data}
+	c.Data["json"] = resp
+
+
+}
+func (c *AdminApiController) ReadAnswerExcel(){
+	c.Ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin", c.Ctx.Request.Header.Get("Origin"))
+	defer c.ServeJSON()
+	var resp Response
+	var  err error
+	_, header, err := c.GetFile("excel")
+	err = err
+	if err != nil {
+		log.Println(err)
+		resp = Response{"10001","cannot unmarshal",err}
+		c.Data["json"] = resp
+		return
+	}
+
+	//----------------------------------------------------
+
+	f, err := excelize.OpenFile(header.Filename)
+	if err != nil {
+		log.Println(err)
+		resp = Response{"30000","excel 表导入错误",err}
+		c.Data["json"] = resp
+		return
+	}
+
+
+	// Get all the rows in the Sheet1.
+	rows, err := f.GetRows("Sheet2")
+	if err != nil {
+		log.Println(err)
+		resp = Response{"30000","excel 表导入错误",err}
+		c.Data["json"] = resp
+		return
+	}
+
+
+	for i:=1;i<len(rows);i++ {
+		for j:=1;j<len(rows[i]);j++ {
+
+			if i>=1&&j>=3 {
+				//准备数据
+			    testIdStr:=rows[i][0]
+			    testId, _ := strconv.ParseInt(testIdStr, 10, 64)
+			    questionIds := strings.Split(rows[0][j], "-")
+			    questionIdStr:=questionIds[0]
+			    questionId, _ := strconv.ParseInt(questionIdStr, 10, 64)
+			    questionDetailIdStr:=questionIds[3]
+				questionDetailId, _ := strconv.ParseInt(questionDetailIdStr, 10, 64)
+				name:=rows[i][2]
+				//填充数据
+				var testPaperInfo  models.TestPaperInfo
+				var testPaper models.TestPaper
+
+				testPaperInfo.Question_detail_id=questionDetailId
+				s:=rows[i][j]
+				split := strings.Split(s, "\n")
+				src := UploadPic(rows[i][0]+rows[0][j], split)
+			    testPaperInfo.Pic_src=src
+				//查看大题试卷是否已经导入
+				has,err := testPaper.GetTestPaper(testId)
+				if err!=nil {
+					log.Println(err)
+				}
+
+				//导入大题试卷
+				if !has {
+					testPaper.Test_id=testId
+					testPaper.Question_id=questionId
+					testPaper.Question_status=5
+					testPaper.Candidate=name
+					err = testPaper.Insert()
+					if err != nil {
+						log.Println(err)
+						resp = Response{"30001","试卷大题导入错误",err}
+						c.Data["json"] = resp
+						return
+					}
+				}
+				//导入小题试卷
+				testPaperInfo.Test_id=testId
+				err = testPaperInfo.Insert()
+				if err != nil {
+					log.Println(err)
+					resp = Response{"30002","试卷小题导错误",err}
+					c.Data["json"] = resp
+					return
+				}
+
+			}
+
+		}
+
+	}
+	//获取选项名 存导入试卷数
+	for k:=3;k<len(rows[0]);k++ {
+		questionIds := strings.Split(rows[0][k], "-")
+		questionIdStr:=questionIds[0]
+		questionId, _ := strconv.ParseInt(questionIdStr, 10, 64)
+	  var topic models.Topic
+		topic.Question_id=questionId
+		topic.Import_number=int64(len(rows)-1)
+		err = topic.Update()
+		if err != nil {
+			log.Println(err)
+			resp = Response{"30003","大题导入试卷数更新错误",err}
+			c.Data["json"] = resp
+			return
+		}
+	}
+
+
 	if err!=nil {
 		log.Println(err)
 	}
