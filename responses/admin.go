@@ -24,6 +24,7 @@ type DistributionInfoVO struct {
 	ImportTestNumber  int64
 	LeftTestNumber int
 	OnlineNumber int64
+	ScoreType int64
 }
 type TopicVO struct {
 	TopicId int64

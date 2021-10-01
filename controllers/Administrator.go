@@ -728,6 +728,10 @@ func (c *AdminApiController) DistributionInfo(){
 		c.Data["json"] = resp
 		return
 	}
+
+	scoreType:=topic.Score_type
+	distributionInfoVO.ScoreType=scoreType
+
 	importNumber:=topic.Import_number
 	distributionInfoVO.ImportTestNumber =importNumber
 	//获取试卷未分配数量
