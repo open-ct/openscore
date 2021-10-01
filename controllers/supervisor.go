@@ -1179,7 +1179,7 @@ func (c *SupervisorApiController) ScoreProgress() {
 /**
 19.阅卷组长批改试卷
  */
-func (c *SupervisorApiController) SupervisorPoint() {
+func (c *SupervisorApiController)  () {
 	defer c.ServeJSON()
 	var requestBody requests.SupervisorPoint
 	var resp Response

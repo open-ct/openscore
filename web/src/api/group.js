@@ -16,7 +16,7 @@ const group = {
   },
 
   questionList(data) {
-    return axios.post('/marking/supervisor/question/list', data)
+    return axios.post('/marking/admin/questionBySubList', data)
   },
 
   teacherMonitor(data) {

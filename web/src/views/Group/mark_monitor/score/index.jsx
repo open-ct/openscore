@@ -57,7 +57,7 @@ export default class index extends Component {
         return option;
     };
     questionList = () => {
-        group.questionList({ supervisorId: "2" })
+        group.questionList({ adminId: "1",subjectName: JSON.parse(localStorage.getItem('userInfo')).SubjectName})
             .then((res) => {
                 if (res.data.status == "10000") {
                     this.setState({
@@ -73,7 +73,7 @@ export default class index extends Component {
     }
 
     tableData = (questionId) => {
-        group.scoreMonitor({ supervisorId: "2", questionId: questionId })
+        group.scoreMonitor({ supervisorId: "1", questionId: questionId })
             .then((res) => {
                 if (res.data.status == "10000") {
                     console.log(res.data)

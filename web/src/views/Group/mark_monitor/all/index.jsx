@@ -7,7 +7,7 @@ import group from "../../../../api/group";
 const { Option } = Select;
 export default class index extends Component {
 
-    supervisorId = '2'
+    supervisorId = '1'
 
     state = {
         questionList: [],
@@ -41,21 +41,6 @@ export default class index extends Component {
                     width: 90,
                     dataIndex: 'DistributionNumber',
                 },
-            ]
-        },
-        {
-            title: '进度预测（正评）',
-            children: [
-                {
-                    title: '出成绩量',
-                    width: 90,
-                    dataIndex: 'FinishNumber',
-                },
-                {
-                    title: '平均分（含零/除零）',
-                    width: 90,
-                    dataIndex: 'AverageScore',
-                },
                 {
                     title: '完成量',
                     width: 90,
@@ -69,30 +54,50 @@ export default class index extends Component {
                         return (<Progress type="circle" percent={text*100} width={40} />)
                     }
                 },
-                // {
-                //     title: '未完成量',
-                //     width: 90,
-                //     dataIndex: 'UnfinishedNumber',
-                // },
-                // {
-                //     title: '未完成率',
-                //     width: 90,
-                //     dataIndex: 'UnfinishedRate',
-                // },
                 {
                     title: '状态',
                     width: 90,
                     dataIndex: 'IsAllFinished',
                 },
+            ]
+        },
+        {
+            title: '进度预测（正评）',
+            children: [
                 {
-                    title: '平均速度（分钟）',
+                    title: '平均分',
+                    width: 90,
+                    dataIndex: 'AverageScore',
+                },
+                {
+                    title: '在线平均分',
+                    width: 90,
+                    dataIndex: 'OnlineAverageScore',
+                },
+                {
+                    title: '预计时间',
+                    width: 90,
+                    dataIndex: 'PredictTime',
+                },
+                {
+                    title: '在线预计时间',
+                    width: 90,
+                    dataIndex: 'OnlinePredictTime',
+                },
+                {
+                    title: '平均速度',
                     width: 90,
                     dataIndex: 'AverageSpeed',
                 },
                 {
-                    title: '预计时间（小时）',
+                    title: '在线平均速度',
                     width: 90,
-                    dataIndex: 'PredictTime',
+                    dataIndex: 'OnlineAverageSpeed',
+                },
+                {
+                    title: '自评指数',
+                    width: 90,
+                    dataIndex: 'SelfScoreRate',
                 },
             ]
         },
@@ -284,7 +289,7 @@ export default class index extends Component {
         },
     ]
     questionList = () => {
-        group.questionList({ supervisorId: "2" })
+        group.questionList({ adminId: "1",subjectName: JSON.parse(localStorage.getItem('userInfo')).SubjectName})
             .then((res) => {
                 if (res.data.status == "10000") {
                     this.setState({
@@ -300,7 +305,7 @@ export default class index extends Component {
     }
 
     tableData = () => {
-        group.allMonitor({ supervisorId: "2" })
+        group.allMonitor({ supervisorId: "2",subjectName: JSON.parse(localStorage.getItem('userInfo')).SubjectName})
             .then((res) => {
                 if (res.data.status == "10000") {
                     let tableData = [];

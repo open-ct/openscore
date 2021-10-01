@@ -39,7 +39,7 @@ import detail from  "../Manage/paper_manage/detail"
 import menuList from '../../menu/menuTab.js'
 
 import logoUrl from '../../asset/images/OpenCT_Logo.png';
-
+import group from "../../api/group";
 import './index.less'
 const { Header, Sider, Content } = Layout;
 const { SubMenu } = Menu
@@ -56,6 +56,7 @@ export default class index extends Component {
     componentDidMount() {
         console.log(this.props)
         this.getAccount();
+        this.userInfo()
         setTimeout(() => {
             console.log(this.state)
         }, 5000);
@@ -74,6 +75,21 @@ export default class index extends Component {
         })
     }
 
+    userInfo = () => {
+        group.userInfo({ supervisorId:"1" })
+            .then((res) => {
+                if (res.data.status == "10000") {
+                    this.setState({
+                        userInfo: res.data.data.userInfo
+                    })
+                    console.log(res.data.data.userInfo)
+                    localStorage.setItem("userInfo", JSON.stringify(res.data.data.userInfo))
+                }
+            })
+            .catch((e) => {
+                console.log(e)
+            })
+    }
     getAccount() {
         AccountBackend.getAccount()
             .then((res) => {
