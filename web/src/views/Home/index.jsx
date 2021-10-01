@@ -277,7 +277,7 @@ export default class index extends Component {
                                     <Route path="/home/answer" component={Answer} exact></Route>
                                     <Route path="/home/sample" component={Sample} exact></Route>
                                     <Route path="/home/review" component={Review} exact></Route>
-                                    <Route path="/home/selfMark" component={SelfMark} exact></Route>
+                                    {/* <Route path="/home/selfMark" component={SelfMark} exact></Route> */}
 
                                     <Route path="/home/markMonitor/all" component={all} exact></Route>
                                     <Route path="/home/markMonitor/average" component={average} exact></Route>
