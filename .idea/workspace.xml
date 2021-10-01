@@ -4,9 +4,10 @@
     <list default="true" id="90d49d24-cd7e-4f14-b075-c6e5fe5ae2ce" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/controllers/Administrator.go" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/Administrator.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controllers/supervisor.go" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/supervisor.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010142092---119.png" beforeDir="false" afterPath="$PROJECT_DIR$/img/9000010142092---119.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lastupdate.tmp" beforeDir="false" afterPath="$PROJECT_DIR$/lastupdate.tmp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/responses/admin.go" beforeDir="false" afterPath="$PROJECT_DIR$/responses/admin.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test1.xlsm" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -87,7 +88,7 @@
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../openscore" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
@@ -184,8 +185,8 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/controllers/score.go</url>
-          <line>159</line>
-          <option name="timeStamp" value="8" />
+          <line>783</line>
+          <option name="timeStamp" value="15" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
