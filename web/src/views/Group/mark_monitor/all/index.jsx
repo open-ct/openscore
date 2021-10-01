@@ -7,7 +7,7 @@ import group from "../../../../api/group";
 const { Option } = Select;
 export default class index extends Component {
 
-    supervisorId = '2'
+    supervisorId = '1'
 
     state = {
         questionList: [],
@@ -305,7 +305,7 @@ export default class index extends Component {
     }
 
     tableData = () => {
-        group.allMonitor({ supervisorId: "2" })
+        group.allMonitor({ supervisorId: "2",subjectName: JSON.parse(localStorage.getItem('userInfo')).SubjectName})
             .then((res) => {
                 if (res.data.status == "10000") {
                     let tableData = [];
