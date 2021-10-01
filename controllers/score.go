@@ -117,7 +117,9 @@ func (c *TestPaperApiController) List() {
 func (c *TestPaperApiController) Point() {
 	defer c.ServeJSON()
 	var requestBody requests.TestPoint
-	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	var resp Response
+	var  err error
+	err = json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
 	if err != nil {
 		resp := Response{"10001", "cannot unmarshal", err}
 		c.Data["json"] = resp
@@ -131,18 +133,7 @@ func (c *TestPaperApiController) Point() {
 	scores := strings.Split(scoresStr, "-")
 	testDetailIds := strings.Split(testDetailIdStr, "-")
 	//-------------------------------------------------------
-	//score数组string转int
-	var scoreArr []int64
-	var sum int64 = 0
-	var record models.ScoreRecord
-	for _, i := range scores {
-		j, err := strconv.ParseInt(i, 10, 64)
-		sum += j
-		if err != nil {
-			panic(err)
-		}
-		scoreArr = append(scoreArr, j)
-	}
+
 	//获取该试卷大题 和抽象大题信息
 	var test models.TestPaper
 	var topic models.Topic
@@ -166,149 +157,414 @@ func (c *TestPaperApiController) Point() {
 		c.Data["json"] = resp
 		return
 	}
+	if underTest.Test_question_type==0 {
+		standardError := topic.Standard_error
 
-	final := false
+		//分三种情况
+		if userId == test.Examiner_first_id {
+			var sum int64
+			//给试卷详情表打分
+			for i := 0; i < len(testDetailIds); i++ {
+				//取出小题试卷id,和小题分数
+				var testInfo models.TestPaperInfo
+				testDetailIdString:=testDetailIds[i]
+				testDetailId, _ := strconv.ParseInt(testDetailIdString, 10, 64)
+				scoreString:=scores[i]
+				score, _ := strconv.ParseInt(scoreString, 10, 64)
+				//------------------------------------------------
 
-	if topic.Score_type == 1 {
-		test.Examiner_first_id = userId
-		test.Examiner_first_score = sum
-		final = true
-	} else if underTest.Test_question_type == 2 && test.Examiner_first_id == "-1" {
-		test.Examiner_first_id = userId
-		test.Examiner_first_score = sum
-	} else if underTest.Test_question_type == 2 && test.Examiner_second_id == "-1" {
-		test.Examiner_second_id = userId
-		test.Examiner_second_score = sum
-		if math.Abs(float64(test.Examiner_second_score)-float64(test.Examiner_first_score)) <= float64(topic.Standard_error) {
-			log.Println(math.Abs(float64(test.Examiner_second_score) - float64(test.Examiner_first_score)))
-			sum = int64(math.Abs(float64(test.Examiner_second_score+test.Examiner_first_score)) / 2)
-			final = true
-		} else {
-			newUnderTest := models.UnderCorrectedPaper{}
-			//随机 抽一个 人
 
-			newUnderTest.User_id = models.FindNewUserId(test.Examiner_first_id, test.Examiner_second_id, test.Question_id)
-			newUnderTest.Test_question_type = 3
-			newUnderTest.Test_id = underTest.Test_id
-			newUnderTest.Question_id = underTest.Question_id
-			err = newUnderTest.Save()
+				//查试卷小题
+				err := testInfo.GetTestPaperInfo(testDetailId)
+				if err != nil {
+					resp := Response{"10008", "get testPaper fail", err}
+					c.Data["json"] = resp
+					return
+				}
+				//修改试卷详情表
+
+
+				testInfo.Examiner_first_self_score=score
+
+				err = testInfo.Update()
+				if err != nil {
+					resp := Response{"10009", "update testPaper fail", err}
+					c.Data["json"] = resp
+					return
+				}
+				sum += score
+			}
+			//给试卷表打分
+
+			test.Examiner_first_self_score = sum
+			err = test.Update()
 			if err != nil {
-				resp := Response{"10005", "insert undertest fail", err}
+				resp := Response{"10007", "update test fail", err}
 				c.Data["json"] = resp
 				return
 			}
-		}
-	}
-	if underTest.Test_question_type == 0  {
 
-		test.Leader_id = userId
-		test.Leader_score = sum
-		final = true
-	}
-	if underTest.Test_question_type == 3 {
-		test.Examiner_third_id = userId
-		test.Examiner_third_score = sum
-		first := math.Abs(float64(test.Examiner_third_score - test.Examiner_first_score))
-		second := math.Abs(float64(test.Examiner_third_score - test.Examiner_second_score))
-		var small float64
-		if first <= second {
-			small = first
-			sum = (test.Examiner_third_score + test.Examiner_first_score) / 2
-		} else {
-			small = second
-			sum = (test.Examiner_third_score + test.Examiner_second_score) / 2
-		}
-		if small <= float64(topic.Standard_error) {
-			final = true
-		} else {
+			//删除试卷待批改表 ，增加试卷记录表
+			var record models.ScoreRecord
+			var underTest models.UnderCorrectedPaper
 
-			test.Question_status = 2
-
-			newUnderTest := models.UnderCorrectedPaper{}
-			//阅卷组长类型默认 id 10000
-			newUnderTest.User_id = "10000"
-			newUnderTest.Test_question_type = 4
-			newUnderTest.Test_id = underTest.Test_id
-			newUnderTest.Question_id = underTest.Question_id
-			err = newUnderTest.Save()
-			if err != nil {
-				resp := Response{"10006", "insert undertest fail", err}
+			err = models.GetSelfScorePaperByTestQuestionTypeAndTestId(&underTest, testId,userId)
+			if err!=nil {
+				resp = Response{"20012","GetUnderCorrectedPaperByUserIdAndTestId  fail",err}
 				c.Data["json"] = resp
 				return
 			}
-		}
-	}
-	if final {
-		test.Final_score = sum
-		record.Test_finish=1
-	}
+			record.Score = sum
+			record.Test_id = testId
+			record.Test_record_type = underTest.Test_question_type
+			record.User_id = userId
+			record.Question_id=underTest.Question_id
 
-	err = underTest.Delete()
-	if err != nil {
-		resp := Response{"10006", "delete undertest fail", err}
-		c.Data["json"] = resp
-		return
-	}
-	err = test.Update()
-	if err != nil {
-		resp := Response{"10007", "update test fail", err}
-		c.Data["json"] = resp
-		return
-	}
-	for i := 0; i < len(scores); i++ {
-		score := scoreArr[i]
-		var tempTest models.TestPaperInfo
-		id, _ := strconv.ParseInt(testDetailIds[i], 10, 64)
-		log.Println(id)
-		err = tempTest.GetTestPaperInfo(id)
-		if err != nil {
-			resp := Response{"10008", "get testPaper fail", err}
-			c.Data["json"] = resp
-			return
+			err = record.Save()
+			if err!=nil {
+				resp = Response{"20013","Save  fail",err}
+				c.Data["json"] = resp
+				return
+			}
+			err = underTest.SelfMarkDelete()
+			if err!=nil {
+				resp = Response{"20014","Delete  fail",err}
+				c.Data["json"] = resp
+				return
+			}
+
+			if math.Abs(float64(sum-test.Examiner_first_score))>float64(standardError) {
+				var newUnderTest models.UnderCorrectedPaper
+				newUnderTest.User_id="10000"
+				newUnderTest.Self_score_id=userId
+				newUnderTest.Test_id=testId
+				newUnderTest.Question_id=test.Question_id
+				newUnderTest.Test_question_type=7
+				newUnderTest.Save()
+			}
+
+		}else if userId==test.Examiner_second_id {
+			var sum int64
+			//给试卷详情表打分
+			for i := 0; i < len(testDetailIds); i++ {
+				//取出小题试卷id,和小题分数
+				var testInfo models.TestPaperInfo
+				testDetailIdString:=testDetailIds[i]
+				testDetailId, _ := strconv.ParseInt(testDetailIdString, 10, 64)
+				scoreString:=scores[i]
+				score, _ := strconv.ParseInt(scoreString, 10, 64)
+				//------------------------------------------------
+
+
+				//查试卷小题
+				err := testInfo.GetTestPaperInfo(testDetailId)
+				if err != nil {
+					resp := Response{"10008", "get testPaper fail", err}
+					c.Data["json"] = resp
+					return
+				}
+				//修改试卷详情表
+
+
+				testInfo.Examiner_second_self_score=score
+
+				err = testInfo.Update()
+				if err != nil {
+					resp := Response{"10009", "update testPaper fail", err}
+					c.Data["json"] = resp
+					return
+				}
+				sum += score
+			}
+			//给试卷表打分
+
+			test.Examiner_second_self_score = sum
+
+			err = test.Update()
+			if err != nil {
+				resp := Response{"10007", "update test fail", err}
+				c.Data["json"] = resp
+				return
+			}
+			//删除试卷待批改表 ，增加试卷记录表
+			var record models.ScoreRecord
+			var underTest models.UnderCorrectedPaper
+
+			err = models.GetSelfScorePaperByTestQuestionTypeAndTestId(&underTest, testId,userId)
+			if err!=nil {
+				resp = Response{"20012","GetUnderCorrectedPaperByUserIdAndTestId  fail",err}
+				c.Data["json"] = resp
+				return
+			}
+			record.Score = sum
+			record.Test_id = testId
+			record.Test_record_type = underTest.Test_question_type
+			record.User_id = userId
+			record.Question_id=underTest.Question_id
+			err = record.Save()
+			if err!=nil {
+				resp = Response{"20013","Save  fail",err}
+				c.Data["json"] = resp
+				return
+			}
+			err = underTest.SelfMarkDelete()
+			if err!=nil {
+				resp = Response{"20014","Delete  fail",err}
+				c.Data["json"] = resp
+				return
+			}
+			if math.Abs(float64(sum-test.Examiner_second_score))>float64(standardError) {
+				var newUnderTest models.UnderCorrectedPaper
+				newUnderTest.User_id="10000"
+				newUnderTest.Test_id=testId
+				newUnderTest.Self_score_id=userId
+				newUnderTest.Question_id=test.Question_id
+				newUnderTest.Test_question_type=7
+				newUnderTest.Save()
+			}
+
+		} else if userId ==test.Examiner_third_id {
+			var sum int64
+			//给试卷详情表打分
+			for i := 0; i < len(testDetailIds); i++ {
+				//取出小题试卷id,和小题分数
+				var testInfo models.TestPaperInfo
+				testDetailIdString:=testDetailIds[i]
+				testDetailId, _ := strconv.ParseInt(testDetailIdString, 10, 64)
+				scoreString:=scores[i]
+				score, _ := strconv.ParseInt(scoreString, 10, 64)
+				//------------------------------------------------
+
+
+				//查试卷小题
+				err := testInfo.GetTestPaperInfo(testDetailId)
+				if err != nil {
+					resp := Response{"10008", "get testPaper fail", err}
+					c.Data["json"] = resp
+					return
+				}
+				//修改试卷详情表
+
+
+				testInfo.Examiner_third_self_score=score
+
+				err = testInfo.Update()
+				if err != nil {
+					resp := Response{"10009", "update testPaper fail", err}
+					c.Data["json"] = resp
+					return
+				}
+				sum += score
+			}
+			//给试卷表打分
+
+			test.Examiner_third_self_score = sum
+
+			err = test.Update()
+			if err != nil {
+				resp := Response{"10007", "update test fail", err}
+				c.Data["json"] = resp
+				return
+			}
+			//删除试卷待批改表 ，增加试卷记录表
+			var record models.ScoreRecord
+			var underTest models.UnderCorrectedPaper
+
+			err = models.GetSelfScorePaperByTestQuestionTypeAndTestId(&underTest, testId,userId)
+			if err!=nil {
+				resp = Response{"20012","GetUnderCorrectedPaperByUserIdAndTestId  fail",err}
+				c.Data["json"] = resp
+				return
+			}
+			record.Score = sum
+			record.Test_id = testId
+			record.Test_record_type = underTest.Test_question_type
+			record.User_id = userId
+			record.Question_id=underTest.Question_id
+
+			err = record.Save()
+			if err!=nil {
+				resp = Response{"20013","Save  fail",err}
+				c.Data["json"] = resp
+				return
+			}
+			err = underTest.SelfMarkDelete()
+			if err!=nil {
+				resp = Response{"20014","Delete  fail",err}
+				c.Data["json"] = resp
+				return
+			}
+			if math.Abs(float64(sum-test.Examiner_third_score))>float64(standardError) {
+				var newUnderTest models.UnderCorrectedPaper
+				newUnderTest.User_id="10000"
+				newUnderTest.Test_id=testId
+				newUnderTest.Question_id=test.Question_id
+				newUnderTest.Self_score_id=userId
+				newUnderTest.Test_question_type=7
+				newUnderTest.Save()
+			}
+
 		}
+
+	}else {	//score数组string转int
+		var scoreArr []int64
+		var sum int64 = 0
+		var record models.ScoreRecord
+		for _, i := range scores {
+			j, err := strconv.ParseInt(i, 10, 64)
+			sum += j
+			if err != nil {
+				panic(err)
+			}
+			scoreArr = append(scoreArr, j)
+		}
+
+		final := false
+
 		if topic.Score_type == 1 {
-			tempTest.Examiner_first_id = userId
-			tempTest.Examiner_first_score = score
-		} else if topic.Score_type == 2 && tempTest.Examiner_first_id == "-1" {
-			tempTest.Examiner_first_id = userId
-			tempTest.Examiner_first_score = score
-		} else if topic.Score_type == 2 && tempTest.Examiner_second_id == "-1" {
-			tempTest.Examiner_second_id = userId
-			tempTest.Examiner_second_score = score
+			test.Examiner_first_id = userId
+			test.Examiner_first_score = sum
+			final = true
+		} else if underTest.Test_question_type == 2 && test.Examiner_first_id == "-1" {
+			test.Examiner_first_id = userId
+			test.Examiner_first_score = sum
+		} else if underTest.Test_question_type == 2 && test.Examiner_second_id == "-1" {
+			test.Examiner_second_id = userId
+			test.Examiner_second_score = sum
+			if math.Abs(float64(test.Examiner_second_score)-float64(test.Examiner_first_score)) <= float64(topic.Standard_error) {
+				log.Println(math.Abs(float64(test.Examiner_second_score) - float64(test.Examiner_first_score)))
+				sum = int64(math.Abs(float64(test.Examiner_second_score+test.Examiner_first_score)) / 2)
+				final = true
+			} else {
+				newUnderTest := models.UnderCorrectedPaper{}
+				//随机 抽一个 人
+
+				newUnderTest.User_id = models.FindNewUserId(test.Examiner_first_id, test.Examiner_second_id, test.Question_id)
+				newUnderTest.Test_question_type = 3
+				newUnderTest.Test_id = underTest.Test_id
+				newUnderTest.Question_id = underTest.Question_id
+				err = newUnderTest.Save()
+				if err != nil {
+					resp := Response{"10005", "insert undertest fail", err}
+					c.Data["json"] = resp
+					return
+				}
+			}
 		}
-		if underTest.Test_question_type == 4 || underTest.Test_question_type == 5 {
-			tempTest.Leader_id = userId
-			tempTest.Leader_score = score
-		} else if underTest.Test_question_type == 3 {
-			tempTest.Examiner_third_id = userId
-			tempTest.Examiner_third_score = score
+		if underTest.Test_question_type == 0  {
+
+			test.Leader_id = userId
+			test.Leader_score = sum
+			final = true
+		}
+		if underTest.Test_question_type == 3 {
+			test.Examiner_third_id = userId
+			test.Examiner_third_score = sum
+			first := math.Abs(float64(test.Examiner_third_score - test.Examiner_first_score))
+			second := math.Abs(float64(test.Examiner_third_score - test.Examiner_second_score))
+			var small float64
+			if first <= second {
+				small = first
+				sum = (test.Examiner_third_score + test.Examiner_first_score) / 2
+			} else {
+				small = second
+				sum = (test.Examiner_third_score + test.Examiner_second_score) / 2
+			}
+			if small <= float64(topic.Standard_error) {
+				final = true
+			} else {
+
+				test.Question_status = 2
+
+				newUnderTest := models.UnderCorrectedPaper{}
+				//阅卷组长类型默认 id 10000
+				newUnderTest.User_id = "10000"
+				newUnderTest.Test_question_type = 4
+				newUnderTest.Test_id = underTest.Test_id
+				newUnderTest.Question_id = underTest.Question_id
+				err = newUnderTest.Save()
+				if err != nil {
+					resp := Response{"10006", "insert undertest fail", err}
+					c.Data["json"] = resp
+					return
+				}
+			}
 		}
 		if final {
-			tempTest.Final_score = score
-
+			test.Final_score = sum
+			record.Test_finish=1
 		}
-		err = tempTest.Update()
+
+		err = underTest.Delete()
 		if err != nil {
-			resp := Response{"10009", "update testPaper fail", err}
+			resp := Response{"10006", "delete undertest fail", err}
 			c.Data["json"] = resp
 			return
 		}
+		err = test.Update()
+		if err != nil {
+			resp := Response{"10007", "update test fail", err}
+			c.Data["json"] = resp
+			return
+		}
+		for i := 0; i < len(scores); i++ {
+			score := scoreArr[i]
+			var tempTest models.TestPaperInfo
+			id, _ := strconv.ParseInt(testDetailIds[i], 10, 64)
+			log.Println(id)
+			err = tempTest.GetTestPaperInfo(id)
+			if err != nil {
+				resp := Response{"10008", "get testPaper fail", err}
+				c.Data["json"] = resp
+				return
+			}
+			if topic.Score_type == 1 {
+				tempTest.Examiner_first_id = userId
+				tempTest.Examiner_first_score = score
+			} else if topic.Score_type == 2 && tempTest.Examiner_first_id == "-1" {
+				tempTest.Examiner_first_id = userId
+				tempTest.Examiner_first_score = score
+			} else if topic.Score_type == 2 && tempTest.Examiner_second_id == "-1" {
+				tempTest.Examiner_second_id = userId
+				tempTest.Examiner_second_score = score
+			}
+			if underTest.Test_question_type == 4 || underTest.Test_question_type == 5 {
+				tempTest.Leader_id = userId
+				tempTest.Leader_score = score
+			} else if underTest.Test_question_type == 3 {
+				tempTest.Examiner_third_id = userId
+				tempTest.Examiner_third_score = score
+			}
+			if final {
+				tempTest.Final_score = score
+
+			}
+			err = tempTest.Update()
+			if err != nil {
+				resp := Response{"10009", "update testPaper fail", err}
+				c.Data["json"] = resp
+				return
+			}
+		}
+
+
+		record.Score = sum
+		record.Question_id = topic.Question_id
+		record.Test_id = testId
+		record.Test_record_type = underTest.Test_question_type
+		record.User_id = userId
+		record.Score_time = time.Now()
+		err = record.Save()
+		if err != nil {
+			resp := Response{"10010", "insert record fail", err}
+			c.Data["json"] = resp
+			return
+		}
+
 	}
 
 
-	record.Score = sum
-	record.Question_id = topic.Question_id
-	record.Test_id = testId
-	record.Test_record_type = underTest.Test_question_type
-	record.User_id = userId
-	record.Score_time = time.Now()
-	err = record.Save()
-	if err != nil {
-		resp := Response{"10010", "insert record fail", err}
-		c.Data["json"] = resp
-		return
-	}
-	resp := Response{"10000", "ok", err}
+	resp = Response{"10000", "ok", err}
 	c.Data["json"] = resp
 }
 
@@ -702,291 +958,44 @@ func (c *TestPaperApiController) SelfScoreList() {
 	c.Data["json"] = resp
 
 }
-/**
-20.自评卷打分
-*/
-func (c *TestPaperApiController) SelfMarkPoint() {
-	defer c.ServeJSON()
-	var requestBody requests.TestPoint
-	var resp Response
-	var  err error
-
-	err=json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
-	if err!=nil {
-		resp = Response{"10001","cannot unmarshal",err}
-		c.Data["json"] = resp
-		return
-	}
-	userId := requestBody.UserId
-	testId := requestBody.TestId
-	scoreStr:= requestBody.Scores
-	testDetailIdStr:=requestBody.TestDetailId
-	testDetailIds := strings.Split(testDetailIdStr, "-")
-	scores := strings.Split(scoreStr, "-")
-
-	//---------------------------------------------------------------------------------------
-
-
-   //查找大题
-	var test models.TestPaper
-	_,err = test.GetTestPaper(testId)
-	if err != nil || test.Test_id == 0 {
-		resp := Response{"10002", "get test paper fail", err}
-		c.Data["json"] = resp
-		return
-	}
-	var topic models.Topic
-	topic.GetTopic(test.Question_id)
-	standardError := topic.Standard_error
-
-	//分三种情况
-	if userId == test.Examiner_first_id {
-		var sum int64
-		//给试卷详情表打分
-		for i := 0; i < len(testDetailIds); i++ {
-			//取出小题试卷id,和小题分数
-			var testInfo models.TestPaperInfo
-			testDetailIdString:=testDetailIds[i]
-			testDetailId, _ := strconv.ParseInt(testDetailIdString, 10, 64)
-			scoreString:=scores[i]
-			score, _ := strconv.ParseInt(scoreString, 10, 64)
-			//------------------------------------------------
-
-
-			//查试卷小题
-			err := testInfo.GetTestPaperInfo(testDetailId)
-			if err != nil {
-				resp := Response{"10008", "get testPaper fail", err}
-				c.Data["json"] = resp
-				return
-			}
-			//修改试卷详情表
-
-
-			testInfo.Examiner_first_self_score=score
-
-			err = testInfo.Update()
-			if err != nil {
-				resp := Response{"10009", "update testPaper fail", err}
-				c.Data["json"] = resp
-				return
-			}
-			sum += score
-		}
-		//给试卷表打分
-
-		test.Examiner_first_self_score = sum
-		err = test.Update()
-		if err != nil {
-			resp := Response{"10007", "update test fail", err}
-			c.Data["json"] = resp
-			return
-		}
-
-		//删除试卷待批改表 ，增加试卷记录表
-		var record models.ScoreRecord
-		var underTest models.UnderCorrectedPaper
-
-		err = models.GetSelfScorePaperByTestQuestionTypeAndTestId(&underTest, testId,userId)
-		if err!=nil {
-			resp = Response{"20012","GetUnderCorrectedPaperByUserIdAndTestId  fail",err}
-			c.Data["json"] = resp
-			return
-		}
-		record.Score = sum
-		record.Test_id = testId
-		record.Test_record_type = underTest.Test_question_type
-		record.User_id = userId
-		record.Question_id=underTest.Question_id
-
-		err = record.Save()
-		if err!=nil {
-			resp = Response{"20013","Save  fail",err}
-			c.Data["json"] = resp
-			return
-		}
-		err = underTest.SelfMarkDelete()
-		if err!=nil {
-			resp = Response{"20014","Delete  fail",err}
-			c.Data["json"] = resp
-			return
-		}
-
-		if math.Abs(float64(sum-test.Examiner_first_score))>float64(standardError) {
-			var newUnderTest models.UnderCorrectedPaper
-			newUnderTest.User_id="10000"
-			newUnderTest.Self_score_id=userId
-			newUnderTest.Test_id=testId
-			newUnderTest.Question_id=test.Question_id
-			newUnderTest.Test_question_type=7
-			newUnderTest.Save()
-		}
-
-	}else if userId==test.Examiner_second_id {
-		var sum int64
-		//给试卷详情表打分
-		for i := 0; i < len(testDetailIds); i++ {
-			//取出小题试卷id,和小题分数
-			var testInfo models.TestPaperInfo
-			testDetailIdString:=testDetailIds[i]
-			testDetailId, _ := strconv.ParseInt(testDetailIdString, 10, 64)
-			scoreString:=scores[i]
-			score, _ := strconv.ParseInt(scoreString, 10, 64)
-			//------------------------------------------------
-
-
-			//查试卷小题
-			err := testInfo.GetTestPaperInfo(testDetailId)
-			if err != nil {
-				resp := Response{"10008", "get testPaper fail", err}
-				c.Data["json"] = resp
-				return
-			}
-			//修改试卷详情表
-
-
-			testInfo.Examiner_second_self_score=score
-
-			err = testInfo.Update()
-			if err != nil {
-				resp := Response{"10009", "update testPaper fail", err}
-				c.Data["json"] = resp
-				return
-			}
-			sum += score
-		}
-		//给试卷表打分
-
-		test.Examiner_second_self_score = sum
-
-		err = test.Update()
-		if err != nil {
-			resp := Response{"10007", "update test fail", err}
-			c.Data["json"] = resp
-			return
-		}
-		//删除试卷待批改表 ，增加试卷记录表
-		var record models.ScoreRecord
-		var underTest models.UnderCorrectedPaper
-
-		err = models.GetSelfScorePaperByTestQuestionTypeAndTestId(&underTest, testId,userId)
-		if err!=nil {
-			resp = Response{"20012","GetUnderCorrectedPaperByUserIdAndTestId  fail",err}
-			c.Data["json"] = resp
-			return
-		}
-		record.Score = sum
-		record.Test_id = testId
-		record.Test_record_type = underTest.Test_question_type
-		record.User_id = userId
-		record.Question_id=underTest.Question_id
-		err = record.Save()
-		if err!=nil {
-			resp = Response{"20013","Save  fail",err}
-			c.Data["json"] = resp
-			return
-		}
-		err = underTest.SelfMarkDelete()
-		if err!=nil {
-			resp = Response{"20014","Delete  fail",err}
-			c.Data["json"] = resp
-			return
-		}
-		if math.Abs(float64(sum-test.Examiner_second_score))>float64(standardError) {
-			var newUnderTest models.UnderCorrectedPaper
-			newUnderTest.User_id="10000"
-			newUnderTest.Test_id=testId
-			newUnderTest.Self_score_id=userId
-			newUnderTest.Question_id=test.Question_id
-			newUnderTest.Test_question_type=7
-			newUnderTest.Save()
-		}
-
-	} else if userId ==test.Examiner_third_id {
-		var sum int64
-		//给试卷详情表打分
-		for i := 0; i < len(testDetailIds); i++ {
-			//取出小题试卷id,和小题分数
-			var testInfo models.TestPaperInfo
-			testDetailIdString:=testDetailIds[i]
-			testDetailId, _ := strconv.ParseInt(testDetailIdString, 10, 64)
-			scoreString:=scores[i]
-			score, _ := strconv.ParseInt(scoreString, 10, 64)
-			//------------------------------------------------
-
-
-			//查试卷小题
-			err := testInfo.GetTestPaperInfo(testDetailId)
-			if err != nil {
-				resp := Response{"10008", "get testPaper fail", err}
-				c.Data["json"] = resp
-				return
-			}
-			//修改试卷详情表
-
-
-			testInfo.Examiner_third_self_score=score
-
-			err = testInfo.Update()
-			if err != nil {
-				resp := Response{"10009", "update testPaper fail", err}
-				c.Data["json"] = resp
-				return
-			}
-			sum += score
-		}
-		//给试卷表打分
-
-		test.Examiner_third_self_score = sum
-
-		err = test.Update()
-		if err != nil {
-			resp := Response{"10007", "update test fail", err}
-			c.Data["json"] = resp
-			return
-		}
-		//删除试卷待批改表 ，增加试卷记录表
-		var record models.ScoreRecord
-		var underTest models.UnderCorrectedPaper
-
-		err = models.GetSelfScorePaperByTestQuestionTypeAndTestId(&underTest, testId,userId)
-		if err!=nil {
-			resp = Response{"20012","GetUnderCorrectedPaperByUserIdAndTestId  fail",err}
-			c.Data["json"] = resp
-			return
-		}
-		record.Score = sum
-		record.Test_id = testId
-		record.Test_record_type = underTest.Test_question_type
-		record.User_id = userId
-		record.Question_id=underTest.Question_id
-
-		err = record.Save()
-		if err!=nil {
-			resp = Response{"20013","Save  fail",err}
-			c.Data["json"] = resp
-			return
-		}
-		err = underTest.SelfMarkDelete()
-		if err!=nil {
-			resp = Response{"20014","Delete  fail",err}
-			c.Data["json"] = resp
-			return
-		}
-		if math.Abs(float64(sum-test.Examiner_third_score))>float64(standardError) {
-			var newUnderTest models.UnderCorrectedPaper
-			newUnderTest.User_id="10000"
-			newUnderTest.Test_id=testId
-			newUnderTest.Question_id=test.Question_id
-			newUnderTest.Self_score_id=userId
-			newUnderTest.Test_question_type=7
-			newUnderTest.Save()
-		}
-
-	}
-
-
-	//----------------------------------------
-	resp = Response{"10000", "OK", nil}
-	c.Data["json"] = resp
-}
+///**
+//20.自评卷打分
+//*/
+//func (c *TestPaperApiController) SelfMarkPoint() {
+//	defer c.ServeJSON()
+//	var requestBody requests.TestPoint
+//
+//
+//	err=json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+//	if err!=nil {
+//		resp = Response{"10001","cannot unmarshal",err}
+//		c.Data["json"] = resp
+//		return
+//	}
+//	userId := requestBody.UserId
+//	testId := requestBody.TestId
+//	scoreStr:= requestBody.Scores
+//	testDetailIdStr:=requestBody.TestDetailId
+//	testDetailIds := strings.Split(testDetailIdStr, "-")
+//	scores := strings.Split(scoreStr, "-")
+//
+//	//---------------------------------------------------------------------------------------
+//
+//
+//   //查找大题
+//	var test models.TestPaper
+//	_,err = test.GetTestPaper(testId)
+//	if err != nil || test.Test_id == 0 {
+//		resp := Response{"10002", "get test paper fail", err}
+//		c.Data["json"] = resp
+//		return
+//	}
+//	var topic models.Topic
+//	topic.GetTopic(test.Question_id)
+//
+//
+//
+//	//----------------------------------------
+//	resp = Response{"10000", "OK", nil}
+//	c.Data["json"] = resp
+//}
