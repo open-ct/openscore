@@ -22,6 +22,7 @@ export default class index extends Component {
         subjectValue: undefined,
         questionValue: undefined,
         loading: false,
+        ScoreType:undefined
     }
 
     componentDidMount() {
@@ -64,6 +65,7 @@ export default class index extends Component {
                         questionList: res.data.data.questionsList,
                         ImportTestNumber: undefined,
                         OnlineNumber: undefined,
+                        ScoreType:undefined,
                         testNumber: undefined,
                         userNumber: undefined
                     })
@@ -93,7 +95,8 @@ export default class index extends Component {
                 if (res.data.status === "10000") {
                     this.setState({
                         ImportTestNumber: res.data.data.distributionInfoVO.ImportTestNumber,
-                        OnlineNumber: res.data.data.distributionInfoVO.OnlineNumber
+                        OnlineNumber: res.data.data.distributionInfoVO.OnlineNumber,
+                        ScoreType:res.data.data.distributionInfoVO.ScoreType,
                     })
                 }
             })
@@ -116,7 +119,7 @@ export default class index extends Component {
                     })
                     Manage.distributePaper({ adminId: this.adminId, questionId: this.state.questionValue, testNumber: Number(this.state.testNumber), userNumber: Number(this.state.userNumber) })
                         .then((res) => {
-                            // if (res.data.status === "10000") {
+                            if (res.data.status === "10000") {
                                 this.setState({
                                     loading: false,
                                     questionList: [],
@@ -124,10 +127,11 @@ export default class index extends Component {
                                     OnlineNumber: undefined,
                                     testNumber: undefined,
                                     userNumber: undefined,
-                                    questionValue: undefined
+                                    questionValue: undefined,
+                                    ScoreType:undefined
                                 })
                                 message.success('试卷分配成功！')
-                            // }
+                            }
                         })
                         .catch((e) => {
                             console.log(e)
@@ -143,8 +147,16 @@ export default class index extends Component {
             this.props.history.push({pathname:"/home/management/detailTable",query:{subjectName:this.state.subjectValue}})
         }else {
             message.warning('请先选择科目！')
+        }   
+    }
+    ScoreType = () => {console.log('111111')
+        if (this.state.ScoreType === 1) {
+            return '否'
+        } else if (this.state.ScoreType === 1) {
+            return '是'
+        }else {
+            return null
         }
-        
     }
     render() {
         return (
@@ -192,7 +204,7 @@ export default class index extends Component {
                                     未分配试卷数：{this.state.ImportTestNumber}
                                 </div>
                                 <div className="setting-item">
-                                    是否需要二次阅卷：否
+                                    是否需要二次阅卷：{this.ScoreType()}
                                 </div>
                             </div>
                             <div className="setting-input" style={{ marginTop: 24 }}>

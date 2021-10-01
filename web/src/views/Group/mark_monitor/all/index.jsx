@@ -39,7 +39,7 @@ export default class index extends Component {
                 {
                     title: '分配人数',
                     width: 90,
-                    dataIndex: 'DistributionNumber',
+                    dataIndex: 'DistributionUserNumber',
                 },
                 {
                     title: '完成量',
@@ -305,7 +305,7 @@ export default class index extends Component {
     }
 
     tableData = () => {
-        group.allMonitor({ supervisorId: "2",subjectName: JSON.parse(localStorage.getItem('userInfo')).SubjectName})
+        group.allMonitor({ supervisorId: "2",subject: JSON.parse(localStorage.getItem('userInfo')).SubjectName})
             .then((res) => {
                 if (res.data.status == "10000") {
                     let tableData = [];

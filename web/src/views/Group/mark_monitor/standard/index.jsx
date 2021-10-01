@@ -84,7 +84,7 @@ export default class index extends Component {
             dataIndex: 'UserName',
         },
         {
-            title: '小题标准差',
+            title: '标准差',
             width: 180,
             dataIndex: 'Deviation',
         }
@@ -116,7 +116,7 @@ export default class index extends Component {
                             </Select>
                         </div>
                         <div className="question-score">
-                            满分：{this.state.fullScore}
+                            {/* 满分：{this.state.fullScore} */}
                         </div>
                     </div>
                     <div className="display-container">

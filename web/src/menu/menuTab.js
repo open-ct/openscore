@@ -37,15 +37,15 @@ export default [
         chidPermissions: [
         ]
     },
-    {
-        key: "selfMark",
-        userPermission: "阅卷员",
-        menu_name: "自评",
-        menu_url: "/home/selfMark",
-        icon: "SolutionOutlined",
-        chidPermissions: [
-        ]
-    },
+    // {
+    //     key: "selfMark",
+    //     userPermission: "阅卷员",
+    //     menu_name: "自评",
+    //     menu_url: "/home/selfMark",
+    //     icon: "SolutionOutlined",
+    //     chidPermissions: [
+    //     ]
+    // },
     {
         key: "mark_monitor",
         userPermission: "组长",
@@ -174,7 +174,7 @@ export default [
             {
                 key: "paper",
                 userPermission: "管理员",
-                menu_name: "导入导出试卷",
+                menu_name: "试卷导入",
                 menu_url: "/home/management/paper",
                 icon: "",
                 chidPermissions: [
