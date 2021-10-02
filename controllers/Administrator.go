@@ -13,6 +13,7 @@ import (
 	"image/color"
 	"image/draw"
 	"image/png"
+	"io"
 	"io/ioutil"
 	"log"
 	"openscore/models"
@@ -132,7 +133,9 @@ func (c *AdminApiController) ReadExcel(){
 	defer c.ServeJSON()
 	var resp Response
 	var  err error
-	_, header, err := c.GetFile("excel")
+
+
+	file, header, err := c.GetFile("excel")
 	err = err
 	if err != nil {
 		log.Println(err)
@@ -140,9 +143,8 @@ func (c *AdminApiController) ReadExcel(){
 		c.Data["json"] = resp
 		return
 	}
-
-	//----------------------------------------------------
-
+	tempFile, err := os.Create(header.Filename)
+	io.Copy(tempFile,file)
 	f, err := excelize.OpenFile(header.Filename)
 	if err != nil {
 		log.Println(err)
@@ -160,19 +162,19 @@ func (c *AdminApiController) ReadExcel(){
 		c.Data["json"] = resp
 		return
 	}
-	
+fmt.Println(rows)
 
 	for i:=1;i<len(rows);i++ {
 		for j:=1;j<len(rows[i]);j++ {
 
 			if i>=1&&j>=3 {
 				//准备数据
-			    testIdStr:=rows[i][0]
-			    testId, _ := strconv.ParseInt(testIdStr, 10, 64)
-			    questionIds := strings.Split(rows[0][j], "-")
-			    questionIdStr:=questionIds[0]
-			    questionId, _ := strconv.ParseInt(questionIdStr, 10, 64)
-			    questionDetailIdStr:=questionIds[3]
+				testIdStr:=rows[i][0]
+				testId, _ := strconv.ParseInt(testIdStr, 10, 64)
+				questionIds := strings.Split(rows[0][j], "-")
+				questionIdStr:=questionIds[0]
+				questionId, _ := strconv.ParseInt(questionIdStr, 10, 64)
+				questionDetailIdStr:=questionIds[3]
 				questionDetailId, _ := strconv.ParseInt(questionDetailIdStr, 10, 64)
 				name:=rows[i][2]
 				//填充数据
@@ -183,7 +185,7 @@ func (c *AdminApiController) ReadExcel(){
 				s:=rows[i][j]
 				split := strings.Split(s, "\n")
 				src := UploadPic(rows[i][0]+rows[0][j], split)
-			    testPaperInfo.Pic_src=src
+				testPaperInfo.Pic_src=src
 				//查看大题试卷是否已经导入
 				has,err := testPaper.GetTestPaper(testId)
 				if err!=nil {
@@ -194,7 +196,6 @@ func (c *AdminApiController) ReadExcel(){
 				if !has {
 					testPaper.Test_id=testId
 					testPaper.Question_id=questionId
-					testPaper.Question_status=1
 					testPaper.Candidate=name
 					err = testPaper.Insert()
 					if err != nil {
@@ -217,14 +218,14 @@ func (c *AdminApiController) ReadExcel(){
 			}
 
 		}
-		
+
 	}
 	//获取选项名 存导入试卷数
 	for k:=3;k<len(rows[0]);k++ {
 		questionIds := strings.Split(rows[0][k], "-")
 		questionIdStr:=questionIds[0]
 		questionId, _ := strconv.ParseInt(questionIdStr, 10, 64)
-	  var topic models.Topic
+		var topic models.Topic
 		topic.Question_id=questionId
 		topic.Import_number=int64(len(rows)-1)
 		err = topic.Update()
@@ -236,14 +237,16 @@ func (c *AdminApiController) ReadExcel(){
 		}
 	}
 
+	err = tempFile.Close()
+	if err!=nil {
+		log.Println(err)
+	}
+	err = os.Remove(header.Filename)
+	if err!=nil {
+		log.Println(err)
+	}
 
-	if err!=nil {
-		log.Println(err)
-	}
-	err = os.Remove("excelFile")
-	if err!=nil {
-		log.Println(err)
-	}
+
 	//------------------------------------------------
 	data := make(map[string]interface{})
 	data["data"] =nil
@@ -252,6 +255,7 @@ func (c *AdminApiController) ReadExcel(){
 
 
 }
+
 /**
 2.样卷导入
  */
@@ -261,7 +265,11 @@ func (c *AdminApiController) ReadExampleExcel(){
 	defer c.ServeJSON()
 	var resp Response
 	var  err error
-	_, header, err := c.GetFile("excel")
+
+
+	//----------------------------------------------------
+
+	file, header, err := c.GetFile("excel")
 	err = err
 	if err != nil {
 		log.Println(err)
@@ -269,9 +277,8 @@ func (c *AdminApiController) ReadExampleExcel(){
 		c.Data["json"] = resp
 		return
 	}
-
-	//----------------------------------------------------
-
+	tempFile, err := os.Create(header.Filename)
+	io.Copy(tempFile,file)
 	f, err := excelize.OpenFile(header.Filename)
 	if err != nil {
 		log.Println(err)
@@ -366,13 +373,15 @@ func (c *AdminApiController) ReadExampleExcel(){
 	}
 
 
+	err = tempFile.Close()
 	if err!=nil {
 		log.Println(err)
 	}
-	err = os.Remove("excelFile")
+	err = os.Remove(header.Filename)
 	if err!=nil {
 		log.Println(err)
 	}
+
 	//------------------------------------------------
 	data := make(map[string]interface{})
 	data["data"] =nil
@@ -386,7 +395,11 @@ func (c *AdminApiController) ReadAnswerExcel(){
 	defer c.ServeJSON()
 	var resp Response
 	var  err error
-	_, header, err := c.GetFile("excel")
+
+
+	//----------------------------------------------------
+
+	file, header, err := c.GetFile("excel")
 	err = err
 	if err != nil {
 		log.Println(err)
@@ -394,9 +407,8 @@ func (c *AdminApiController) ReadAnswerExcel(){
 		c.Data["json"] = resp
 		return
 	}
-
-	//----------------------------------------------------
-
+	tempFile, err := os.Create(header.Filename)
+	io.Copy(tempFile,file)
 	f, err := excelize.OpenFile(header.Filename)
 	if err != nil {
 		log.Println(err)
@@ -491,13 +503,15 @@ func (c *AdminApiController) ReadAnswerExcel(){
 	}
 
 
+	err = tempFile.Close()
 	if err!=nil {
 		log.Println(err)
 	}
-	err = os.Remove("excelFile")
+	err = os.Remove(header.Filename)
 	if err!=nil {
 		log.Println(err)
 	}
+
 	//------------------------------------------------
 	data := make(map[string]interface{})
 	data["data"] =nil
@@ -728,9 +742,10 @@ func (c *AdminApiController) DistributionInfo(){
 		c.Data["json"] = resp
 		return
 	}
+
 	scoreType:=topic.Score_type
 	distributionInfoVO.ScoreType=scoreType
-	
+
 	importNumber:=topic.Import_number
 	distributionInfoVO.ImportTestNumber =importNumber
 	//获取试卷未分配数量
