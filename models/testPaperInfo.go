@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"log"
 
 	"xorm.io/builder"
@@ -27,6 +28,8 @@ type TestPaperInfo struct {
 }
 
 func (t *TestPaperInfo) GetTestPaperInfoByTestIdAndQuestionDetailId(testId int64, questionDetailId int64) error {
+	fmt.Println("testId: ", testId, questionDetailId)
+
 	has, err := x.Where("question_detail_id = ? and test_id = ?", questionDetailId, testId).Get(t)
 	if !has || err != nil {
 		log.Println("could not specific info")
@@ -76,7 +79,7 @@ func GetTestInfoPicListByTestId(id int64, as *[]string) error {
 	return err
 }
 
-func FindTestPaperInfoByQuestionDetailId(questionDetailId int64,  t *[]TestPaperInfo) error {
+func FindTestPaperInfoByQuestionDetailId(questionDetailId int64, t *[]TestPaperInfo) error {
 	err := x.Where("question_detail_id = ?", questionDetailId).Find(t)
 	if err != nil {
 		log.Println("could not FindTestPaperInfoByQuestionId ")
@@ -86,7 +89,7 @@ func FindTestPaperInfoByQuestionDetailId(questionDetailId int64,  t *[]TestPaper
 }
 func (u *TestPaperInfo) Delete() error {
 	_, err := x.Where(builder.Eq{"test_id": u.Test_id}).Delete(u)
-	if  err != nil {
+	if err != nil {
 		log.Println("delete fail")
 	}
 	return err

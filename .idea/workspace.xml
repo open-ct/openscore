@@ -1,13 +1,264 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="ALL" />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="90d49d24-cd7e-4f14-b075-c6e5fe5ae2ce" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/controller/Administrator.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/controller/supervisor.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/openscore.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/openscore.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controllers/Administrator.go" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/Administrator.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/img/9000010142092---119.png" beforeDir="false" afterPath="$PROJECT_DIR$/img/9000010142092---119.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lastupdate.tmp" beforeDir="false" afterPath="$PROJECT_DIR$/lastupdate.tmp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test.xlsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test1.xlsm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/auth/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/auth/.idea/compiler.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/auth/.idea/dataSources.local.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/auth/.idea/encodings.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/auth/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/auth/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/auth/.idea/openscore.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/auth/.idea/shelf/Uncommitted_changes_before_Update_at_2021_8_12_20_43_[Default_Changelist]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/auth/.idea/shelf/Uncommitted_changes_before_Update_at_2021_8_12_20_43__Default_Changelist_.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/auth/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/auth/.idea/workspace.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/conf/mysql.conf" beforeDir="false" afterPath="$PROJECT_DIR$/conf/mysql.conf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controllers/Administrator.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/controllers/base.go" beforeDir="false" afterPath="$PROJECT_DIR$/controller/base.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controllers/default.go" beforeDir="false" afterPath="$PROJECT_DIR$/controller/default.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controllers/score.go" beforeDir="false" afterPath="$PROJECT_DIR$/controller/score.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controllers/supervisor.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/font/msyh.ttc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/font/msyhbd.ttc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/font/msyhl.ttc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/font/simhei.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/font/simkai.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/font/simsun.ttc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010140192---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010140192---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010140292---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010140292---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010140392---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010140392---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010140492---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010140492---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010140592---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010140592---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010140692---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010140692---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010140792---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010140792---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010140892---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010140892---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010140992---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010140992---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010141092---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010141092---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010141192---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010141192---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010141292---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010141292---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010141392---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010141392---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010141492---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010141492---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010141592---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010141592---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010141692---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010141692---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010141792---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010141792---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010141892---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010141892---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010141992---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010141992---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010142092---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010142092---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010142192---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010142192---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010142292---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010142292---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010142392---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010142392---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010142492---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010142492---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010142592---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010142592---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010142692---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010142692---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010142792---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010142792---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010142892---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010142892---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010142992---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010142992---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010143092---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010143092---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010143192---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010143192---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010143292---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010143292---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010143392---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010143392---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010143492---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010143492---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010143592---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010143592---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010143692---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010143692---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010143892---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010143892---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010143992---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010143992---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010144092---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010144092---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010144192---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010144192---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010144292---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010144292---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010150192---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010150192---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010150292---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010150292---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010150392---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010150392---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010150492---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010150492---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010150592---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010150592---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010150692---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010150692---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010150792---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010150792---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010150892---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010150892---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010243092---118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010243092---119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010243094---122.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/9000010243094---123.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/answer1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/answer2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/example1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/example2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/example3.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/example4.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/example5.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/example6.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lastupdate.tmp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/testPaper.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/testPaper.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/testPaperInfo.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/testPaperInfo.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/.bin/yarn" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/.bin/yarn.cmd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/.bin/yarn.ps1" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/.bin/yarnpkg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/.bin/yarnpkg.cmd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/.bin/yarnpkg.ps1" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/yarn/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/yarn/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/yarn/bin/yarn" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/yarn/bin/yarn.cmd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/yarn/bin/yarn.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/yarn/bin/yarnpkg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/yarn/bin/yarnpkg.cmd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/yarn/lib/cli.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/yarn/lib/v8-compile-cache.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/yarn/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/yarn/preinstall.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/openct.http" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/requests/supervisor.go" beforeDir="false" afterPath="$PROJECT_DIR$/requests/supervisor.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routers/filter.go" beforeDir="false" afterPath="$PROJECT_DIR$/router/filter.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routers/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/router/router.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routers/static_filter.go" beforeDir="false" afterPath="$PROJECT_DIR$/router/static_filter.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/js/reload.min.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tstex_modules/_api.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/index.tpl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/.env" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/.idea/frontend.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/config-overrides.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/package-lock.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/public/favicon.ico" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/public/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/public/logo192.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/public/logo512.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/public/manifest.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/public/robots.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/App.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/App.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/Conf.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/Setting.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/api/group.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/api/manage.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/api/marking.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/api/request.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/asset/images/OpenCT_Logo.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/auth/Auth.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/auth/AuthCallback.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/auth/Util.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/backend/AccountBackend.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/logo.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/menu/menuTab.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/serviceWorker.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/setupProxy.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/util/Util.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Group/mark_monitor/all/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Group/mark_monitor/all/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Group/mark_monitor/average/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Group/mark_monitor/average/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Group/mark_monitor/score/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Group/mark_monitor/score/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Group/mark_monitor/self/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Group/mark_monitor/self/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Group/mark_monitor/standard/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Group/mark_monitor/standard/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Group/mark_monitor/teacher/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Group/mark_monitor/teacher/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Group/test_monitor/arbitration/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Group/test_monitor/arbitration/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Group/test_monitor/markTasks/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Group/test_monitor/markTasks/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Group/test_monitor/marking/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Group/test_monitor/marking/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Group/test_monitor/problem/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Group/test_monitor/problem/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Home/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Home/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Manage/paper_manage/allot/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Manage/paper_manage/allot/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Manage/paper_manage/detail/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Manage/paper_manage/detail/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Manage/paper_manage/manage/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Manage/paper_manage/manage/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Manage/paper_manage/paper/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Manage/paper_manage/paper/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Manage/paper_manage/question/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Manage/paper_manage/question/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Manage/user_manage/manage/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Manage/user_manage/manage/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Manage/user_manage/user/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Manage/user_manage/user/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Mark/Answer/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Mark/Answer/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Mark/MarkTasks/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Mark/MarkTasks/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Mark/Review/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Mark/Review/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Mark/Sample/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Mark/Sample/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Mark/SelfMark/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/views/Mark/SelfMark/index.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/yarn.lock" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -21,7 +272,7 @@
       </list>
     </option>
   </component>
-  <component name="GOROOT" url="file://$PROJECT_DIR$/../../../../../Program Files/Go" />
+  <component name="GOROOT" url="file://$USER_HOME$/go/go1.16" />
   <component name="Git.Merge.Settings">
     <option name="BRANCH" value="backend-api" />
   </component>
@@ -58,12 +309,15 @@
     <option name="indexEntireGoPath" value="false" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$PROJECT_DIR$/controllers/score.go" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/controllers/default.go" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/responses/test.go" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/controller/base.go" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/controller/default.go" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/controller/score.go" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/controller/supervisor.go" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/requests/supervisor.go" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/controllers/supervisor.go" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/controllers/base.go" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/responses/test.go" root0="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
   </component>
   <component name="MavenImportPreferences">
     <option name="generalSettings">
@@ -78,30 +332,30 @@
   <component name="ProjectViewState">
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">
-    <property name="DatabaseDriversLRU" value="mysql" />
-    <property name="DefaultGoTemplateProperty" value="Go File" />
-    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
-    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="aspect.path.notification.shown" value="true" />
-    <property name="go.import.settings.migrated" value="true" />
-    <property name="go.sdk.automatically.set" value="true" />
-    <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../openscore" />
-    <property name="node.js.detected.package.eslint" value="true" />
-    <property name="node.js.detected.package.tslint" value="true" />
-    <property name="node.js.selected.package.eslint" value="(autodetect)" />
-    <property name="node.js.selected.package.tslint" value="(autodetect)" />
-    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
-    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
-    <property name="nodejs_package_manager_path" value="yarn" />
-    <property name="project.structure.last.edited" value="Libraries" />
-    <property name="project.structure.proportion" value="0.15" />
-    <property name="project.structure.side.proportion" value="0.2" />
-    <property name="restartRequiresConfirmation" value="false" />
-    <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
-  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultGoTemplateProperty&quot;: &quot;Go File&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.modules.go.list.on.any.changes.was.set&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.watchers.conflict.with.on.save.actions.check.performed&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;database.data.extractors.current.export.id&quot;: &quot;SQL Inserts&quot;,
+    &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
+    &quot;go.sdk.automatically.set&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/taodei/Desktop/openscore/openscore&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;go.sdk&quot;
+  },
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;mysql&quot;
+    ]
+  }
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\chen\go\src\openscore" />
@@ -109,13 +363,42 @@
       <recent name="C:\Users\chen\go\src\openscore\controllers" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/frontend" />
       <recent name="C:\Users\chen\go\src\openscore" />
       <recent name="C:\Users\chen\go\src\openscore\controllers" />
       <recent name="C:\Users\chen\go\src\openscore\responses" />
     </key>
   </component>
-  <component name="RunManager">
-    <configuration name="go build openscore" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Go Build.go build openscore (3)">
+    <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
+      <module name="openscore" />
+      <working_directory value="$PROJECT_DIR$" />
+      <go_parameters value="-i" />
+      <kind value="FILE" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build openscore (1)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="openscore" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="DIRECTORY" />
+      <package value="openscore" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/main.go" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build openscore (2)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="openscore" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="DIRECTORY" />
+      <package value="openscore" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/main.go" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build openscore (3)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="openscore" />
       <working_directory value="$PROJECT_DIR$" />
       <kind value="PACKAGE" />
@@ -124,9 +407,42 @@
       <filePath value="$PROJECT_DIR$/main.go" />
       <method v="2" />
     </configuration>
+    <configuration name="go build openscore" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="openscore" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="FILE" />
+      <package value="openscore" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/test.go" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="GoTestRunConfiguration" factoryName="Go Test">
+      <module name="openscore" />
+      <working_directory value="$PROJECT_DIR$" />
+      <go_parameters value="-i" />
+      <kind value="DIRECTORY" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <method v="2" />
+    </configuration>
+    <configuration name="start (1)" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/frontend/web/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="start" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Build.go build openscore (3)" />
+        <item itemvalue="Go Build.go build openscore (2)" />
         <item itemvalue="Go Build.go build openscore" />
+        <item itemvalue="Go Build.go build openscore (1)" />
+        <item itemvalue="npm.start (1)" />
       </list>
     </recent_temporary>
   </component>
@@ -175,18 +491,27 @@
         </entry>
       </map>
     </option>
-    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VgoProject">
-    <integration-enabled>true</integration-enabled>
+    <settings-migrated>true</settings-migrated>
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/controllers/score.go</url>
-          <line>783</line>
+          <url>file://$PROJECT_DIR$/controller/score.go</url>
+          <line>778</line>
           <option name="timeStamp" value="15" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/controller/score.go</url>
+          <line>62</line>
+          <option name="timeStamp" value="20" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/main.go</url>
+          <line>32</line>
+          <option name="timeStamp" value="21" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

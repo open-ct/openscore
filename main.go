@@ -8,9 +8,8 @@
 package main
 
 import (
-	_ "openscore/routers"
-	routers "openscore/routers"
-
+	_ "openscore/router"
+	routers "openscore/router"
 
 	// "github.com/astaxie/beego"
 	// "github.com/astaxie/beego/plugins/cors"
@@ -20,12 +19,11 @@ import (
 )
 
 func main() {
+
 	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
 
-
-
 		AllowOrigins: []string{"*"},
-		//AllowMethods:     []string{"GET", "PUT", "PATCH", "POST"},
+		// AllowMethods:     []string{"GET", "PUT", "PATCH", "POST"},
 		AllowMethods: []string{"GET", "PUT", "PATCH", "POST", "OPTIONS"},
 		// AllowHeaders:     []string{"Origin", "Access-Control-Allow-Origin", "Access-Control-Allow-Headers", "Content-Type"},
 		AllowHeaders:     []string{"Content-Type", "Access-Control-Allow-Headers", "X-Requested-With", "Authorization"},
@@ -40,5 +38,5 @@ func main() {
 	beego.BConfig.WebConfig.Session.SessionProvider = "file"
 	beego.BConfig.WebConfig.Session.SessionProviderConfig = "./tmp"
 	beego.BConfig.WebConfig.Session.SessionGCMaxLifetime = 3600 * 24 * 365
-		beego.Run()
-	}
+	beego.Run()
+}
