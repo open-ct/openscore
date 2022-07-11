@@ -9,26 +9,35 @@ import (
 )
 
 type User struct {
-	User_id        string    `json:"user_id" xorm:"pk"`
-	User_name      string    `json:"user_name"`
-	Examiner_count string    `json:"examiner_count"`
-	Password       string    `json:"password"`
-	Id_card        string    `json:"id_card"`
-	Address        string    `json:"address"`
-	Tel            string    `json:"tel"`
-	Email          string    `json:"email"`
-	Login_time     time.Time `json:"login_time"`
-	Exist_time     time.Time `json:"exist_time"`
-	Online_time    int64     `json:"online_time"`
-	Subject_name   string    `json:"subject_name"`
-	Status         int64     `json:"status"`
-	UserType       int64     `json:"userType"`
-	IsDistribute   int64     `json:"isDistribute"`
+	UserId        int64     `json:"user_id" xorm:"pk autoincr"`
+	UserName      string    `json:"user_name"`
+	ExaminerCount string    `json:"examiner_count"`
+	Password      string    `json:"password"`
+	IdCard        string    `json:"id_card"`
+	Address       string    `json:"address"`
+	Tel           string    `json:"tel"`
+	Email         string    `json:"email"`
+	LoginTime     time.Time `json:"login_time"`
+	ExistTime     time.Time `json:"exist_time"`
+	OnlineTime    int64     `json:"online_time"`
+	SubjectName   string    `json:"subject_name"`
+	Status        int64     `json:"status"`
+	UserType      int64     `json:"user_type"`
+	IsDistribute  int64     `json:"is_distribute"`
 
 	QuestionId int64 `json:"question_id"`
 }
 
-func (u *User) GetUser(id string) error {
+func (u *User) Insert() error {
+	code, err := x.Insert(u)
+	if code == 0 || err != nil {
+		log.Println("insert user fail")
+		log.Printf("%+v", err)
+	}
+	return err
+}
+
+func (u *User) GetUser(id int64) error {
 	has, err := x.Where(builder.Eq{"user_id": id}).Get(u)
 	if !has || err != nil {
 		log.Println("could not found user")
@@ -83,8 +92,9 @@ func FindUsers(u *[]User) error {
 	}
 	return err
 }
-func FindNewUserId(id1 string, id2 string, questionId int64) (newId string) {
-	var Ids []string
+
+func FindNewUserId(id1 int64, id2 int64, questionId int64) (newId int64) {
+	var Ids []int64
 	err := x.Table("user").Where("user_id !=?", id1).Where("user_id !=?", id2).Where("question_id=?", questionId).Where("status=?", 1).Select("user_id").Find(&Ids)
 	if err != nil {
 		log.Println("FindNewUserId err")

@@ -7,7 +7,7 @@ import (
 
 type SubTopicPlus struct {
 	model.SubTopic
-	Test_detail_id int64 `json:"test_detail_id"`
+	TestDetailId int64 `json:"test_detail_id"`
 }
 type TestPaperInfoPlus struct {
 	model.TestPaperInfo

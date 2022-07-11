@@ -62,9 +62,9 @@ func (idp *FacebookIdProvider) getConfig(clientId string, clientSecret string, r
 }
 
 type FacebookAccessToken struct {
-	AccessToken string `json:"access_token"` //Interface call credentials
-	TokenType   string `json:"token_type"`   //Access token type
-	ExpiresIn   int64  `json:"expires_in"`   //access_token interface call credential timeout time, unit (seconds)
+	AccessToken string `json:"access_token"` // Interface call credentials
+	TokenType   string `json:"token_type"`   // Access token type
+	ExpiresIn   int64  `json:"expires_in"`   // access_token interface call credential timeout time, unit (seconds)
 }
 
 type FacebookCheckToken struct {
@@ -73,7 +73,7 @@ type FacebookCheckToken struct {
 
 // Get more detail via: https://developers.facebook.com/docs/facebook-login/manually-build-a-login-flow#checktoken
 type FacebookCheckTokenData struct {
-	UserId string `json:"user_id"`
+	UserId int64 `json:"user_id"`
 }
 
 // GetToken use code get access_token (*operation of getting code ought to be done in front)
@@ -106,7 +106,7 @@ func (idp *FacebookIdProvider) GetToken(code string) (*oauth2.Token, error) {
 	return &token, nil
 }
 
-//{
+// {
 //    "id": "123456789",
 //    "name": "Example Name",
 //    "name_format": "{first} {last}",
@@ -119,7 +119,7 @@ func (idp *FacebookIdProvider) GetToken(code string) (*oauth2.Token, error) {
 //        }
 //    },
 //    "email": "test@example.com"
-//}
+// }
 
 type FacebookUserInfo struct {
 	Id         string   `json:"id"`          // The app user's App-Scoped User ID. This ID is unique to the app and cannot be used by other apps.

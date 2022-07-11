@@ -8,23 +8,23 @@ import (
 )
 
 type TestPaperInfo struct {
-	Test_detail_id             int64  `json:"test_detail_id" xorm:"pk autoincr"`
-	Question_detail_id         int64  `json:"question_detail_id"`
-	Test_id                    int64  `json:"test_id"`
-	Pic_src                    string `json:"pic_src"`
-	Examiner_first_id          string `json:"examiner_first_id" xorm:"default('-1')"`
-	Examiner_first_score       int64  `json:"examiner_first_score" xorm:"default(-1)"`
-	Examiner_first_self_score  int64  `json:"examiner_first_self_score" xorm:"default(-1)"`
-	Examiner_second_id         string `json:"examiner_second_id" xorm:"default('-1')"`
-	Examiner_second_score      int64  `json:"examiner_second_score" xorm:"default(-1)"`
-	Examiner_second_self_score int64  `json:"examiner_second_self_score" xorm:"default(-1)"`
-	Examiner_third_id          string `json:"examiner_third_id" xorm:"default('-1')"`
-	Examiner_third_score       int64  `json:"examiner_third_score" xorm:"default(-1)"`
-	Examiner_third_self_score  int64  `json:"examiner_third_self_score" xorm:"default(-1)"`
-	Leader_id                  string `json:"leader_id" xorm:"default('-1')"`
-	Leader_score               int64  `json:"leader_score" xorm:"default(-1)"`
-	Final_score                int64  `json:"finale_score" xorm:"default(-1)"`
-	Final_score_id             string `json:"final_score_id" xorm:"default('-1')"`
+	TestDetailId            int64  `json:"test_detail_id" xorm:"pk autoincr"`
+	QuestionDetailId        int64  `json:"question_detail_id"`
+	TestId                  int64  `json:"test_id"`
+	PicSrc                  string `json:"pic_src"`
+	ExaminerFirstId         int64  `json:"examiner_first_id" xorm:"default(-1)"`
+	ExaminerFirstScore      int64  `json:"examiner_first_score" xorm:"default(-1)"`
+	ExaminerFirstSelfScore  int64  `json:"examiner_first_self_score" xorm:"default(-1)"`
+	ExaminerSecondId        int64  `json:"examiner_second_id" xorm:"default(-1)"`
+	ExaminerSecondScore     int64  `json:"examiner_second_score" xorm:"default(-1)"`
+	ExaminerSecondSelfScore int64  `json:"examiner_second_self_score" xorm:"default(-1)"`
+	ExaminerThirdId         int64  `json:"examiner_third_id" xorm:"default(-1)"`
+	ExaminerThirdScore      int64  `json:"examiner_third_score" xorm:"default(-1)"`
+	ExaminerThirdSelfScore  int64  `json:"examiner_third_self_score" xorm:"default(-1)"`
+	LeaderId                int64  `json:"leader_id" xorm:"default(-1)"`
+	LeaderScore             int64  `json:"leader_score" xorm:"default(-1)"`
+	FinalScore              int64  `json:"finale_score" xorm:"default(-1)"`
+	FinalScoreId            int64  `json:"final_score_id" xorm:"default(-1)"`
 }
 
 func (t *TestPaperInfo) GetTestPaperInfoByTestIdAndQuestionDetailId(testId int64, questionDetailId int64) error {
@@ -47,7 +47,7 @@ func (t *TestPaperInfo) GetTestPaperInfo(id int64) error {
 }
 
 func (t *TestPaperInfo) Update() error {
-	code, err := x.Where(builder.Eq{"test_detail_id": t.Test_detail_id}).AllCols().Update(t)
+	code, err := x.Where(builder.Eq{"test_detail_id": t.TestDetailId}).AllCols().Update(t)
 	if code == 0 && err != nil {
 		log.Println("update test paper info fail")
 		log.Println(err)
@@ -87,8 +87,8 @@ func FindTestPaperInfoByQuestionDetailId(questionDetailId int64, t *[]TestPaperI
 	}
 	return err
 }
-func (u *TestPaperInfo) Delete() error {
-	_, err := x.Where(builder.Eq{"test_id": u.Test_id}).Delete(u)
+func (t *TestPaperInfo) Delete() error {
+	_, err := x.Where(builder.Eq{"test_id": t.TestId}).Delete(t)
 	if err != nil {
 		log.Println("delete fail")
 	}

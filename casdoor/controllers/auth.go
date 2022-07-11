@@ -154,7 +154,7 @@ func (c *ApiController) Login() {
 			}
 
 			// get user
-			var userId string
+			var userId int64
 			if form.Username == "" {
 				userId, _ = c.RequireSignedIn()
 			} else {
@@ -258,15 +258,15 @@ func (c *ApiController) Login() {
 			if user != nil {
 				// Sign in via OAuth
 
-				//if object.IsForbidden(userId) {
+				// if object.IsForbidden(userId) {
 				//	c.forbiddenAccountResp(userId)
 				//	return
-				//}
+				// }
 
-				//if len(object.GetMemberAvatar(userId)) == 0 {
+				// if len(object.GetMemberAvatar(userId)) == 0 {
 				//	avatar := UploadAvatarToOSS(res.Avatar, userId)
 				//	object.LinkMemberAccount(userId, "avatar", avatar)
-				//}
+				// }
 
 				resp = c.HandleLoggedIn(application, user, &form)
 
@@ -274,7 +274,7 @@ func (c *ApiController) Login() {
 				record.Organization = application.Organization
 				record.Username = user.Name
 
-				 object.AddRecord(record)
+				object.AddRecord(record)
 			} else {
 				// Sign up via OAuth
 				if !application.EnableSignUp {
@@ -324,7 +324,7 @@ func (c *ApiController) Login() {
 
 				object.AddRecord(record)
 			}
-			//resp = &Response{Status: "ok", Msg: "", Data: res}
+			// resp = &Response{Status: "ok", Msg: "", Data: res}
 		} else { // form.Method != "signup"
 			userId := c.GetSessionUsername()
 			if userId == "" {
@@ -356,10 +356,10 @@ func (c *ApiController) Login() {
 			} else {
 				resp = &Response{Status: "error", Msg: "Failed to link user account", Data: isLinked}
 			}
-			//if len(object.GetMemberAvatar(userId)) == 0 {
+			// if len(object.GetMemberAvatar(userId)) == 0 {
 			//	avatar := UploadAvatarToOSS(tempUserAccount.AvatarUrl, userId)
 			//	object.LinkUserAccount(userId, "avatar", avatar)
-			//}
+			// }
 		}
 	} else {
 		panic("unknown authentication type (not password or provider), form = " + util.StructToJson(form))

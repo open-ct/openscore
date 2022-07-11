@@ -7,6 +7,7 @@ import (
 	"flag"
 	"fmt"
 	beego "github.com/beego/beego/v2/server/web"
+	"github.com/beego/beego/v2/server/web/context"
 	"github.com/golang/freetype"
 	"github.com/golang/freetype/truetype"
 	"github.com/xuri/excelize/v2"
@@ -146,12 +147,10 @@ func UploadPic(name string, text string) (src string) {
 /**
 2.试卷导入
 */
-// TODO
-func (c *AdminApiController) ReadExcel() {
+func (c *AdminApiController) ReadExcel(_ *context.Context) {
 	c.Ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin", c.Ctx.Request.Header.Get("Origin"))
 	defer c.ServeJSON()
 	var resp Response
-	var err error
 
 	file, header, err := c.GetFile("excel")
 
@@ -204,18 +203,16 @@ func (c *AdminApiController) ReadExcel() {
 
 	for _, smallQuestion := range smallQuestions {
 		var topic model.Topic
-		topic.Question_id = int64(smallQuestion.Id)
-		topic.Import_number = int64(len(rows) - 1)
+		topic.QuestionId = int64(smallQuestion.Id)
+		topic.ImportNumber = int64(len(rows) - 1)
 
 		if err := topic.Update(); err != nil {
 			log.Println(err)
 			resp = Response{"30003", "大题导入试卷数更新错误", err}
+			c.Data["json"] = resp
 			return
 		}
 	}
-
-	fmt.Println("bigQuestions: ", bigQuestions)
-	fmt.Println("smallQuestions: ", smallQuestions)
 
 	for _, r := range rows[1:] {
 		row := make([]string, len(rows[0]))
@@ -226,7 +223,7 @@ func (c *AdminApiController) ReadExcel() {
 		for _, bigQuestion := range bigQuestions {
 			var testPaper model.TestPaper
 			testPaper.TicketId = row[0]
-			testPaper.Question_id = int64(bigQuestion.Id)
+			testPaper.QuestionId = int64(bigQuestion.Id)
 			testPaper.Mobile = row[1]
 			isParent, _ := strconv.Atoi(row[2])
 			testPaper.IsParent = int64(isParent)
@@ -256,11 +253,11 @@ func (c *AdminApiController) ReadExcel() {
 				fmt.Println("src: ", src)
 
 				var testPaperInfo model.TestPaperInfo
-				testPaperInfo.Pic_src = src
+				testPaperInfo.PicSrc = src
 				fmt.Println("testId: ", testId)
 
-				testPaperInfo.Test_id = testId
-				testPaperInfo.Question_detail_id = int64(smallQuestions[smallIndex].Id)
+				testPaperInfo.TestId = testId
+				testPaperInfo.QuestionDetailId = int64(smallQuestions[smallIndex].Id)
 
 				if err := testPaperInfo.Insert(); err != nil {
 					log.Println(err)
@@ -300,7 +297,7 @@ type question struct {
 2.样卷导入
 */
 
-func (c *AdminApiController) ReadExampleExcel() {
+func (c *AdminApiController) ReadExampleExcel(_ *context.Context) {
 	c.Ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin", c.Ctx.Request.Header.Get("Origin"))
 	defer c.ServeJSON()
 	var resp Response
@@ -352,11 +349,11 @@ func (c *AdminApiController) ReadExampleExcel() {
 				var testPaperInfo model.TestPaperInfo
 				var testPaper model.TestPaper
 
-				testPaperInfo.Question_detail_id = questionDetailId
+				testPaperInfo.QuestionDetailId = questionDetailId
 				s := rows[i][j]
 				// split := strings.Split(s, "\n")
 				src := UploadPic(rows[i][0]+rows[0][j], s)
-				testPaperInfo.Pic_src = src
+				testPaperInfo.PicSrc = src
 				// 查看大题试卷是否已经导入
 				has, err := testPaper.GetTestPaper(testId)
 				if err != nil {
@@ -365,9 +362,9 @@ func (c *AdminApiController) ReadExampleExcel() {
 
 				// 导入大题试卷
 				if !has {
-					testPaper.Test_id = testId
-					testPaper.Question_id = questionId
-					testPaper.Question_status = 6
+					testPaper.TestId = testId
+					testPaper.QuestionId = questionId
+					testPaper.QuestionStatus = 6
 					testPaper.Candidate = name
 					_, err = testPaper.Insert()
 					if err != nil {
@@ -378,7 +375,7 @@ func (c *AdminApiController) ReadExampleExcel() {
 					}
 				}
 				// 导入小题试卷
-				testPaperInfo.Test_id = testId
+				testPaperInfo.TestId = testId
 				err = testPaperInfo.Insert()
 				if err != nil {
 					log.Println(err)
@@ -398,8 +395,8 @@ func (c *AdminApiController) ReadExampleExcel() {
 		questionIdStr := questionIds[0]
 		questionId, _ := strconv.ParseInt(questionIdStr, 10, 64)
 		var topic model.Topic
-		topic.Question_id = questionId
-		topic.Import_number = int64(len(rows) - 1)
+		topic.QuestionId = questionId
+		topic.ImportNumber = int64(len(rows) - 1)
 		err = topic.Update()
 		if err != nil {
 			log.Println(err)
@@ -425,7 +422,7 @@ func (c *AdminApiController) ReadExampleExcel() {
 	c.Data["json"] = resp
 
 }
-func (c *AdminApiController) ReadAnswerExcel() {
+func (c *AdminApiController) ReadAnswerExcel(_ *context.Context) {
 	c.Ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin", c.Ctx.Request.Header.Get("Origin"))
 	defer c.ServeJSON()
 	var resp Response
@@ -477,11 +474,11 @@ func (c *AdminApiController) ReadAnswerExcel() {
 				var testPaperInfo model.TestPaperInfo
 				var testPaper model.TestPaper
 
-				testPaperInfo.Question_detail_id = questionDetailId
+				testPaperInfo.QuestionDetailId = questionDetailId
 				s := rows[i][j]
 				// split := strings.Split(s, "\n")
 				src := UploadPic(rows[i][0]+rows[0][j], s)
-				testPaperInfo.Pic_src = src
+				testPaperInfo.PicSrc = src
 				// 查看大题试卷是否已经导入
 				has, err := testPaper.GetTestPaper(testId)
 				if err != nil {
@@ -490,9 +487,9 @@ func (c *AdminApiController) ReadAnswerExcel() {
 
 				// 导入大题试卷
 				if !has {
-					testPaper.Test_id = testId
-					testPaper.Question_id = questionId
-					testPaper.Question_status = 5
+					testPaper.TestId = testId
+					testPaper.QuestionId = questionId
+					testPaper.QuestionStatus = 5
 					testPaper.Candidate = name
 					_, err = testPaper.Insert()
 					if err != nil {
@@ -503,7 +500,7 @@ func (c *AdminApiController) ReadAnswerExcel() {
 					}
 				}
 				// 导入小题试卷
-				testPaperInfo.Test_id = testId
+				testPaperInfo.TestId = testId
 				err = testPaperInfo.Insert()
 				if err != nil {
 					log.Println(err)
@@ -523,8 +520,8 @@ func (c *AdminApiController) ReadAnswerExcel() {
 		questionIdStr := questionIds[0]
 		questionId, _ := strconv.ParseInt(questionIdStr, 10, 64)
 		var topic model.Topic
-		topic.Question_id = questionId
-		topic.Import_number = int64(len(rows) - 1)
+		topic.QuestionId = questionId
+		topic.ImportNumber = int64(len(rows) - 1)
 		err = topic.Update()
 		if err != nil {
 			log.Println(err)
@@ -555,7 +552,7 @@ func (c *AdminApiController) ReadAnswerExcel() {
 3.大题列表
 */
 
-func (c *AdminApiController) QuestionBySubList() {
+func (c *AdminApiController) QuestionBySubList(_ *context.Context) {
 	defer c.ServeJSON()
 	var requestBody QuestionBySubList
 	var resp Response
@@ -584,8 +581,8 @@ func (c *AdminApiController) QuestionBySubList() {
 	var questions = make([]QuestionBySubListVO, len(topics))
 	for i := 0; i < len(topics); i++ {
 
-		questions[i].QuestionId = topics[i].Question_id
-		questions[i].QuestionName = topics[i].Question_name
+		questions[i].QuestionId = topics[i].QuestionId
+		questions[i].QuestionName = topics[i].QuestionName
 
 	}
 
@@ -600,7 +597,7 @@ func (c *AdminApiController) QuestionBySubList() {
 4.试卷参数导入
 */
 
-func (c *AdminApiController) InsertTopic() {
+func (c *AdminApiController) InsertTopic(_ *context.Context) {
 
 	defer c.ServeJSON()
 	var requestBody AddTopic
@@ -642,13 +639,13 @@ func (c *AdminApiController) InsertTopic() {
 	}
 	// 添加topic
 	var topic model.Topic
-	topic.Question_name = topicName
-	topic.Score_type = scoreType
-	topic.Question_score = score
-	topic.Standard_error = standardError
-	topic.Subject_name = subjectName
-	topic.Import_time = time.Now()
-	topic.Subject_Id = subjectId
+	topic.QuestionName = topicName
+	topic.ScoreType = scoreType
+	topic.QuestionScore = score
+	topic.StandardError = standardError
+	topic.SubjectName = subjectName
+	topic.ImportTime = time.Now()
+	topic.SubjectId = subjectId
 
 	err, questionId := model.InsertTopic(&topic)
 	if err != nil {
@@ -663,10 +660,10 @@ func (c *AdminApiController) InsertTopic() {
 
 	for i := 0; i < len(details); i++ {
 		var subTopic model.SubTopic
-		subTopic.Question_detail_name = details[i].TopicDetailName
-		subTopic.Question_detail_score = details[i].DetailScore
-		subTopic.Score_type = details[i].DetailScoreTypes
-		subTopic.Question_id = questionId
+		subTopic.QuestionDetailName = details[i].TopicDetailName
+		subTopic.QuestionDetailScore = details[i].DetailScore
+		subTopic.ScoreType = details[i].DetailScoreTypes
+		subTopic.QuestionId = questionId
 		err, questionDetailId := model.InsertSubTopic(&subTopic)
 		if err != nil {
 			log.Println(err)
@@ -690,7 +687,7 @@ func (c *AdminApiController) InsertTopic() {
 5.科目选择
 */
 
-func (c *AdminApiController) SubjectList() {
+func (c *AdminApiController) SubjectList(_ *context.Context) {
 
 	defer c.ServeJSON()
 	var requestBody SubjectList
@@ -733,7 +730,7 @@ func (c *AdminApiController) SubjectList() {
 /**
 6.试卷分配界面
 */
-func (c *AdminApiController) DistributionInfo() {
+func (c *AdminApiController) DistributionInfo(_ *context.Context) {
 
 	defer c.ServeJSON()
 	var requestBody DistributionInfo
@@ -755,7 +752,7 @@ func (c *AdminApiController) DistributionInfo() {
 	var distributionInfoVO DistributionInfoVO
 	// 获取试卷导入数量
 	var topic model.Topic
-	topic.Question_id = questionId
+	topic.QuestionId = questionId
 	err = topic.GetTopic(questionId)
 	if err != nil {
 		log.Println(err)
@@ -764,10 +761,10 @@ func (c *AdminApiController) DistributionInfo() {
 		return
 	}
 
-	scoreType := topic.Score_type
+	scoreType := topic.ScoreType
 	distributionInfoVO.ScoreType = scoreType
 
-	importNumber := topic.Import_number
+	importNumber := topic.ImportNumber
 	distributionInfoVO.ImportTestNumber = importNumber
 	// 获取试卷未分配数量
 	// 查询相应试卷
@@ -801,7 +798,7 @@ func (c *AdminApiController) DistributionInfo() {
 /**
 7.试卷分配
 */
-func (c *AdminApiController) Distribution() {
+func (c *AdminApiController) Distribution(_ *context.Context) {
 
 	defer c.ServeJSON()
 	var requestBody Distribution
@@ -823,7 +820,7 @@ func (c *AdminApiController) Distribution() {
 
 	// 是否需要二次阅卷
 	var topic model.Topic
-	topic.Question_id = questionId
+	topic.QuestionId = questionId
 	err = topic.GetTopic(questionId)
 	if err != nil {
 		log.Println(err)
@@ -831,7 +828,7 @@ func (c *AdminApiController) Distribution() {
 		c.Data["json"] = resp
 		return
 	}
-	score_type := topic.Score_type
+	score_type := topic.ScoreType
 
 	// 查询相应试卷
 	papers := make([]model.TestPaper, 0)
@@ -869,7 +866,7 @@ func (c *AdminApiController) Distribution() {
 				break
 			} else {
 				// 修改testPaper改为已分配
-				testPapers[ii].Correcting_status = 1
+				testPapers[ii].CorrectingStatus = 1
 				err := testPapers[ii].Update()
 				if err != nil {
 					log.Println(err)
@@ -880,10 +877,10 @@ func (c *AdminApiController) Distribution() {
 
 				// 添加试卷未批改记录
 				var underCorrectedPaper model.UnderCorrectedPaper
-				underCorrectedPaper.Test_id = testPapers[ii].Test_id
-				underCorrectedPaper.Question_id = testPapers[ii].Question_id
-				underCorrectedPaper.Test_question_type = 1
-				underCorrectedPaper.User_id = users[j].User_id
+				underCorrectedPaper.TestId = testPapers[ii].TestId
+				underCorrectedPaper.QuestionId = testPapers[ii].QuestionId
+				underCorrectedPaper.TestQuestionType = 1
+				underCorrectedPaper.UserId = users[j].UserId
 				err = underCorrectedPaper.Save()
 				if err != nil {
 					log.Println(err)
@@ -910,7 +907,7 @@ func (c *AdminApiController) Distribution() {
 					break
 				} else {
 					// 修改testPaper改为已分配
-					testPapers[ii].Correcting_status = 1
+					testPapers[ii].CorrectingStatus = 1
 					err := testPapers[ii].Update()
 					if err != nil {
 						log.Println(err)
@@ -921,10 +918,10 @@ func (c *AdminApiController) Distribution() {
 
 					// 添加试卷未批改记录
 					var underCorrectedPaper model.UnderCorrectedPaper
-					underCorrectedPaper.Test_id = testPapers[ii].Test_id
-					underCorrectedPaper.Question_id = testPapers[ii].Question_id
-					underCorrectedPaper.Test_question_type = 2
-					underCorrectedPaper.User_id = users[j].User_id
+					underCorrectedPaper.TestId = testPapers[ii].TestId
+					underCorrectedPaper.QuestionId = testPapers[ii].QuestionId
+					underCorrectedPaper.TestQuestionType = 2
+					underCorrectedPaper.UserId = users[j].UserId
 					err = underCorrectedPaper.Save()
 					if err != nil {
 						log.Println(err)
@@ -945,9 +942,9 @@ func (c *AdminApiController) Distribution() {
 	for i := 0; i < userNumber; i++ {
 		// 添加试卷分配表
 		var paperDistribution model.PaperDistribution
-		paperDistribution.Test_distribution_number = int64(countUser[i])
-		paperDistribution.User_id = users[i].User_id
-		paperDistribution.Question_id = questionId
+		paperDistribution.TestDistributionNumber = int64(countUser[i])
+		paperDistribution.UserId = users[i].UserId
+		paperDistribution.QuestionId = questionId
 		err := paperDistribution.Save()
 		if err != nil {
 			log.Println(err)
@@ -981,7 +978,7 @@ func (c *AdminApiController) Distribution() {
 /**
 8.图片显示
 */
-func (c *AdminApiController) Pic() {
+func (c *AdminApiController) Pic(_ *context.Context) {
 	defer c.ServeJSON()
 	var requestBody ReadFile
 	var resp Response
@@ -1055,7 +1052,7 @@ func cutUser(oldData []model.User, n int) (newData []model.User) {
 9.大题展示列表
 */
 
-func (c *AdminApiController) TopicList() {
+func (c *AdminApiController) TopicList(_ *context.Context) {
 	defer c.ServeJSON()
 	var requestBody TopicList
 	var resp Response
@@ -1084,16 +1081,16 @@ func (c *AdminApiController) TopicList() {
 	var topicVOList = make([]TopicVO, len(topics))
 	for i := 0; i < len(topics); i++ {
 
-		topicVOList[i].SubjectName = topics[i].Subject_name
-		topicVOList[i].TopicName = topics[i].Question_name
-		topicVOList[i].Score = topics[i].Question_score
-		topicVOList[i].StandardError = topics[i].Standard_error
-		topicVOList[i].ScoreType = topics[i].Score_type
-		topicVOList[i].TopicId = topics[i].Question_id
-		topicVOList[i].ImportTime = topics[i].Import_time
+		topicVOList[i].SubjectName = topics[i].SubjectName
+		topicVOList[i].TopicName = topics[i].QuestionName
+		topicVOList[i].Score = topics[i].QuestionScore
+		topicVOList[i].StandardError = topics[i].StandardError
+		topicVOList[i].ScoreType = topics[i].ScoreType
+		topicVOList[i].TopicId = topics[i].QuestionId
+		topicVOList[i].ImportTime = topics[i].ImportTime
 
 		subTopics := make([]model.SubTopic, 0)
-		model.FindSubTopicsByQuestionId(topics[i].Question_id, &subTopics)
+		model.FindSubTopicsByQuestionId(topics[i].QuestionId, &subTopics)
 		if err != nil {
 			log.Println(err)
 			resp = Response{"30022", "获取小题参数设置记录表失败  ", err}
@@ -1102,10 +1099,10 @@ func (c *AdminApiController) TopicList() {
 		}
 		subTopicVOS := make([]SubTopicVO, len(subTopics))
 		for j := 0; j < len(subTopics); j++ {
-			subTopicVOS[j].SubTopicId = subTopics[j].Question_detail_id
-			subTopicVOS[j].SubTopicName = subTopics[j].Question_detail_name
-			subTopicVOS[j].Score = subTopics[j].Question_detail_score
-			subTopicVOS[j].ScoreDistribution = subTopics[j].Score_type
+			subTopicVOS[j].SubTopicId = subTopics[j].QuestionDetailId
+			subTopicVOS[j].SubTopicName = subTopics[j].QuestionDetailName
+			subTopicVOS[j].Score = subTopics[j].QuestionDetailScore
+			subTopicVOS[j].ScoreDistribution = subTopics[j].ScoreType
 		}
 		topicVOList[i].SubTopicVOList = subTopicVOS
 	}
@@ -1120,7 +1117,7 @@ func (c *AdminApiController) TopicList() {
 /**
 DistributionRecord
 */
-func (c *AdminApiController) DistributionRecord() {
+func (c *AdminApiController) DistributionRecord(_ *context.Context) {
 	defer c.ServeJSON()
 	var requestBody DistributionRecord
 	var resp Response
@@ -1149,17 +1146,17 @@ func (c *AdminApiController) DistributionRecord() {
 	var distributionRecordList = make([]DistributionRecordVO, len(topics))
 	for i := 0; i < len(topics); i++ {
 
-		distributionRecordList[i].TopicId = topics[i].Question_id
-		distributionRecordList[i].TopicName = topics[i].Question_name
-		distributionRecordList[i].ImportNumber = topics[i].Import_number
-		distributionTestNumber, err := model.CountTestDistributionNumberByQuestionId(topics[i].Question_id)
+		distributionRecordList[i].TopicId = topics[i].QuestionId
+		distributionRecordList[i].TopicName = topics[i].QuestionName
+		distributionRecordList[i].ImportNumber = topics[i].ImportNumber
+		distributionTestNumber, err := model.CountTestDistributionNumberByQuestionId(topics[i].QuestionId)
 		if err != nil {
 			log.Println(err)
 			resp = Response{"30024", "获取试卷分配记录表失败，统计试卷已分配数失败  ", err}
 			c.Data["json"] = resp
 			return
 		}
-		distributionUserNumber, err := model.CountUserDistributionNumberByQuestionId(topics[i].Question_id)
+		distributionUserNumber, err := model.CountUserDistributionNumberByQuestionId(topics[i].QuestionId)
 		if err != nil {
 			log.Println(err)
 			resp = Response{"30025", "获取试卷分配记录表失败，统计用户已分配数失败  ", err}
@@ -1182,7 +1179,7 @@ func (c *AdminApiController) DistributionRecord() {
 试卷删除
 */
 
-func (c *AdminApiController) DeleteTest() {
+func (c *AdminApiController) DeleteTest(_ *context.Context) {
 
 	defer c.ServeJSON()
 	var requestBody DeleteTest
@@ -1208,9 +1205,9 @@ func (c *AdminApiController) DeleteTest() {
 		for j := 0; j < len(subTopics); j++ {
 			subTopic := subTopics[j]
 			testPaperInfos := make([]model.TestPaperInfo, 0)
-			model.FindTestPaperInfoByQuestionDetailId(subTopic.Question_detail_id, &testPaperInfos)
+			model.FindTestPaperInfoByQuestionDetailId(subTopic.QuestionDetailId, &testPaperInfos)
 			for k := 0; k < len(testPaperInfos); k++ {
-				picName := testPaperInfos[k].Pic_src
+				picName := testPaperInfos[k].PicSrc
 				src := "./img/" + picName
 				os.Remove(src)
 				testPaperInfos[k].Delete()
@@ -1228,5 +1225,72 @@ func (c *AdminApiController) DeleteTest() {
 	data["data"] = nil
 	resp = Response{"10000", "OK", data}
 	c.Data["json"] = resp
+
+}
+
+// 导入用户
+func (c *AdminApiController) ReadUserExcel(_ *context.Context) {
+	c.Ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin", c.Ctx.Request.Header.Get("Origin"))
+	defer c.ServeJSON()
+
+	file, header, err := c.GetFile("excel")
+
+	if err != nil {
+		log.Println(err)
+		c.Data["json"] = Response{Status: "10001", Msg: "cannot unmarshal", Data: err}
+		return
+	}
+	tempFile, err := os.Create(header.Filename)
+	io.Copy(tempFile, file)
+	f, err := excelize.OpenFile(header.Filename)
+	if err != nil {
+		log.Println(err)
+		c.Data["json"] = Response{Status: "30000", Msg: "excel 表导入错误", Data: err}
+		return
+	}
+
+	// Get all the rows in the Sheet1.
+	rows, err := f.GetRows("Sheet1")
+	if err != nil {
+		log.Println(err)
+		c.Data["json"] = Response{Status: "30000", Msg: "excel 表导入错误", Data: err}
+		return
+	}
+
+	for _, r := range rows[1:] {
+		row := make([]string, len(rows[0]))
+		copy(row, r)
+		var user model.User
+		user.UserName = row[0]
+		user.ExaminerCount = row[1]
+		user.Password = row[2]
+		user.IdCard = row[3]
+		user.Address = row[4]
+		user.Tel = row[5]
+		user.Email = row[6]
+		userType, _ := strconv.Atoi(row[7])
+		user.UserType = int64(userType)
+		user.SubjectName = row[8]
+		if err := user.Insert(); err != nil {
+			log.Println(err)
+			c.Data["json"] = Response{Status: "30001", Msg: "用户导入错误", Data: err}
+			return
+		}
+
+	}
+
+	err = tempFile.Close()
+	if err != nil {
+		log.Println(err)
+	}
+	err = os.Remove(header.Filename)
+	if err != nil {
+		log.Println(err)
+	}
+
+	// ------------------------------------------------
+	data := make(map[string]interface{})
+	data["data"] = nil
+	c.Data["json"] = Response{Status: "10000", Msg: "OK", Data: data}
 
 }

@@ -7,11 +7,11 @@ import (
 )
 
 type SubTopic struct {
-	Question_detail_id    int64  `json:"question_detail_id" xorm:"pk autoincr"`
-	Question_detail_name  string `json:"question_detail_name"`
-	Question_id           int64  `json:"question_id"`
-	Question_detail_score int64  `json:"question_detail_score"`
-	Score_type            string `json:"score_type"`
+	QuestionDetailId    int64  `json:"question_detail_id" xorm:"pk autoincr"`
+	QuestionDetailName  string `json:"question_detail_name"`
+	QuestionId          int64  `json:"question_id"`
+	QuestionDetailScore int64  `json:"question_detail_score"`
+	ScoreType           string `json:"score_type"`
 }
 
 func FindSubTopicsByQuestionId(id int64, st *[]SubTopic) error {
@@ -44,5 +44,5 @@ func InsertSubTopic(subTopic *SubTopic) (err1 error, questionDetailId int64) {
 		log.Println("GetTopicList err ")
 	}
 
-	return err, subTopic.Question_detail_id
+	return err, subTopic.QuestionDetailId
 }

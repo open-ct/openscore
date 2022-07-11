@@ -3,7 +3,7 @@ package test
 import (
 	"net/http"
 	"net/http/httptest"
-	_ "openscore/router"
+	_ "openscore/routers"
 	"path/filepath"
 	"runtime"
 	"testing"

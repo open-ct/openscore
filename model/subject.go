@@ -5,7 +5,7 @@ import (
 )
 
 type Subject struct {
-	SubjectId   int64  `json:"subjectId" xorm:"pk autoincr"`
+	SubjectId   int64  `json:"subject_id" xorm:"pk autoincr"`
 	SubjectName string `json:"subject_name"`
 }
 

@@ -9,8 +9,6 @@ import (
 )
 
 func init() {
-	// var scor score.TestPaperApiController
-	// beego.Get("/", scor.Display)
 	beego.Router("/", &score.TestPaperApiController{})
 	beego.Router("/api/login", &controllers.ApiController{}, "post:Login")
 	beego.Router("/api/logout", &controllers.ApiController{}, "post:Logout")
@@ -31,8 +29,10 @@ func init() {
 	/**
 	  chen :阅卷组长端
 	*/
+	var super supervisor.SupervisorApiController
 	// beego.Router("/openct/marking/supervisor/question/list", &supervisor.SupervisorApiController{}, "post:QuestionList")
 	beego.Router("/openct/marking/supervisor/user/info", &supervisor.SupervisorApiController{}, "post:UserInfo")
+	beego.Post("/openct/marking/supervisor/user/info", super.UserInfo)
 	beego.Router("/openct/marking/supervisor/teacher/monitoring", &supervisor.SupervisorApiController{}, "post:TeacherMonitoring")
 	beego.Router("/openct/marking/supervisor/score/distribution", &supervisor.SupervisorApiController{}, "post:ScoreDistribution")
 	beego.Router("/openct/marking/supervisor/question/teacher/list", &supervisor.SupervisorApiController{}, "post:TeachersByQuestion")
@@ -54,6 +54,7 @@ func init() {
 	// beego.Router("/openct/marking/admin/uploadPic",&admin.AdminApiController{},"post:UploadPic")
 	beego.Router("/openct/marking/admin/readExcel", &admin.AdminApiController{}, "post:ReadExcel")
 	beego.Router("/openct/marking/admin/readExcel", &admin.AdminApiController{}, "OPTIONS:ReadExcel")
+	beego.Router("/openct/marking/admin/readUserExcel", &admin.AdminApiController{}, "post:ReadUserExcel")
 	beego.Router("/openct/marking/admin/readExampleExcel", &admin.AdminApiController{}, "post:ReadExampleExcel")
 	beego.Router("/openct/marking/admin/readExampleExcel", &admin.AdminApiController{}, "OPTIONS:ReadExampleExcel")
 	beego.Router("/openct/marking/admin/readAnswerExcel", &admin.AdminApiController{}, "post:ReadAnswerExcel")

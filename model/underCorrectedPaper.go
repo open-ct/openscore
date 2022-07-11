@@ -7,17 +7,17 @@ import (
 )
 
 type UnderCorrectedPaper struct {
-	UnderCorrected_id  int64  `json:"underCorrected_id" xorm:"pk autoincr"`
-	User_id            string `json:"user_id"`
-	Test_id            int64  `json:"test_id"`
-	Question_id        int64  `json:"question_id"`
-	Test_question_type int64  `json:"test_question_type"`
-	Problem_type       int64  `json:"problem_type" xorm:"default(-1)"`
-	Problem_message    string `json:"test_message"`
-	Self_score_id      string `json:"self_score_id"`
+	UnderCorrectedId int64  `json:"under_corrected_id" xorm:"pk autoincr"`
+	UserId           int64  `json:"user_id"`
+	TestId           int64  `json:"test_id"`
+	QuestionId       int64  `json:"question_id"`
+	TestQuestionType int64  `json:"test_question_type"`
+	ProblemType      int64  `json:"problem_type" xorm:"default(-1)"`
+	ProblemMessage   string `json:"test_message"`
+	SelfScoreId      int64  `json:"self_score_id"`
 }
 
-func (u *UnderCorrectedPaper) GetUnderCorrectedPaper(userId string, testId int64) error {
+func (u *UnderCorrectedPaper) GetUnderCorrectedPaper(userId int64, testId int64) error {
 	has, err := x.Where("test_id=?", testId).Where("user_id =?", userId).Get(u)
 	if !has || err != nil {
 		log.Println("could not find under corrected paper")
@@ -27,21 +27,21 @@ func (u *UnderCorrectedPaper) GetUnderCorrectedPaper(userId string, testId int64
 }
 
 func (u *UnderCorrectedPaper) Delete() error {
-	code, err := x.Where(builder.Eq{"test_id": u.Test_id, "user_id": u.User_id}).Delete(u)
+	code, err := x.Where(builder.Eq{"test_id": u.TestId, "user_id": u.UserId}).Delete(u)
 	if code == 0 || err != nil {
 		log.Println("delete fail")
 	}
 	return err
 }
 func (u *UnderCorrectedPaper) SupervisorDelete() error {
-	code, err := x.Where(builder.Eq{"test_id": u.Test_id}).Where(" test_question_type =4 or  test_question_type =6 or  test_question_type =7").Delete(u)
+	code, err := x.Where(builder.Eq{"test_id": u.TestId}).Where(" test_question_type =4 or  test_question_type =6 or  test_question_type =7").Delete(u)
 	if code == 0 || err != nil {
 		log.Println("delete fail")
 	}
 	return err
 }
 func (u *UnderCorrectedPaper) SelfMarkDelete() error {
-	code, err := x.Where(builder.Eq{"test_id": u.Test_id}).Where(" test_question_type =0 ").Delete(u)
+	code, err := x.Where(builder.Eq{"test_id": u.TestId}).Where(" test_question_type =0 ").Delete(u)
 	if code == 0 || err != nil {
 		log.Println("delete fail")
 	}
@@ -59,7 +59,7 @@ func (u *UnderCorrectedPaper) Save() error {
 
 func (u *UnderCorrectedPaper) IsDuplicate() (bool, error) {
 	var temp UnderCorrectedPaper
-	has, err := x.Where(builder.Eq{"test_id": u.Test_id, "problem_type": u.Problem_type}).Get(&temp)
+	has, err := x.Where(builder.Eq{"test_id": u.TestId, "problem_type": u.ProblemType}).Get(&temp)
 	if !has || err != nil {
 		log.Println(err)
 	}
@@ -73,7 +73,7 @@ func GetDistributedPaperByUserId(id string, up *[]UnderCorrectedPaper) error {
 	}
 	return err
 }
-func CountRemainingTestNumberByUserId(questionId int64, userId string) (count int64, err error) {
+func CountRemainingTestNumberByUserId(questionId int64, userId int64) (count int64, err error) {
 	underCorrectedPaper := new(UnderCorrectedPaper)
 	count, err1 := x.Where("question_id = ?", questionId).Where("user_id=?", userId).Where("test_question_type=1 or test_question_type=2").Count(underCorrectedPaper)
 	if err != nil {
@@ -106,7 +106,7 @@ func CountUnScoreTestNumberByQuestionId(questionId int64) (count int64, err erro
 	return count, err1
 }
 
-func GetUnderCorrectedPaperByUserIdAndTestId(underCorrectedPaper *UnderCorrectedPaper, userId string, testId int64) error {
+func GetUnderCorrectedPaperByUserIdAndTestId(underCorrectedPaper *UnderCorrectedPaper, userId int64, testId int64) error {
 
 	_, err := x.Where("user_id=?", userId).Where("test_id =?", testId).Where(" test_question_type !=?", 0).Get(underCorrectedPaper)
 	if err != nil {
@@ -122,7 +122,7 @@ func GetUnderCorrectedSupervisorPaperByTestQuestionTypeAndTestId(underCorrectedP
 	}
 	return err
 }
-func GetSelfScorePaperByTestQuestionTypeAndTestId(underCorrectedPaper *UnderCorrectedPaper, testId int64, userId string) error {
+func GetSelfScorePaperByTestQuestionTypeAndTestId(underCorrectedPaper *UnderCorrectedPaper, testId int64, userId int64) error {
 
 	_, err := x.Where("test_id =?", testId).Where(" test_question_type =0").Where("user_Id = ?", userId).Get(underCorrectedPaper)
 	if err != nil {
@@ -180,7 +180,7 @@ func FindProblemUnderCorrectedList(problemUnderCorrectedPaper *[]UnderCorrectedP
 	}
 	return err
 }
-func GetDistributedTestIdPaperByUserId(id string, up *[]int64) error {
+func GetDistributedTestIdPaperByUserId(id int64, up *[]int64) error {
 	err := x.Table("under_corrected_paper").Select("test_id").Where("user_id = ?", id).Where(" test_question_type=0 or test_question_type=1 or test_question_type=2 or test_question_type=3").Find(up)
 	if err != nil {
 		log.Panic(err)
@@ -188,7 +188,7 @@ func GetDistributedTestIdPaperByUserId(id string, up *[]int64) error {
 	}
 	return err
 }
-func GetUnMarkSelfTestIdPaperByUserId(id string, up *[]int64) error {
+func GetUnMarkSelfTestIdPaperByUserId(id int64, up *[]int64) error {
 	err := x.Table("under_corrected_paper").Select("test_id").Where("user_id = ?", id).Where(" test_question_type=0 ").Find(up)
 	if err != nil {
 		log.Panic(err)

@@ -11,7 +11,7 @@ type UserInfoVO struct {
 }
 
 type TeacherMonitoringVO struct {
-	UserId                 string
+	UserId                 int64
 	UserName               string
 	TestDistributionNumber int64
 	TestSuccessNumber      float64
@@ -31,7 +31,7 @@ type ScoreDistributionVO struct {
 }
 
 type TeacherVO struct {
-	UserId   string
+	UserId   int64
 	UserName string
 }
 
@@ -44,13 +44,13 @@ type SelfScoreRecordVO struct {
 	StandardError int64
 }
 type ScoreAverageVO struct {
-	UserId   string
+	UserId   int64
 	UserName string
 	Average  float64
 }
 type ProblemUnderCorrectedPaperVO struct {
 	TestId       int64
-	ExaminerId   string
+	ExaminerId   int64
 	ExaminerName string
 	ProblemType  int64
 	ProblemMes   string
@@ -64,13 +64,13 @@ type SelfUnmarkListVO struct {
 
 type ArbitramentTestVO struct {
 	TestId              int64
-	ExaminerFirstId     string
+	ExaminerFirstId     int64
 	ExaminerFirstName   string
 	ExaminerFirstScore  int64
-	ExaminerSecondId    string
+	ExaminerSecondId    int64
 	ExaminerSecondName  string
 	ExaminerSecondScore int64
-	ExaminerThirdId     string
+	ExaminerThirdId     int64
 	ExaminerThirdName   string
 	ExaminerThirdScore  int64
 	PracticeError       int64
@@ -86,7 +86,7 @@ type SelfMarkListVO struct {
 	SelfScore     int64
 	Error         float64
 	StandardError int64
-	Userid        string
+	Userid        int64
 	Name          string
 }
 
@@ -153,7 +153,7 @@ type ScoreProgressVO struct {
 }
 
 type ScoreDeviationVO struct {
-	UserId         string
+	UserId         int64
 	UserName       string
 	DeviationScore float64
 }

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	beego "github.com/beego/beego/v2/server/web"
+	"github.com/beego/beego/v2/server/web/context"
 	"math"
 	. "openscore/controllers"
 	"openscore/model"
@@ -19,7 +20,7 @@ type SupervisorApiController struct {
 /**
 9.大题选择列表
 */
-func (c *SupervisorApiController) QuestionList() {
+func (c *SupervisorApiController) QuestionList(_ *context.Context) {
 	defer c.ServeJSON()
 	var requestBody QuestionList
 	var resp Response
@@ -35,9 +36,8 @@ func (c *SupervisorApiController) QuestionList() {
 	// ----------------------------------------------------
 	// 获取大题列表
 	var user model.User
-	user.User_id = supervisorId
 	user.GetUser(supervisorId)
-	subjectName := user.Subject_name
+	subjectName := user.SubjectName
 
 	topics := make([]model.Topic, 0)
 	err = model.FindTopicBySubNameList(&topics, subjectName)
@@ -52,8 +52,8 @@ func (c *SupervisorApiController) QuestionList() {
 	var questions = make([]QuestionListVO, len(topics))
 	for i := 0; i < len(topics); i++ {
 
-		questions[i].QuestionId = topics[i].Question_id
-		questions[i].QuestionName = topics[i].Question_name
+		questions[i].QuestionId = topics[i].QuestionId
+		questions[i].QuestionName = topics[i].QuestionName
 
 	}
 
@@ -67,7 +67,7 @@ func (c *SupervisorApiController) QuestionList() {
 /**
 10.用户登入信息表
 */
-func (c *SupervisorApiController) UserInfo() {
+func (c *SupervisorApiController) UserInfo(_ *context.Context) {
 	defer c.ServeJSON()
 	var requestBody UserInfo
 	var resp Response
@@ -82,7 +82,7 @@ func (c *SupervisorApiController) UserInfo() {
 	supervisorId := requestBody.SupervisorId
 
 	// ----------------------------------------------------
-	user := model.User{User_id: supervisorId}
+	user := model.User{UserId: supervisorId}
 	err = user.GetUser(supervisorId)
 	if err != nil {
 		resp = Response{"20001", "获取用户信息失败", err}
@@ -90,8 +90,8 @@ func (c *SupervisorApiController) UserInfo() {
 		return
 	}
 	var userInfoVO UserInfoVO
-	userInfoVO.UserName = user.User_name
-	userInfoVO.SubjectName = user.Subject_name
+	userInfoVO.UserName = user.UserName
+	userInfoVO.SubjectName = user.SubjectName
 
 	// --------------------------------------------------
 
@@ -104,7 +104,7 @@ func (c *SupervisorApiController) UserInfo() {
 /**
 8.教师监控页面
 */
-func (c *SupervisorApiController) TeacherMonitoring() {
+func (c *SupervisorApiController) TeacherMonitoring(_ *context.Context) {
 	defer c.ServeJSON()
 	var requestBody TeacherMonitoring
 	var resp Response
@@ -130,10 +130,10 @@ func (c *SupervisorApiController) TeacherMonitoring() {
 	teacherMonitoringList := make([]TeacherMonitoringVO, len(paperDistributions))
 	for i := 0; i < len(paperDistributions); i++ {
 		// 教师id
-		userId := paperDistributions[i].User_id
+		userId := paperDistributions[i].UserId
 		teacherMonitoringList[i].UserId = userId
 		// 分配试卷数量
-		testDistributionNumber := paperDistributions[i].Test_distribution_number
+		testDistributionNumber := paperDistributions[i].TestDistributionNumber
 		teacherMonitoringList[i].TestDistributionNumber = testDistributionNumber
 		// 试卷失败数
 		failCount, err1 := model.CountFailTestNumberByUserId(userId, questionId)
@@ -156,10 +156,10 @@ func (c *SupervisorApiController) TeacherMonitoring() {
 		teacherMonitoringList[i].TestRemainingNumber = remainingTestNumber
 
 		// 试卷完成数
-		finishCount := paperDistributions[i].Test_distribution_number - failCount - remainingTestNumber
-		teacherMonitoringList[i].TestSuccessNumber = (float64(finishCount))
+		finishCount := paperDistributions[i].TestDistributionNumber - failCount - remainingTestNumber
+		teacherMonitoringList[i].TestSuccessNumber = float64(finishCount)
 		// 用户信息
-		user := model.User{User_id: userId}
+		user := model.User{UserId: userId}
 		err = user.GetUser(userId)
 		if err != nil {
 			resp = Response{"20001", "无法获取用户信息", err}
@@ -167,7 +167,7 @@ func (c *SupervisorApiController) TeacherMonitoring() {
 			return
 		}
 		// 用户名
-		teacherMonitoringList[i].UserName = user.User_name
+		teacherMonitoringList[i].UserName = user.UserName
 		// 是否在线
 		isOnline := user.UserType
 		teacherMonitoringList[i].IsOnline = isOnline
@@ -175,11 +175,11 @@ func (c *SupervisorApiController) TeacherMonitoring() {
 		var onlineTime int64
 		if isOnline == 1 {
 			endingTime := time.Now().Unix()
-			startTime := user.Login_time.Unix()
+			startTime := user.LoginTime.Unix()
 			tempTime := endingTime - startTime
-			onlineTime = user.Online_time + (tempTime)
+			onlineTime = user.OnlineTime + (tempTime)
 		} else {
-			onlineTime = user.Online_time
+			onlineTime = user.OnlineTime
 		}
 		// 平均速度  (秒/份)
 		var markingSpeed float64 = 99999999
@@ -262,7 +262,7 @@ func (c *SupervisorApiController) TeacherMonitoring() {
 /**
 11.分数分布表
 */
-func (c *SupervisorApiController) ScoreDistribution() {
+func (c *SupervisorApiController) ScoreDistribution(_ *context.Context) {
 	defer c.ServeJSON()
 	var requestBody ScoreDistribution
 	var resp Response
@@ -279,14 +279,14 @@ func (c *SupervisorApiController) ScoreDistribution() {
 
 	// ----------------------------------------------------
 	// 求大题满分
-	topic := model.Topic{Question_id: questionId}
+	topic := model.Topic{QuestionId: questionId}
 	err = topic.GetTopic(questionId)
 	if err != nil {
 		resp = Response{"20002", "could not find topic", err}
 		c.Data["json"] = resp
 		return
 	}
-	questionScore := topic.Question_score
+	questionScore := topic.QuestionScore
 	// 求该大题的已批改试卷表
 	scoreRecordList := make([]model.ScoreRecord, 0)
 	err = model.FindFinishScoreRecordListByQuestionId(&scoreRecordList, questionId)
@@ -335,7 +335,7 @@ func (c *SupervisorApiController) ScoreDistribution() {
 /**
 12.大题教师选择列表
 */
-func (c *SupervisorApiController) TeachersByQuestion() {
+func (c *SupervisorApiController) TeachersByQuestion(_ *context.Context) {
 	defer c.ServeJSON()
 	var requestBody TeachersByQuestion
 	var resp Response
@@ -365,15 +365,15 @@ func (c *SupervisorApiController) TeachersByQuestion() {
 
 	// 求教师名和转化输出
 	for i := 0; i < len(paperDistributions); i++ {
-		userId := paperDistributions[i].User_id
-		user := model.User{User_id: userId}
+		userId := paperDistributions[i].UserId
+		user := model.User{UserId: userId}
 		err := user.GetUser(userId)
 		if err != nil {
 			resp = Response{"20001", "could not found user", err}
 			c.Data["json"] = resp
 			return
 		}
-		userName := user.User_name
+		userName := user.UserName
 		teacherVOList[i].UserId = userId
 		teacherVOList[i].UserName = userName
 	}
@@ -420,18 +420,18 @@ func (c *SupervisorApiController) SelfScore() {
 
 	// 求教师名和转化输出
 	for i := 0; i < len(selfScoreRecord); i++ {
-		testId := selfScoreRecord[i].Test_id
+		testId := selfScoreRecord[i].TestId
 		var test model.TestPaper
 		test.GetTestPaperByTestId(testId)
 
 		// 求大题信息 标准误差
 		var topic model.Topic
-		topic.GetTopic(test.Question_id)
-		standardError := topic.Standard_error
+		topic.GetTopic(test.QuestionId)
+		standardError := topic.StandardError
 		var error float64
-		if test.Examiner_first_id == examinerId {
-			selfScoreRecordVOList[i].Score = test.Examiner_first_score
-			selfScoreRecordVOList[i].SelfScore = test.Examiner_first_self_score
+		if test.ExaminerFirstId == examinerId {
+			selfScoreRecordVOList[i].Score = test.ExaminerFirstScore
+			selfScoreRecordVOList[i].SelfScore = test.ExaminerFirstSelfScore
 			selfScoreRecordVOList[i].StandardError = standardError
 
 			error = math.Abs(float64(selfScoreRecordVOList[i].Score - selfScoreRecordVOList[i].SelfScore))
@@ -440,9 +440,9 @@ func (c *SupervisorApiController) SelfScore() {
 			} else {
 				selfScoreRecordVOList[i].IsQualified = 0
 			}
-		} else if test.Examiner_second_id == examinerId {
-			selfScoreRecordVOList[i].Score = test.Examiner_second_score
-			selfScoreRecordVOList[i].SelfScore = test.Examiner_second_self_score
+		} else if test.ExaminerSecondId == examinerId {
+			selfScoreRecordVOList[i].Score = test.ExaminerSecondScore
+			selfScoreRecordVOList[i].SelfScore = test.ExaminerSecondSelfScore
 			selfScoreRecordVOList[i].StandardError = standardError
 			error = math.Abs(float64(selfScoreRecordVOList[i].Score - selfScoreRecordVOList[i].SelfScore))
 			if error <= float64(standardError) {
@@ -450,9 +450,9 @@ func (c *SupervisorApiController) SelfScore() {
 			} else {
 				selfScoreRecordVOList[i].IsQualified = 0
 			}
-		} else if test.Examiner_third_id == examinerId {
-			selfScoreRecordVOList[i].Score = test.Examiner_third_score
-			selfScoreRecordVOList[i].SelfScore = test.Examiner_third_self_score
+		} else if test.ExaminerThirdId == examinerId {
+			selfScoreRecordVOList[i].Score = test.ExaminerThirdScore
+			selfScoreRecordVOList[i].SelfScore = test.ExaminerThirdSelfScore
 			selfScoreRecordVOList[i].StandardError = standardError
 			error = math.Abs(float64(selfScoreRecordVOList[i].Score - selfScoreRecordVOList[i].SelfScore))
 			if error <= float64(standardError) {
@@ -479,7 +479,7 @@ func (c *SupervisorApiController) SelfScore() {
 /**
 14，平均分监控表
 */
-func (c *SupervisorApiController) AverageScore() {
+func (c *SupervisorApiController) AverageScore(_ *context.Context) {
 	defer c.ServeJSON()
 	var requestBody AverageScore
 	var resp Response
@@ -509,15 +509,15 @@ func (c *SupervisorApiController) AverageScore() {
 	// 求教师名和转化输出
 	for i := 0; i < len(paperDistributions); i++ {
 		// 求userId 和userName
-		userId := paperDistributions[i].User_id
-		user := model.User{User_id: userId}
+		userId := paperDistributions[i].UserId
+		user := model.User{UserId: userId}
 		err := user.GetUser(userId)
 		if err != nil {
 			resp = Response{"20001", "could not found user", err}
 			c.Data["json"] = resp
 			return
 		}
-		userName := user.User_name
+		userName := user.UserName
 		scoreAverageVOList[i].UserId = userId
 		scoreAverageVOList[i].UserName = userName
 
@@ -545,14 +545,14 @@ func (c *SupervisorApiController) AverageScore() {
 		scoreAverageVOList[i].Average = averageScore
 
 	}
-	var topic = model.Topic{Question_id: questionId}
+	var topic = model.Topic{QuestionId: questionId}
 	err = topic.GetTopic(questionId)
 	if err != nil {
 		resp = Response{"20000", "GetTopicList err ", err}
 		c.Data["json"] = resp
 		return
 	}
-	var fullScore = topic.Question_score
+	var fullScore = topic.QuestionScore
 	var questionAverageScore = 0.0
 	if count != 0 {
 		questionAverageScore = sumAllTestScore / count
@@ -573,7 +573,7 @@ func (c *SupervisorApiController) AverageScore() {
 /**
 17，问题卷表
 */
-func (c *SupervisorApiController) ProblemTest() {
+func (c *SupervisorApiController) ProblemTest(_ *context.Context) {
 	defer c.ServeJSON()
 	var requestBody ProblemTest
 	var resp Response
@@ -607,22 +607,22 @@ func (c *SupervisorApiController) ProblemTest() {
 	// 求阅卷老师名和转化输出
 	for i := 0; i < len(problemUnderCorrectedPaper); i++ {
 		// 存testId
-		ProblemUnderCorrectedPaperVOList[i].TestId = problemUnderCorrectedPaper[i].Test_id
+		ProblemUnderCorrectedPaperVOList[i].TestId = problemUnderCorrectedPaper[i].TestId
 		// 存userId  userName
-		userId := problemUnderCorrectedPaper[i].User_id
-		user := model.User{User_id: userId}
+		userId := problemUnderCorrectedPaper[i].UserId
+		user := model.User{UserId: userId}
 		err := user.GetUser(userId)
 		if err != nil {
 			resp = Response{"20001", "could not found user", err}
 			c.Data["json"] = resp
 			return
 		}
-		userName := user.User_name
+		userName := user.UserName
 		ProblemUnderCorrectedPaperVOList[i].ExaminerId = userId
 		ProblemUnderCorrectedPaperVOList[i].ExaminerName = userName
 		// 存问题类型
-		ProblemUnderCorrectedPaperVOList[i].ProblemType = problemUnderCorrectedPaper[i].Problem_type
-		ProblemUnderCorrectedPaperVOList[i].ProblemMes = problemUnderCorrectedPaper[i].Problem_message
+		ProblemUnderCorrectedPaperVOList[i].ProblemType = problemUnderCorrectedPaper[i].ProblemType
+		ProblemUnderCorrectedPaperVOList[i].ProblemMes = problemUnderCorrectedPaper[i].ProblemMessage
 
 	}
 
@@ -639,7 +639,7 @@ func (c *SupervisorApiController) ProblemTest() {
 /**
 18，仲裁卷表
 */
-func (c *SupervisorApiController) ArbitramentTest() {
+func (c *SupervisorApiController) ArbitramentTest(_ *context.Context) {
 	defer c.ServeJSON()
 	var requestBody ArbitramentTest
 	var resp Response
@@ -670,19 +670,19 @@ func (c *SupervisorApiController) ArbitramentTest() {
 	// 求阅卷老师名和转化输出
 	for i := 0; i < len(arbitramentUnderCorrectedPaper); i++ {
 		// 存testId
-		var testId = arbitramentUnderCorrectedPaper[i].Test_id
+		var testId = arbitramentUnderCorrectedPaper[i].TestId
 		arbitramentTestVOList[i].TestId = testId
 
 		// 查试卷
 		var testPaper model.TestPaper
-		testPaper.Test_id = testId
+		testPaper.TestId = testId
 
 		testPaper.GetTestPaper(testId)
 		// 查存试卷第一次评分人id
-		var examinerFirstId = testPaper.Examiner_first_id
+		var examinerFirstId = testPaper.ExaminerFirstId
 		arbitramentTestVOList[i].ExaminerFirstId = examinerFirstId
 		// 查第一次评分人
-		firstExaminer := model.User{User_id: examinerFirstId}
+		firstExaminer := model.User{UserId: examinerFirstId}
 		err := firstExaminer.GetUser(examinerFirstId)
 		if err != nil {
 			resp = Response{"20001", "could not found user", err}
@@ -690,16 +690,16 @@ func (c *SupervisorApiController) ArbitramentTest() {
 			return
 		}
 		// 查第一次评分人姓名
-		examinerFirstName := firstExaminer.User_name
+		examinerFirstName := firstExaminer.UserName
 		// 存试卷第一次评分人姓名和分数
 		arbitramentTestVOList[i].ExaminerFirstName = examinerFirstName
-		arbitramentTestVOList[i].ExaminerFirstScore = testPaper.Examiner_first_score
+		arbitramentTestVOList[i].ExaminerFirstScore = testPaper.ExaminerFirstScore
 
 		// 查存试卷第二次评分人id
-		var examinerSecondId = testPaper.Examiner_second_id
+		var examinerSecondId = testPaper.ExaminerSecondId
 		arbitramentTestVOList[i].ExaminerSecondId = examinerSecondId
 		// 查第二次试卷评分人
-		secondExaminer := model.User{User_id: examinerSecondId}
+		secondExaminer := model.User{UserId: examinerSecondId}
 		err = secondExaminer.GetUser(examinerSecondId)
 		if err != nil {
 			resp = Response{"20001", "could not found user", err}
@@ -707,16 +707,16 @@ func (c *SupervisorApiController) ArbitramentTest() {
 			return
 		}
 		// 查第二次评分人姓名
-		secondExaminerName := secondExaminer.User_name
+		secondExaminerName := secondExaminer.UserName
 		// 存第二次评分人姓名和分数
 		arbitramentTestVOList[i].ExaminerSecondName = secondExaminerName
-		arbitramentTestVOList[i].ExaminerSecondScore = testPaper.Examiner_second_score
+		arbitramentTestVOList[i].ExaminerSecondScore = testPaper.ExaminerSecondScore
 
 		// 查存试卷第三次评分人id
-		var examinerThirdId = testPaper.Examiner_third_id
+		var examinerThirdId = testPaper.ExaminerThirdId
 		arbitramentTestVOList[i].ExaminerThirdId = examinerThirdId
 		// 查第二次试卷评分人
-		thirdExaminer := model.User{User_id: examinerThirdId}
+		thirdExaminer := model.User{UserId: examinerThirdId}
 		err = thirdExaminer.GetUser(examinerThirdId)
 		if err != nil {
 			resp = Response{"20001", "could not found user", err}
@@ -724,22 +724,22 @@ func (c *SupervisorApiController) ArbitramentTest() {
 			return
 		}
 		// 查第三次评分人姓名
-		thirdExaminerName := thirdExaminer.User_name
+		thirdExaminerName := thirdExaminer.UserName
 		// 存第三次评分人姓名和分数
 		arbitramentTestVOList[i].ExaminerThirdName = thirdExaminerName
-		arbitramentTestVOList[i].ExaminerThirdScore = testPaper.Examiner_third_score
+		arbitramentTestVOList[i].ExaminerThirdScore = testPaper.ExaminerThirdScore
 		// 查存实际误差
-		arbitramentTestVOList[i].PracticeError = testPaper.Pratice_error
+		arbitramentTestVOList[i].PracticeError = testPaper.PracticeError
 		// 查存标准误差
 		var topic model.Topic
 		topic.GetTopic(questionId)
-		arbitramentTestVOList[i].StandardError = topic.Standard_error
+		arbitramentTestVOList[i].StandardError = topic.StandardError
 
 	}
 	// 查存该题满分
-	var topic = model.Topic{Question_id: questionId}
+	var topic = model.Topic{QuestionId: questionId}
 	topic.GetTopic(questionId)
-	var fullScore = topic.Question_score
+	var fullScore = topic.QuestionScore
 
 	// --------------------------------------------------
 
@@ -755,7 +755,7 @@ func (c *SupervisorApiController) ArbitramentTest() {
 /**
 15.总体进度
 */
-func (c *SupervisorApiController) ScoreProgress() {
+func (c *SupervisorApiController) ScoreProgress(_ *context.Context) {
 	defer c.ServeJSON()
 	var requestBody ScoreProgress
 	var resp Response
@@ -784,16 +784,16 @@ func (c *SupervisorApiController) ScoreProgress() {
 
 	for i := 0; i < len(topics); i++ {
 		// 获取大题id
-		questionId := topics[i].Question_id
+		questionId := topics[i].QuestionId
 		scoreProgressVOList[i].QuestionId = questionId
 		// 获取大题名
-		questionName := topics[i].Question_name
+		questionName := topics[i].QuestionName
 		scoreProgressVOList[i].QuestionName = questionName
 		// 自评率
 		scoreProgressVOList[i].SelfScoreRate = topics[i].SelfScoreRate
 
 		// 获取 任务总量
-		importNumber := topics[i].Import_number
+		importNumber := topics[i].ImportNumber
 		scoreProgressVOList[i].ImportNumber = importNumber
 
 		// 出成绩量
@@ -858,9 +858,9 @@ func (c *SupervisorApiController) ScoreProgress() {
 		var currentUserScoreSum int64 = 0
 
 		for i := 0; i < usersNumber; i++ {
-			userId := users[i].User_id
+			userId := users[i].UserId
 			isOnline := users[i].Status
-			userOnlineTime := users[i].Online_time
+			userOnlineTime := users[i].OnlineTime
 			userRecord := make([]model.ScoreRecord, 0)
 			model.FindFinishTestByUserId(&userRecord, userId, questionId)
 			tempFinishNumber := len(userRecord)
@@ -871,7 +871,7 @@ func (c *SupervisorApiController) ScoreProgress() {
 			if isOnline == 1 {
 				// 计算时间
 				endingTime := time.Now().Unix()
-				startTime := users[i].Login_time.Unix()
+				startTime := users[i].LoginTime.Unix()
 				tempTime := endingTime - startTime
 				userOnlineTime = userOnlineTime + (tempTime)
 
@@ -1167,7 +1167,7 @@ func (c *SupervisorApiController) ScoreProgress() {
 /**
 19.阅卷组长批改试卷
 */
-func (c *SupervisorApiController) SupervisorPoint() {
+func (c *SupervisorApiController) SupervisorPoint(_ *context.Context) {
 	defer c.ServeJSON()
 	var requestBody SupervisorPoint
 	var resp Response
@@ -1208,10 +1208,10 @@ func (c *SupervisorApiController) SupervisorPoint() {
 			return
 		}
 		// 修改试卷详情表
-		testInfo.Leader_id = supervisorId
-		testInfo.Leader_score = score
-		testInfo.Final_score = score
-		testInfo.Final_score_id = supervisorId
+		testInfo.LeaderId = supervisorId
+		testInfo.LeaderScore = score
+		testInfo.FinalScore = score
+		testInfo.FinalScoreId = supervisorId
 		err = testInfo.Update()
 		if err != nil {
 			resp := Response{"10009", "update testPaper fail", err}
@@ -1222,15 +1222,15 @@ func (c *SupervisorApiController) SupervisorPoint() {
 	}
 	// 给试卷表打分
 	_, err = test.GetTestPaper(testId)
-	if err != nil || test.Test_id == 0 {
+	if err != nil || test.TestId == 0 {
 		resp := Response{"10002", "get test paper fail", err}
 		c.Data["json"] = resp
 		return
 	}
-	test.Leader_id = supervisorId
-	test.Leader_score = sum
-	test.Final_score = sum
-	test.Final_score_id = supervisorId
+	test.LeaderId = supervisorId
+	test.LeaderScore = sum
+	test.FinalScore = sum
+	test.FinalScoreId = supervisorId
 	err = test.Update()
 	if err != nil {
 		resp := Response{"10007", "update test fail", err}
@@ -1248,13 +1248,13 @@ func (c *SupervisorApiController) SupervisorPoint() {
 		return
 	}
 	record.Score = sum
-	record.Test_id = testId
-	record.Test_record_type = underTest.Test_question_type
-	record.User_id = supervisorId
-	record.Question_id = underTest.Question_id
-	record.Problem_type = underTest.Problem_type
-	if underTest.Test_question_type != 7 {
-		record.Test_finish = 1
+	record.TestId = testId
+	record.TestRecordType = underTest.TestQuestionType
+	record.UserId = supervisorId
+	record.QuestionId = underTest.QuestionId
+	record.ProblemType = underTest.ProblemType
+	if underTest.TestQuestionType != 7 {
+		record.TestFinish = 1
 	}
 
 	err = record.Save()
@@ -1277,7 +1277,7 @@ func (c *SupervisorApiController) SupervisorPoint() {
 /**
 20.问题卷列表
 */
-func (c *SupervisorApiController) ProblemUnmarkList() {
+func (c *SupervisorApiController) ProblemUnmarkList(_ *context.Context) {
 	defer c.ServeJSON()
 	var requestBody ProblemUnmarkList
 	var resp Response
@@ -1307,7 +1307,7 @@ func (c *SupervisorApiController) ProblemUnmarkList() {
 	// 求阅卷输出
 	for i := 0; i < len(problemUnderCorrectedPaper); i++ {
 		// 存testId
-		ProblemUnmarkVOList[i].TestId = problemUnderCorrectedPaper[i].Test_id
+		ProblemUnmarkVOList[i].TestId = problemUnderCorrectedPaper[i].TestId
 	}
 
 	// --------------------------------------------------
@@ -1323,7 +1323,7 @@ func (c *SupervisorApiController) ProblemUnmarkList() {
 /**
 20.自评卷列表
 */
-func (c *SupervisorApiController) SelfUnmarkList() {
+func (c *SupervisorApiController) SelfUnmarkList(_ *context.Context) {
 	defer c.ServeJSON()
 	var requestBody SelfUnmarkList
 	var resp Response
@@ -1353,7 +1353,7 @@ func (c *SupervisorApiController) SelfUnmarkList() {
 	// 求阅卷输出
 	for i := 0; i < len(selfUnderCorrectedPaper); i++ {
 		// 存testId
-		selfUnmarkVOList[i].TestId = selfUnderCorrectedPaper[i].Test_id
+		selfUnmarkVOList[i].TestId = selfUnderCorrectedPaper[i].TestId
 	}
 
 	// --------------------------------------------------
@@ -1369,7 +1369,7 @@ func (c *SupervisorApiController) SelfUnmarkList() {
 /**
 21.仲裁卷列表
 */
-func (c *SupervisorApiController) ArbitramentUnmarkList() {
+func (c *SupervisorApiController) ArbitramentUnmarkList(_ *context.Context) {
 	defer c.ServeJSON()
 	var requestBody ArbitramentUnmarkList
 	var resp Response
@@ -1399,7 +1399,7 @@ func (c *SupervisorApiController) ArbitramentUnmarkList() {
 
 	for i := 0; i < len(arbitramentUnderCorrectedPaper); i++ {
 		// 存testId
-		var testId = arbitramentUnderCorrectedPaper[i].Test_id
+		var testId = arbitramentUnderCorrectedPaper[i].TestId
 		arbitramentUnmarkListVOList[i].TestId = testId
 	}
 
@@ -1414,7 +1414,7 @@ func (c *SupervisorApiController) ArbitramentUnmarkList() {
 
 // 16标准差
 
-func (c *SupervisorApiController) ScoreDeviation() {
+func (c *SupervisorApiController) ScoreDeviation(_ *context.Context) {
 	defer c.ServeJSON()
 	var requestBody ScoreDeviation
 	var resp Response
@@ -1447,15 +1447,15 @@ func (c *SupervisorApiController) ScoreDeviation() {
 	// 求教师名和转化输出
 	for i := 0; i < len(paperDistributions); i++ {
 		// 求userId 和userName
-		userId := paperDistributions[i].User_id
-		user := model.User{User_id: userId}
+		userId := paperDistributions[i].UserId
+		user := model.User{UserId: userId}
 		err := user.GetUser(userId)
 		if err != nil {
 			resp = Response{"20001", "could not found user", err}
 			c.Data["json"] = resp
 			return
 		}
-		userName := user.User_name
+		userName := user.UserName
 		ScoreDeviationVOList[i].UserId = userId
 		ScoreDeviationVOList[i].UserName = userName
 
@@ -1510,7 +1510,7 @@ func (c *SupervisorApiController) ScoreDeviation() {
 /**
 22.自评卷列表
 */
-func (c *SupervisorApiController) SelfMarkList() {
+func (c *SupervisorApiController) SelfMarkList(_ *context.Context) {
 	defer c.ServeJSON()
 	var requestBody SelfMarkList
 	var resp Response
@@ -1529,7 +1529,7 @@ func (c *SupervisorApiController) SelfMarkList() {
 	// 找到大题标准误差
 	var topic model.Topic
 	topic.GetTopic(questionId)
-	standardError := topic.Standard_error
+	standardError := topic.StandardError
 	// 找到自评卷
 	selfMarkPaper := make([]model.UnderCorrectedPaper, 0)
 	err = model.FindSelfMarkPaperByQuestionId(&selfMarkPaper, questionId)
@@ -1543,28 +1543,28 @@ func (c *SupervisorApiController) SelfMarkList() {
 
 	for i := 0; i < len(selfMarkPaper); i++ {
 		// 存testId
-		testId := selfMarkPaper[i].Test_id
-		selfScoreId := selfMarkPaper[i].Self_score_id
+		testId := selfMarkPaper[i].TestId
+		selfScoreId := selfMarkPaper[i].SelfScoreId
 
 		var test model.TestPaper
 		test.GetTestPaperByTestId(testId)
 
-		if test.Examiner_first_id == selfScoreId {
-			selfMarkVOList[i].Score = test.Examiner_first_score
-			selfMarkVOList[i].SelfScore = test.Examiner_first_self_score
+		if test.ExaminerFirstId == selfScoreId {
+			selfMarkVOList[i].Score = test.ExaminerFirstScore
+			selfMarkVOList[i].SelfScore = test.ExaminerFirstSelfScore
 
-		} else if test.Examiner_second_id == selfScoreId {
-			selfMarkVOList[i].Score = test.Examiner_second_score
-			selfMarkVOList[i].SelfScore = test.Examiner_second_self_score
-		} else if test.Examiner_third_id == selfScoreId {
-			selfMarkVOList[i].Score = test.Examiner_third_score
-			selfMarkVOList[i].SelfScore = test.Examiner_third_self_score
+		} else if test.ExaminerSecondId == selfScoreId {
+			selfMarkVOList[i].Score = test.ExaminerSecondScore
+			selfMarkVOList[i].SelfScore = test.ExaminerSecondSelfScore
+		} else if test.ExaminerThirdId == selfScoreId {
+			selfMarkVOList[i].Score = test.ExaminerThirdScore
+			selfMarkVOList[i].SelfScore = test.ExaminerThirdSelfScore
 		}
 		selfMarkVOList[i].Userid = selfScoreId
 		var user model.User
 		user.GetUser(selfScoreId)
 
-		selfMarkVOList[i].Name = user.User_name
+		selfMarkVOList[i].Name = user.UserName
 		selfMarkVOList[i].TestId = testId
 		selfMarkVOList[i].StandardError = standardError
 		selfMarkVOList[i].Error = math.Abs(float64(selfMarkVOList[i].Score - selfMarkVOList[i].SelfScore))
