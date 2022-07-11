@@ -1,20 +1,20 @@
 package score
 
 import (
-	"openscore/models"
+	"openscore/model"
 	"time"
 )
 
 type SubTopicPlus struct {
-	models.SubTopic
+	model.SubTopic
 	Test_detail_id int64 `json:"test_detail_id"`
 }
 type TestPaperInfoPlus struct {
-	models.TestPaperInfo
+	model.TestPaperInfo
 	PicCode string `json:"picCode"`
 }
 
-type TestDisplay struct {
+type TestDisplayResponse struct {
 	QuestionId   int64               `json:"questionId"`
 	QuestionName string              `json:"questionName"`
 	TestId       int64               `json:"testId"`
@@ -22,25 +22,25 @@ type TestDisplay struct {
 	TestInfos    []TestPaperInfoPlus `json:"testInfos"`
 }
 
-type TestList struct {
+type TestListResponse struct {
 	TestId []int64 `json:"TestIds"`
 }
 
-type TestAnswer struct {
+type TestAnswerResponse struct {
 	Pics []string `json:"Pics"`
 }
 
-type ExampleList struct {
-	TestPapers []models.TestPaper `json:"exampleTestPapers"`
+type ExampleListResponse struct {
+	TestPapers []model.TestPaper `json:"exampleTestPapers"`
 }
 
-type TestReview struct {
+type TestReviewResponse struct {
 	TestId    []int64     `json:"testId"`
 	Score     []int64     `json:"score"`
 	ScoreTime []time.Time `json:"score_time"`
 }
 
-type ExampleDetail struct {
-	QuestionName string                   `json:"questionName"`
-	Test         [][]models.TestPaperInfo `json:"test"`
+type ExampleDetailResponse struct {
+	QuestionName string                  `json:"questionName"`
+	Test         [][]model.TestPaperInfo `json:"test"`
 }

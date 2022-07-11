@@ -1,4 +1,4 @@
-package models
+package model
 
 import (
 	"log"
@@ -19,7 +19,7 @@ type Topic struct {
 	Score_type     int64     `json:"score_type"`
 	Import_number  int64     `json:"import_number"`
 	Import_time    time.Time `json:"import_time"`
-	Subject_Id    int64  	 `json:"subject_id"`
+	Subject_Id     int64     `json:"subject_id"`
 	SelfScoreRate  int64     `json:"self_score_rate"`
 }
 
@@ -31,44 +31,44 @@ func (t *Topic) GetTopic(id int64) error {
 	return err
 }
 
-
-func GetTopicList ( topics *[]Topic) error{
+func GetTopicList(topics *[]Topic) error {
 	err := x.Find(topics)
-	if err!=nil {
+	if err != nil {
 		log.Println("GetTopicList err ")
 	}
-	return  err
+	return err
 }
-func FindTopicBySubNameList ( topics *[]Topic,subjectName string) error{
-	err := x.Where("subject_name=?",subjectName).Find(topics)
-	if err!=nil {
+func FindTopicBySubNameList(topics *[]Topic, subjectName string) error {
+	err := x.Where("subject_name=?", subjectName).Find(topics)
+	if err != nil {
 		log.Println("FindTopicBySubNameList err ")
 	}
-	return  err
+	return err
 }
-func FindTopicList ( topics *[]Topic) error{
+func FindTopicList(topics *[]Topic) error {
 	err := x.Find(topics)
-	if err!=nil {
+	if err != nil {
 		log.Println("FindTopicList err ")
 	}
-	return  err
+	return err
 }
-func InsertTopic ( topic *Topic)(err1 error,questionId int64) {
-	_,err:= x.Insert(topic)
-	if err!=nil {
+func InsertTopic(topic *Topic) (err1 error, questionId int64) {
+	_, err := x.Insert(topic)
+	if err != nil {
 		log.Println("GetTopicList err ")
 	}
 
-	return  err,topic.Question_id
+	return err, topic.Question_id
 }
-//func Update ( topic *Topic,questionId int64)error {
+
+// func Update ( topic *Topic,questionId int64)error {
 //	_,err:= x.Where("question_id=?",questionId).Update(&topic)
 //	if err!=nil {
 //		log.Println("Update topic err ")
 //	}
 //
 //	return  err
-//}
+// }
 func (t *Topic) Update() error {
 	code, err := x.Where(builder.Eq{"question_id": t.Question_id}).Update(t)
 	if code == 0 || err != nil {

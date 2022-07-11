@@ -1,4 +1,4 @@
-package models
+package model
 
 import (
 	"log"
@@ -21,12 +21,12 @@ func (u *PaperDistribution) GetPaperDistribution(id string) error {
 	}
 	return err
 }
-func FindPaperDistributionByQuestionId(paperDistributions *[]PaperDistribution,questionId int64) error{
-	err:= x.Where("question_id = ?", questionId).Find(paperDistributions)
-	if err!=nil {
+func FindPaperDistributionByQuestionId(paperDistributions *[]PaperDistribution, questionId int64) error {
+	err := x.Where("question_id = ?", questionId).Find(paperDistributions)
+	if err != nil {
 		log.Println("FindPaperDistributionByQuestionId err ")
 	}
- return err
+	return err
 }
 
 func (u *PaperDistribution) Save() error {
@@ -37,11 +37,11 @@ func (u *PaperDistribution) Save() error {
 	}
 	return err
 }
-func CountUserDistributionNumberByQuestionId(questionId int64)(count int64,err error) {
-	paperDistribution :=new (PaperDistribution)
+func CountUserDistributionNumberByQuestionId(questionId int64) (count int64, err error) {
+	paperDistribution := new(PaperDistribution)
 	count, err1 := x.Where("question_id = ?", questionId).Count(paperDistribution)
-	if err!=nil {
+	if err != nil {
 		log.Println("countUserDistributionNumberByQuestionId err ")
 	}
-	return count ,err1
+	return count, err1
 }

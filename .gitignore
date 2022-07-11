@@ -18,3 +18,5 @@ tmp/
 
 ~$test.xlsx
 lastupdate.tmp
+.idea/
+.DS_Store

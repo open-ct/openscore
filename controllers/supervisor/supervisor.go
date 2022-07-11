@@ -3,22 +3,25 @@ package supervisor
 import (
 	"encoding/json"
 	"fmt"
-
+	beego "github.com/beego/beego/v2/server/web"
 	"math"
-	"openscore/models"
-	"openscore/requests"
-	"openscore/responses"
+	. "openscore/controllers"
+	"openscore/model"
 	"strconv"
 	"strings"
 	"time"
 )
 
-// /**
-// 9.大题选择列表
-// */
+type SupervisorApiController struct {
+	beego.Controller
+}
+
+/**
+9.大题选择列表
+*/
 func (c *SupervisorApiController) QuestionList() {
 	defer c.ServeJSON()
-	var requestBody requests.QuestionList
+	var requestBody QuestionList
 	var resp Response
 	var err error
 
@@ -31,13 +34,13 @@ func (c *SupervisorApiController) QuestionList() {
 	supervisorId := requestBody.SupervisorId
 	// ----------------------------------------------------
 	// 获取大题列表
-	var user models.User
+	var user model.User
 	user.User_id = supervisorId
 	user.GetUser(supervisorId)
 	subjectName := user.Subject_name
 
-	topics := make([]models.Topic, 0)
-	err = models.FindTopicBySubNameList(&topics, subjectName)
+	topics := make([]model.Topic, 0)
+	err = model.FindTopicBySubNameList(&topics, subjectName)
 	fmt.Println("topics: ", topics, subjectName)
 
 	if err != nil {
@@ -46,7 +49,7 @@ func (c *SupervisorApiController) QuestionList() {
 		return
 	}
 
-	var questions = make([]responses.QuestionListVO, len(topics))
+	var questions = make([]QuestionListVO, len(topics))
 	for i := 0; i < len(topics); i++ {
 
 		questions[i].QuestionId = topics[i].Question_id
@@ -66,7 +69,7 @@ func (c *SupervisorApiController) QuestionList() {
 */
 func (c *SupervisorApiController) UserInfo() {
 	defer c.ServeJSON()
-	var requestBody requests.UserInfo
+	var requestBody UserInfo
 	var resp Response
 	var err error
 
@@ -79,14 +82,14 @@ func (c *SupervisorApiController) UserInfo() {
 	supervisorId := requestBody.SupervisorId
 
 	// ----------------------------------------------------
-	user := models.User{User_id: supervisorId}
+	user := model.User{User_id: supervisorId}
 	err = user.GetUser(supervisorId)
 	if err != nil {
 		resp = Response{"20001", "获取用户信息失败", err}
 		c.Data["json"] = resp
 		return
 	}
-	var userInfoVO responses.UserInfoVO
+	var userInfoVO UserInfoVO
 	userInfoVO.UserName = user.User_name
 	userInfoVO.SubjectName = user.Subject_name
 
@@ -103,7 +106,7 @@ func (c *SupervisorApiController) UserInfo() {
 */
 func (c *SupervisorApiController) TeacherMonitoring() {
 	defer c.ServeJSON()
-	var requestBody requests.TeacherMonitoring
+	var requestBody TeacherMonitoring
 	var resp Response
 	var err error
 
@@ -117,14 +120,14 @@ func (c *SupervisorApiController) TeacherMonitoring() {
 	questionId := requestBody.QuestionId
 
 	// ----------------------------------------------------
-	paperDistributions := make([]models.PaperDistribution, 0)
-	err = models.FindPaperDistributionByQuestionId(&paperDistributions, questionId)
+	paperDistributions := make([]model.PaperDistribution, 0)
+	err = model.FindPaperDistributionByQuestionId(&paperDistributions, questionId)
 	if err != nil {
 		resp = Response{"20021", "试卷分配信息获取失败  ", err}
 		c.Data["json"] = resp
 		return
 	}
-	teacherMonitoringList := make([]responses.TeacherMonitoringVO, len(paperDistributions))
+	teacherMonitoringList := make([]TeacherMonitoringVO, len(paperDistributions))
 	for i := 0; i < len(paperDistributions); i++ {
 		// 教师id
 		userId := paperDistributions[i].User_id
@@ -133,7 +136,7 @@ func (c *SupervisorApiController) TeacherMonitoring() {
 		testDistributionNumber := paperDistributions[i].Test_distribution_number
 		teacherMonitoringList[i].TestDistributionNumber = testDistributionNumber
 		// 试卷失败数
-		failCount, err1 := models.CountFailTestNumberByUserId(userId, questionId)
+		failCount, err1 := model.CountFailTestNumberByUserId(userId, questionId)
 		if err1 != nil {
 			resp = Response{"20024", "获取试卷批改失败数 错误 ", err}
 			c.Data["json"] = resp
@@ -144,7 +147,7 @@ func (c *SupervisorApiController) TeacherMonitoring() {
 		failCountFloat, _ := strconv.ParseFloat(failCountString, 64)
 
 		// 试卷剩余未批改数
-		remainingTestNumber, err1 := models.CountRemainingTestNumberByUserId(questionId, userId)
+		remainingTestNumber, err1 := model.CountRemainingTestNumberByUserId(questionId, userId)
 		if err1 != nil {
 			resp = Response{"20023", "无法获取试卷未批改数", err}
 			c.Data["json"] = resp
@@ -156,7 +159,7 @@ func (c *SupervisorApiController) TeacherMonitoring() {
 		finishCount := paperDistributions[i].Test_distribution_number - failCount - remainingTestNumber
 		teacherMonitoringList[i].TestSuccessNumber = (float64(finishCount))
 		// 用户信息
-		user := models.User{User_id: userId}
+		user := model.User{User_id: userId}
 		err = user.GetUser(userId)
 		if err != nil {
 			resp = Response{"20001", "无法获取用户信息", err}
@@ -198,7 +201,7 @@ func (c *SupervisorApiController) TeacherMonitoring() {
 		// 平均分
 		var averageScore float64 = 0
 		if finishCount != 0 {
-			sum, err1 := models.SumFinishScore(userId, questionId)
+			sum, err1 := model.SumFinishScore(userId, questionId)
 			if err1 != nil {
 				resp = Response{"20025", "计算平均分失败", err}
 				c.Data["json"] = resp
@@ -233,8 +236,8 @@ func (c *SupervisorApiController) TeacherMonitoring() {
 
 		// 标准差
 		var add float64
-		finishScoreList := make([]models.ScoreRecord, 0)
-		models.FindFinishTestByUserId(&finishScoreList, userId, questionId)
+		finishScoreList := make([]model.ScoreRecord, 0)
+		model.FindFinishTestByUserId(&finishScoreList, userId, questionId)
 		for j := 0; j < len(finishScoreList); j++ {
 			scoreJ := finishScoreList[j].Score
 			tempJ := math.Abs((float64(scoreJ)) - averageScore)
@@ -261,7 +264,7 @@ func (c *SupervisorApiController) TeacherMonitoring() {
 */
 func (c *SupervisorApiController) ScoreDistribution() {
 	defer c.ServeJSON()
-	var requestBody requests.ScoreDistribution
+	var requestBody ScoreDistribution
 	var resp Response
 	var err error
 
@@ -276,7 +279,7 @@ func (c *SupervisorApiController) ScoreDistribution() {
 
 	// ----------------------------------------------------
 	// 求大题满分
-	topic := models.Topic{Question_id: questionId}
+	topic := model.Topic{Question_id: questionId}
 	err = topic.GetTopic(questionId)
 	if err != nil {
 		resp = Response{"20002", "could not find topic", err}
@@ -285,8 +288,8 @@ func (c *SupervisorApiController) ScoreDistribution() {
 	}
 	questionScore := topic.Question_score
 	// 求该大题的已批改试卷表
-	scoreRecordList := make([]models.ScoreRecord, 0)
-	err = models.FindFinishScoreRecordListByQuestionId(&scoreRecordList, questionId)
+	scoreRecordList := make([]model.ScoreRecord, 0)
+	err = model.FindFinishScoreRecordListByQuestionId(&scoreRecordList, questionId)
 	if err != nil {
 		resp = Response{"20003", "FindFinishScoreRecordListByQuestionId err", err}
 		c.Data["json"] = resp
@@ -298,12 +301,12 @@ func (c *SupervisorApiController) ScoreDistribution() {
 	countString := strconv.FormatInt(int64(count), 10)
 	countFloat, _ := strconv.ParseFloat(countString, 64)
 	// 标准的输出数据
-	scoreDistributionList := make([]responses.ScoreDistributionVO, questionScore+1)
+	scoreDistributionList := make([]ScoreDistributionVO, questionScore+1)
 	// 统计分数
 	var i int64 = 0
 	for ; i <= questionScore; i++ {
 		scoreDistributionList[i].Score = i
-		number, err := models.CountTestByScore(questionId, i)
+		number, err := model.CountTestByScore(questionId, i)
 		if err != nil {
 			resp = Response{"20004", "CountTestByScore err", err}
 			c.Data["json"] = resp
@@ -334,7 +337,7 @@ func (c *SupervisorApiController) ScoreDistribution() {
 */
 func (c *SupervisorApiController) TeachersByQuestion() {
 	defer c.ServeJSON()
-	var requestBody requests.TeachersByQuestion
+	var requestBody TeachersByQuestion
 	var resp Response
 	var err error
 
@@ -349,8 +352,8 @@ func (c *SupervisorApiController) TeachersByQuestion() {
 
 	// ----------------------------------------------------
 	// 根据大题求试卷分配表
-	paperDistributions := make([]models.PaperDistribution, 0)
-	err = models.FindPaperDistributionByQuestionId(&paperDistributions, questionId)
+	paperDistributions := make([]model.PaperDistribution, 0)
+	err = model.FindPaperDistributionByQuestionId(&paperDistributions, questionId)
 	if err != nil {
 		resp = Response{"20005", "FindPaperDistributionByQuestionId err", err}
 		c.Data["json"] = resp
@@ -358,12 +361,12 @@ func (c *SupervisorApiController) TeachersByQuestion() {
 	}
 
 	// 输出标准
-	teacherVOList := make([]responses.TeacherVO, len(paperDistributions))
+	teacherVOList := make([]TeacherVO, len(paperDistributions))
 
 	// 求教师名和转化输出
 	for i := 0; i < len(paperDistributions); i++ {
 		userId := paperDistributions[i].User_id
-		user := models.User{User_id: userId}
+		user := model.User{User_id: userId}
 		err := user.GetUser(userId)
 		if err != nil {
 			resp = Response{"20001", "could not found user", err}
@@ -389,7 +392,7 @@ func (c *SupervisorApiController) TeachersByQuestion() {
 */
 func (c *SupervisorApiController) SelfScore() {
 	defer c.ServeJSON()
-	var requestBody requests.SelfScore
+	var requestBody SelfScore
 	var resp Response
 	var err error
 
@@ -405,24 +408,24 @@ func (c *SupervisorApiController) SelfScore() {
 
 	// 根据userId找到自评卷
 
-	selfScoreRecord := make([]models.ScoreRecord, 0)
-	models.FindSelfScoreRecordByUserId(&selfScoreRecord, examinerId)
+	selfScoreRecord := make([]model.ScoreRecord, 0)
+	model.FindSelfScoreRecordByUserId(&selfScoreRecord, examinerId)
 	if err != nil {
 		resp = Response{"20006", "FindSelfScoreRecordByUserId err", err}
 		c.Data["json"] = resp
 		return
 	}
 	// 输出标准
-	selfScoreRecordVOList := make([]responses.SelfScoreRecordVO, len(selfScoreRecord))
+	selfScoreRecordVOList := make([]SelfScoreRecordVO, len(selfScoreRecord))
 
 	// 求教师名和转化输出
 	for i := 0; i < len(selfScoreRecord); i++ {
 		testId := selfScoreRecord[i].Test_id
-		var test models.TestPaper
+		var test model.TestPaper
 		test.GetTestPaperByTestId(testId)
 
 		// 求大题信息 标准误差
-		var topic models.Topic
+		var topic model.Topic
 		topic.GetTopic(test.Question_id)
 		standardError := topic.Standard_error
 		var error float64
@@ -478,7 +481,7 @@ func (c *SupervisorApiController) SelfScore() {
 */
 func (c *SupervisorApiController) AverageScore() {
 	defer c.ServeJSON()
-	var requestBody requests.AverageScore
+	var requestBody AverageScore
 	var resp Response
 	var err error
 
@@ -492,22 +495,22 @@ func (c *SupervisorApiController) AverageScore() {
 	questionId := requestBody.QuestionId
 	// --------------------------------------------
 	// 根据大题求试卷分配表
-	paperDistributions := make([]models.PaperDistribution, 0)
-	err = models.FindPaperDistributionByQuestionId(&paperDistributions, questionId)
+	paperDistributions := make([]model.PaperDistribution, 0)
+	err = model.FindPaperDistributionByQuestionId(&paperDistributions, questionId)
 	if err != nil {
 		resp = Response{"20007", "FindPaperDistributionByQuestionId err", err}
 		c.Data["json"] = resp
 		return
 	}
 	// 输出标准
-	scoreAverageVOList := make([]responses.ScoreAverageVO, len(paperDistributions))
+	scoreAverageVOList := make([]ScoreAverageVO, len(paperDistributions))
 	var sumAllTestScore = 0.0
 	var count = 0.0
 	// 求教师名和转化输出
 	for i := 0; i < len(paperDistributions); i++ {
 		// 求userId 和userName
 		userId := paperDistributions[i].User_id
-		user := models.User{User_id: userId}
+		user := model.User{User_id: userId}
 		err := user.GetUser(userId)
 		if err != nil {
 			resp = Response{"20001", "could not found user", err}
@@ -518,7 +521,7 @@ func (c *SupervisorApiController) AverageScore() {
 		scoreAverageVOList[i].UserId = userId
 		scoreAverageVOList[i].UserName = userName
 
-		scoreNumber, err := models.CountTestScoreNumberByUserId(userId, questionId)
+		scoreNumber, err := model.CountTestScoreNumberByUserId(userId, questionId)
 		if err != nil {
 			resp = Response{"20008", "CountFinishTestNumberByUserId fail", err}
 			c.Data["json"] = resp
@@ -529,7 +532,7 @@ func (c *SupervisorApiController) AverageScore() {
 		count = count + finishCountFloat
 		var averageScore float64 = 0
 		if finishCountFloat != 0 {
-			sum, err := models.SumFinishScore(userId, questionId)
+			sum, err := model.SumFinishScore(userId, questionId)
 			if err != nil {
 				resp = Response{"20009", "SumFinishScore fail", err}
 				c.Data["json"] = resp
@@ -542,7 +545,7 @@ func (c *SupervisorApiController) AverageScore() {
 		scoreAverageVOList[i].Average = averageScore
 
 	}
-	var topic = models.Topic{Question_id: questionId}
+	var topic = model.Topic{Question_id: questionId}
 	err = topic.GetTopic(questionId)
 	if err != nil {
 		resp = Response{"20000", "GetTopicList err ", err}
@@ -572,7 +575,7 @@ func (c *SupervisorApiController) AverageScore() {
 */
 func (c *SupervisorApiController) ProblemTest() {
 	defer c.ServeJSON()
-	var requestBody requests.ProblemTest
+	var requestBody ProblemTest
 	var resp Response
 	var err error
 
@@ -587,8 +590,8 @@ func (c *SupervisorApiController) ProblemTest() {
 	// ------------------------------------------------
 
 	// 根据大题号找到问题卷
-	problemUnderCorrectedPaper := make([]models.UnderCorrectedPaper, 0)
-	models.FindProblemUnderCorrectedPaperByQuestionId(&problemUnderCorrectedPaper, questionId)
+	problemUnderCorrectedPaper := make([]model.UnderCorrectedPaper, 0)
+	model.FindProblemUnderCorrectedPaperByQuestionId(&problemUnderCorrectedPaper, questionId)
 	if err != nil {
 		resp = Response{"20010", "FindProblemUnderCorrectedPaperByQuestionId  fail", err}
 		c.Data["json"] = resp
@@ -599,7 +602,7 @@ func (c *SupervisorApiController) ProblemTest() {
 	var count = len(problemUnderCorrectedPaper)
 
 	// 输出标准
-	ProblemUnderCorrectedPaperVOList := make([]responses.ProblemUnderCorrectedPaperVO, count)
+	ProblemUnderCorrectedPaperVOList := make([]ProblemUnderCorrectedPaperVO, count)
 
 	// 求阅卷老师名和转化输出
 	for i := 0; i < len(problemUnderCorrectedPaper); i++ {
@@ -607,7 +610,7 @@ func (c *SupervisorApiController) ProblemTest() {
 		ProblemUnderCorrectedPaperVOList[i].TestId = problemUnderCorrectedPaper[i].Test_id
 		// 存userId  userName
 		userId := problemUnderCorrectedPaper[i].User_id
-		user := models.User{User_id: userId}
+		user := model.User{User_id: userId}
 		err := user.GetUser(userId)
 		if err != nil {
 			resp = Response{"20001", "could not found user", err}
@@ -638,7 +641,7 @@ func (c *SupervisorApiController) ProblemTest() {
 */
 func (c *SupervisorApiController) ArbitramentTest() {
 	defer c.ServeJSON()
-	var requestBody requests.ArbitramentTest
+	var requestBody ArbitramentTest
 	var resp Response
 	var err error
 
@@ -653,15 +656,15 @@ func (c *SupervisorApiController) ArbitramentTest() {
 	// ------------------------------------------------
 
 	// 根据大题号找到仲裁卷
-	arbitramentUnderCorrectedPaper := make([]models.UnderCorrectedPaper, 0)
-	err = models.FindArbitramentUnderCorrectedPaperByQuestionId(&arbitramentUnderCorrectedPaper, questionId)
+	arbitramentUnderCorrectedPaper := make([]model.UnderCorrectedPaper, 0)
+	err = model.FindArbitramentUnderCorrectedPaperByQuestionId(&arbitramentUnderCorrectedPaper, questionId)
 	if err != nil {
 		resp = Response{"20011", "FindArbitramentUnderCorrectedPaperByQuestionId  fail", err}
 		c.Data["json"] = resp
 		return
 	}
 	// 输出标准
-	arbitramentTestVOList := make([]responses.ArbitramentTestVO, len(arbitramentUnderCorrectedPaper))
+	arbitramentTestVOList := make([]ArbitramentTestVO, len(arbitramentUnderCorrectedPaper))
 
 	var count = len(arbitramentUnderCorrectedPaper)
 	// 求阅卷老师名和转化输出
@@ -671,7 +674,7 @@ func (c *SupervisorApiController) ArbitramentTest() {
 		arbitramentTestVOList[i].TestId = testId
 
 		// 查试卷
-		var testPaper models.TestPaper
+		var testPaper model.TestPaper
 		testPaper.Test_id = testId
 
 		testPaper.GetTestPaper(testId)
@@ -679,7 +682,7 @@ func (c *SupervisorApiController) ArbitramentTest() {
 		var examinerFirstId = testPaper.Examiner_first_id
 		arbitramentTestVOList[i].ExaminerFirstId = examinerFirstId
 		// 查第一次评分人
-		firstExaminer := models.User{User_id: examinerFirstId}
+		firstExaminer := model.User{User_id: examinerFirstId}
 		err := firstExaminer.GetUser(examinerFirstId)
 		if err != nil {
 			resp = Response{"20001", "could not found user", err}
@@ -696,7 +699,7 @@ func (c *SupervisorApiController) ArbitramentTest() {
 		var examinerSecondId = testPaper.Examiner_second_id
 		arbitramentTestVOList[i].ExaminerSecondId = examinerSecondId
 		// 查第二次试卷评分人
-		secondExaminer := models.User{User_id: examinerSecondId}
+		secondExaminer := model.User{User_id: examinerSecondId}
 		err = secondExaminer.GetUser(examinerSecondId)
 		if err != nil {
 			resp = Response{"20001", "could not found user", err}
@@ -713,7 +716,7 @@ func (c *SupervisorApiController) ArbitramentTest() {
 		var examinerThirdId = testPaper.Examiner_third_id
 		arbitramentTestVOList[i].ExaminerThirdId = examinerThirdId
 		// 查第二次试卷评分人
-		thirdExaminer := models.User{User_id: examinerThirdId}
+		thirdExaminer := model.User{User_id: examinerThirdId}
 		err = thirdExaminer.GetUser(examinerThirdId)
 		if err != nil {
 			resp = Response{"20001", "could not found user", err}
@@ -728,13 +731,13 @@ func (c *SupervisorApiController) ArbitramentTest() {
 		// 查存实际误差
 		arbitramentTestVOList[i].PracticeError = testPaper.Pratice_error
 		// 查存标准误差
-		var topic models.Topic
+		var topic model.Topic
 		topic.GetTopic(questionId)
 		arbitramentTestVOList[i].StandardError = topic.Standard_error
 
 	}
 	// 查存该题满分
-	var topic = models.Topic{Question_id: questionId}
+	var topic = model.Topic{Question_id: questionId}
 	topic.GetTopic(questionId)
 	var fullScore = topic.Question_score
 
@@ -754,7 +757,7 @@ func (c *SupervisorApiController) ArbitramentTest() {
 */
 func (c *SupervisorApiController) ScoreProgress() {
 	defer c.ServeJSON()
-	var requestBody requests.ScoreProgress
+	var requestBody ScoreProgress
 	var resp Response
 	var err error
 
@@ -769,15 +772,15 @@ func (c *SupervisorApiController) ScoreProgress() {
 
 	// ----------------------------------------------------
 	// 根据科目获取大题列表
-	topics := make([]models.Topic, 0)
-	err = models.FindTopicBySubNameList(&topics, subject)
+	topics := make([]model.Topic, 0)
+	err = model.FindTopicBySubNameList(&topics, subject)
 	if err != nil {
 		resp = Response{"20000", "GetTopicList err ", err}
 		c.Data["json"] = resp
 		return
 	}
 	// 确定输出标准
-	scoreProgressVOList := make([]responses.ScoreProgressVO, len(topics))
+	scoreProgressVOList := make([]ScoreProgressVO, len(topics))
 
 	for i := 0; i < len(topics); i++ {
 		// 获取大题id
@@ -794,7 +797,7 @@ func (c *SupervisorApiController) ScoreProgress() {
 		scoreProgressVOList[i].ImportNumber = importNumber
 
 		// 出成绩量
-		finishNumber, err := models.CountFinishScoreNumberByQuestionId(questionId)
+		finishNumber, err := model.CountFinishScoreNumberByQuestionId(questionId)
 		if err != nil {
 			resp = Response{"20013", "CountFinishScoreNumberByQuestionId  fail", err}
 			c.Data["json"] = resp
@@ -833,8 +836,8 @@ func (c *SupervisorApiController) ScoreProgress() {
 		}
 		scoreProgressVOList[i].IsAllFinished = isAllFinished
 		// 在线人数
-		var users = make([]models.User, 0)
-		models.FindUserNumberByQuestionId(&users, questionId)
+		var users = make([]model.User, 0)
+		model.FindUserNumberByQuestionId(&users, questionId)
 		usersNumber := len(users)
 		scoreProgressVOList[i].DistributionUserNumber = int64(usersNumber)
 
@@ -858,8 +861,8 @@ func (c *SupervisorApiController) ScoreProgress() {
 			userId := users[i].User_id
 			isOnline := users[i].Status
 			userOnlineTime := users[i].Online_time
-			userRecord := make([]models.ScoreRecord, 0)
-			models.FindFinishTestByUserId(&userRecord, userId, questionId)
+			userRecord := make([]model.ScoreRecord, 0)
+			model.FindFinishTestByUserId(&userRecord, userId, questionId)
 			tempFinishNumber := len(userRecord)
 			var tempScore int64 = 0
 			for j := 0; j < len(userRecord); j++ {
@@ -917,7 +920,7 @@ func (c *SupervisorApiController) ScoreProgress() {
 
 		// --------------------------------------------------
 		// 一次评卷完成数
-		firstScoreNumber, err1 := models.CountFirstScoreNumberByQuestionId(questionId)
+		firstScoreNumber, err1 := model.CountFirstScoreNumberByQuestionId(questionId)
 		if err1 != nil {
 			resp = Response{"20014", "CountFirstScoreNumberByQuestionId  fail", err}
 			c.Data["json"] = resp
@@ -955,7 +958,7 @@ func (c *SupervisorApiController) ScoreProgress() {
 		// -----------------------------------------
 
 		// 二次评卷完成数
-		secondScoreNumber, err1 := models.CountSecondScoreNumberByQuestionId(questionId)
+		secondScoreNumber, err1 := model.CountSecondScoreNumberByQuestionId(questionId)
 		if err1 != nil {
 			resp = Response{"20015", "CountSecondScoreNumberByQuestionId  fail", err}
 			c.Data["json"] = resp
@@ -995,7 +998,7 @@ func (c *SupervisorApiController) ScoreProgress() {
 		// -----------------------------------------
 
 		// 三次评卷完成数
-		thirdScoreNumber, err1 := models.CountThirdScoreNumberByQuestionId(questionId)
+		thirdScoreNumber, err1 := model.CountThirdScoreNumberByQuestionId(questionId)
 		if err1 != nil {
 			resp = Response{"20016", "CountThirdScoreNumberByQuestionId  fail", err}
 			c.Data["json"] = resp
@@ -1033,7 +1036,7 @@ func (c *SupervisorApiController) ScoreProgress() {
 
 		// -----------------------------------------
 		// 仲裁卷完成数
-		arbitramentFinishNumber, err1 := models.CountArbitramentFinishNumberByQuestionId(questionId)
+		arbitramentFinishNumber, err1 := model.CountArbitramentFinishNumberByQuestionId(questionId)
 		if err1 != nil {
 			resp = Response{"20017", "CountArbitramentFinishNumberByQuestionId  fail", err}
 			c.Data["json"] = resp
@@ -1041,7 +1044,7 @@ func (c *SupervisorApiController) ScoreProgress() {
 		}
 		scoreProgressVOList[i].ArbitramentFinishedNumber = arbitramentFinishNumber
 		// 仲裁卷未完成量
-		arbitramentUnfinishedNumber, err1 := models.CountArbitramentUnFinishNumberByQuestionId(questionId)
+		arbitramentUnfinishedNumber, err1 := model.CountArbitramentUnFinishNumberByQuestionId(questionId)
 		if err1 != nil {
 			resp = Response{"20018", "CountArbitramentUnFinishNumberByQuestionId  fail", err}
 			c.Data["json"] = resp
@@ -1093,7 +1096,7 @@ func (c *SupervisorApiController) ScoreProgress() {
 		// -----------------------------------------
 
 		// 问题卷完成数
-		problemFinishNumber, err1 := models.CountProblemFinishNumberByQuestionId(questionId)
+		problemFinishNumber, err1 := model.CountProblemFinishNumberByQuestionId(questionId)
 		if err1 != nil {
 			resp = Response{"20019", "CountProblemFinishNumberByQuestionId  fail", err}
 			c.Data["json"] = resp
@@ -1101,7 +1104,7 @@ func (c *SupervisorApiController) ScoreProgress() {
 		}
 		scoreProgressVOList[i].ProblemFinishedNumber = problemFinishNumber
 		// 问题卷未完成量
-		problemUnfinishedNumber, err1 := models.CountProblemUnFinishNumberByQuestionId(questionId)
+		problemUnfinishedNumber, err1 := model.CountProblemUnFinishNumberByQuestionId(questionId)
 		if err1 != nil {
 			resp = Response{"20020", "CountProblemUnFinishNumberByQuestionId  fail", err}
 			c.Data["json"] = resp
@@ -1166,7 +1169,7 @@ func (c *SupervisorApiController) ScoreProgress() {
 */
 func (c *SupervisorApiController) SupervisorPoint() {
 	defer c.ServeJSON()
-	var requestBody requests.SupervisorPoint
+	var requestBody SupervisorPoint
 	var resp Response
 	var err error
 
@@ -1186,13 +1189,13 @@ func (c *SupervisorApiController) SupervisorPoint() {
 	// ---------------------------------------------------------------------------------------
 	// 创建试卷小题详情
 
-	var test models.TestPaper
+	var test model.TestPaper
 
 	var sum int64
 	// 给试卷详情表打分
 	for i := 0; i < len(testDetailIds); i++ {
 		// 取出小题试卷id,和小题分数
-		var testInfo models.TestPaperInfo
+		var testInfo model.TestPaperInfo
 		testDetailIdString := testDetailIds[i]
 		testDetailId, _ := strconv.ParseInt(testDetailIdString, 10, 64)
 		scoreString := scores[i]
@@ -1235,10 +1238,10 @@ func (c *SupervisorApiController) SupervisorPoint() {
 		return
 	}
 	// 删除试卷待批改表 ，增加试卷记录表
-	var record models.ScoreRecord
-	var underTest models.UnderCorrectedPaper
+	var record model.ScoreRecord
+	var underTest model.UnderCorrectedPaper
 
-	err = models.GetUnderCorrectedSupervisorPaperByTestQuestionTypeAndTestId(&underTest, testId)
+	err = model.GetUnderCorrectedSupervisorPaperByTestQuestionTypeAndTestId(&underTest, testId)
 	if err != nil {
 		resp = Response{"20012", "GetUnderCorrectedPaperByUserIdAndTestId  fail", err}
 		c.Data["json"] = resp
@@ -1276,7 +1279,7 @@ func (c *SupervisorApiController) SupervisorPoint() {
 */
 func (c *SupervisorApiController) ProblemUnmarkList() {
 	defer c.ServeJSON()
-	var requestBody requests.ProblemUnmarkList
+	var requestBody ProblemUnmarkList
 	var resp Response
 	var err error
 
@@ -1291,15 +1294,15 @@ func (c *SupervisorApiController) ProblemUnmarkList() {
 	// ------------------------------------------------
 
 	// 根据大题号找到问题卷
-	problemUnderCorrectedPaper := make([]models.UnderCorrectedPaper, 0)
-	models.FindProblemUnderCorrectedPaperByQuestionId(&problemUnderCorrectedPaper, questionId)
+	problemUnderCorrectedPaper := make([]model.UnderCorrectedPaper, 0)
+	model.FindProblemUnderCorrectedPaperByQuestionId(&problemUnderCorrectedPaper, questionId)
 	if err != nil {
 		resp = Response{"20027", "FindProblemUnderCorrectedList  fail", err}
 		c.Data["json"] = resp
 		return
 	}
 	// 输出标准
-	ProblemUnmarkVOList := make([]responses.ProblemUnmarkListVO, len(problemUnderCorrectedPaper))
+	ProblemUnmarkVOList := make([]ProblemUnmarkListVO, len(problemUnderCorrectedPaper))
 
 	// 求阅卷输出
 	for i := 0; i < len(problemUnderCorrectedPaper); i++ {
@@ -1322,7 +1325,7 @@ func (c *SupervisorApiController) ProblemUnmarkList() {
 */
 func (c *SupervisorApiController) SelfUnmarkList() {
 	defer c.ServeJSON()
-	var requestBody requests.SelfUnmarkList
+	var requestBody SelfUnmarkList
 	var resp Response
 	var err error
 
@@ -1337,15 +1340,15 @@ func (c *SupervisorApiController) SelfUnmarkList() {
 	// ------------------------------------------------
 
 	// 根据大题号找到自评卷
-	selfUnderCorrectedPaper := make([]models.UnderCorrectedPaper, 0)
-	models.FindSelfUnderCorrectedPaperByQuestionId(&selfUnderCorrectedPaper, questionId)
+	selfUnderCorrectedPaper := make([]model.UnderCorrectedPaper, 0)
+	model.FindSelfUnderCorrectedPaperByQuestionId(&selfUnderCorrectedPaper, questionId)
 	if err != nil {
 		resp = Response{"20027", "FindSelfUnderCorrectedPaperByQuestionId  fail", err}
 		c.Data["json"] = resp
 		return
 	}
 	// 输出标准
-	selfUnmarkVOList := make([]responses.SelfUnmarkListVO, len(selfUnderCorrectedPaper))
+	selfUnmarkVOList := make([]SelfUnmarkListVO, len(selfUnderCorrectedPaper))
 
 	// 求阅卷输出
 	for i := 0; i < len(selfUnderCorrectedPaper); i++ {
@@ -1368,7 +1371,7 @@ func (c *SupervisorApiController) SelfUnmarkList() {
 */
 func (c *SupervisorApiController) ArbitramentUnmarkList() {
 	defer c.ServeJSON()
-	var requestBody requests.ArbitramentUnmarkList
+	var requestBody ArbitramentUnmarkList
 	var resp Response
 	var err error
 
@@ -1384,15 +1387,15 @@ func (c *SupervisorApiController) ArbitramentUnmarkList() {
 	// ------------------------------------------------
 
 	// 找到仲裁卷
-	arbitramentUnderCorrectedPaper := make([]models.UnderCorrectedPaper, 0)
-	err = models.FindAllArbitramentUnderCorrectedPaper(&arbitramentUnderCorrectedPaper, questionId)
+	arbitramentUnderCorrectedPaper := make([]model.UnderCorrectedPaper, 0)
+	err = model.FindAllArbitramentUnderCorrectedPaper(&arbitramentUnderCorrectedPaper, questionId)
 	if err != nil {
 		resp = Response{"20026", "FindAllArbitramentUnderCorrectedPaper  fail", err}
 		c.Data["json"] = resp
 		return
 	}
 	// 输出标准
-	arbitramentUnmarkListVOList := make([]responses.ArbitramentUnmarkListVO, len(arbitramentUnderCorrectedPaper))
+	arbitramentUnmarkListVOList := make([]ArbitramentUnmarkListVO, len(arbitramentUnderCorrectedPaper))
 
 	for i := 0; i < len(arbitramentUnderCorrectedPaper); i++ {
 		// 存testId
@@ -1413,7 +1416,7 @@ func (c *SupervisorApiController) ArbitramentUnmarkList() {
 
 func (c *SupervisorApiController) ScoreDeviation() {
 	defer c.ServeJSON()
-	var requestBody requests.ScoreDeviation
+	var requestBody ScoreDeviation
 	var resp Response
 	var err error
 
@@ -1429,15 +1432,15 @@ func (c *SupervisorApiController) ScoreDeviation() {
 	// ------------------------------------------------
 
 	// 根据大题求试卷分配表
-	paperDistributions := make([]models.PaperDistribution, 0)
-	err = models.FindPaperDistributionByQuestionId(&paperDistributions, questionId)
+	paperDistributions := make([]model.PaperDistribution, 0)
+	err = model.FindPaperDistributionByQuestionId(&paperDistributions, questionId)
 	if err != nil {
 		resp = Response{"20007", "FindPaperDistributionByQuestionId err", err}
 		c.Data["json"] = resp
 		return
 	}
 	// 输出标准
-	ScoreDeviationVOList := make([]responses.ScoreDeviationVO, len(paperDistributions))
+	ScoreDeviationVOList := make([]ScoreDeviationVO, len(paperDistributions))
 	userScoreNumbers := make([]int, len(paperDistributions))
 	var count = 0
 
@@ -1445,7 +1448,7 @@ func (c *SupervisorApiController) ScoreDeviation() {
 	for i := 0; i < len(paperDistributions); i++ {
 		// 求userId 和userName
 		userId := paperDistributions[i].User_id
-		user := models.User{User_id: userId}
+		user := model.User{User_id: userId}
 		err := user.GetUser(userId)
 		if err != nil {
 			resp = Response{"20001", "could not found user", err}
@@ -1456,8 +1459,8 @@ func (c *SupervisorApiController) ScoreDeviation() {
 		ScoreDeviationVOList[i].UserId = userId
 		ScoreDeviationVOList[i].UserName = userName
 
-		var finishScoreList []models.ScoreRecord
-		err = models.FindFinishTestByUserId(&finishScoreList, userId, questionId)
+		var finishScoreList []model.ScoreRecord
+		err = model.FindFinishTestByUserId(&finishScoreList, userId, questionId)
 		if err != nil {
 			resp = Response{"2027", "FindFinishTestNumberByUserId fail", err}
 			c.Data["json"] = resp
@@ -1469,7 +1472,7 @@ func (c *SupervisorApiController) ScoreDeviation() {
 
 		var averageScore float64 = 0
 		if finishCount != 0 {
-			sum, err := models.SumFinishScore(userId, questionId)
+			sum, err := model.SumFinishScore(userId, questionId)
 			if err != nil {
 				resp = Response{"20009", "SumFinishScore fail", err}
 				c.Data["json"] = resp
@@ -1509,7 +1512,7 @@ func (c *SupervisorApiController) ScoreDeviation() {
 */
 func (c *SupervisorApiController) SelfMarkList() {
 	defer c.ServeJSON()
-	var requestBody requests.SelfMarkList
+	var requestBody SelfMarkList
 	var resp Response
 	var err error
 
@@ -1524,26 +1527,26 @@ func (c *SupervisorApiController) SelfMarkList() {
 
 	// ------------------------------------------------
 	// 找到大题标准误差
-	var topic models.Topic
+	var topic model.Topic
 	topic.GetTopic(questionId)
 	standardError := topic.Standard_error
 	// 找到自评卷
-	selfMarkPaper := make([]models.UnderCorrectedPaper, 0)
-	err = models.FindSelfMarkPaperByQuestionId(&selfMarkPaper, questionId)
+	selfMarkPaper := make([]model.UnderCorrectedPaper, 0)
+	err = model.FindSelfMarkPaperByQuestionId(&selfMarkPaper, questionId)
 	if err != nil {
 		resp = Response{"20026", "FindAllArbitramentUnderCorrectedPaper  fail", err}
 		c.Data["json"] = resp
 		return
 	}
 	// 输出标准
-	selfMarkVOList := make([]responses.SelfMarkListVO, len(selfMarkPaper))
+	selfMarkVOList := make([]SelfMarkListVO, len(selfMarkPaper))
 
 	for i := 0; i < len(selfMarkPaper); i++ {
 		// 存testId
 		testId := selfMarkPaper[i].Test_id
 		selfScoreId := selfMarkPaper[i].Self_score_id
 
-		var test models.TestPaper
+		var test model.TestPaper
 		test.GetTestPaperByTestId(testId)
 
 		if test.Examiner_first_id == selfScoreId {
@@ -1558,7 +1561,7 @@ func (c *SupervisorApiController) SelfMarkList() {
 			selfMarkVOList[i].SelfScore = test.Examiner_third_self_score
 		}
 		selfMarkVOList[i].Userid = selfScoreId
-		var user models.User
+		var user model.User
 		user.GetUser(selfScoreId)
 
 		selfMarkVOList[i].Name = user.User_name

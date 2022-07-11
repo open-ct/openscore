@@ -1,4 +1,4 @@
-package models
+package model
 
 import (
 	"fmt"
@@ -25,7 +25,7 @@ func init() {
 		fmt.Println("Fail to create xorm engine")
 		panic(err)
 	}
-	x.ShowSQL(true)
+	// x.ShowSQL(true)
 	initMarkingModels()
 	initUserModels()
 

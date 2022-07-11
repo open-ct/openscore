@@ -1,4 +1,4 @@
-package models
+package model
 
 import (
 	"log"
@@ -38,11 +38,11 @@ func (st *SubTopic) GetSubTopic(id int64) error {
 	}
 	return err
 }
-func InsertSubTopic ( subTopic *SubTopic)(err1 error,questionDetailId int64) {
-	_,err := x.Insert(subTopic)
-	if err!=nil {
+func InsertSubTopic(subTopic *SubTopic) (err1 error, questionDetailId int64) {
+	_, err := x.Insert(subTopic)
+	if err != nil {
 		log.Println("GetTopicList err ")
 	}
 
-	return  err,subTopic.Question_detail_id
+	return err, subTopic.Question_detail_id
 }

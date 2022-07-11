@@ -5,15 +5,14 @@
  * @LastEditors: Junlang
  * @FilePath: /openscore/controllers/default.go
  */
-package controller
+package controllers
 
 import (
 	"fmt"
+	beego "github.com/beego/beego/v2/server/web"
 	"log"
 	"openscore/auth"
-	"openscore/models"
-
-	beego "github.com/beego/beego/v2/server/web"
+	"openscore/model"
 )
 
 type Response struct {
@@ -36,7 +35,7 @@ func (c *ApiController) Get() {
 	// c.Data["Website"] = "beego.me"
 	// c.Data["Email"] = "astaxie@gmail.com"
 	// c.TplName = "index.tpl"
-	a := new(models.Topic)
+	a := new(model.Topic)
 	fmt.Println(a)
 	c.Ctx.WriteString("hello OpenCT")
 	c.Data["json"] = "hello OpenCT"
