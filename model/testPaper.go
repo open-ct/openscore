@@ -85,8 +85,8 @@ func (t *TestPaper) Insert() (int64, error) {
 	return t.TestId, err
 }
 
-func FindTestPaperByQuestionId(question_id int64, t *[]TestPaper) error {
-	err := x.Where("question_id = ?", question_id).Find(t)
+func FindTestPaperByQuestionId(questionId int64, t *[]TestPaper) error {
+	err := x.Where("question_id = ?", questionId).Find(t)
 	if err != nil {
 		log.Println("could not FindTestPaperByQuestionId ")
 		log.Println(err)
@@ -102,7 +102,7 @@ func FindTestPapersByTestId(testId, t *[]TestPaper) error {
 	return err
 }
 func FindUnDistributeTest(id int64, t *[]TestPaper) error {
-	err := x.Where("question_id=?", id).Where("correcting_status=?", 0).Find(t)
+	err := x.Where("correcting_status = 0 AND question_id=?", id).Find(t)
 	if err != nil {
 		log.Println("could not GetUnDistributeTest")
 	}

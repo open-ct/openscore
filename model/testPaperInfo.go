@@ -25,6 +25,7 @@ type TestPaperInfo struct {
 	LeaderScore             int64  `json:"leader_score" xorm:"default(-1)"`
 	FinalScore              int64  `json:"finale_score" xorm:"default(-1)"`
 	FinalScoreId            int64  `json:"final_score_id" xorm:"default(-1)"`
+	TicketId                string `json:"ticket_id"`
 }
 
 func (t *TestPaperInfo) GetTestPaperInfoByTestIdAndQuestionDetailId(testId int64, questionDetailId int64) error {
@@ -87,6 +88,16 @@ func FindTestPaperInfoByQuestionDetailId(questionDetailId int64, t *[]TestPaperI
 	}
 	return err
 }
+
+func FindTestPaperInfoByTicketId(ticketId string) ([]*TestPaperInfo, error) {
+	var infos []*TestPaperInfo
+	err := x.Where("ticket_id = ?", ticketId).Find(&infos)
+	if err != nil {
+		return nil, err
+	}
+	return infos, nil
+}
+
 func (t *TestPaperInfo) Delete() error {
 	_, err := x.Where(builder.Eq{"test_id": t.TestId}).Delete(t)
 	if err != nil {

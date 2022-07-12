@@ -55,6 +55,7 @@ func init() {
 		beego.NSRouter("/selfMark/unmark/list", superApi, "post:SelfUnmarkList"),
 		beego.NSRouter("/problem/unmark/list", superApi, "post:ProblemUnmarkList"),
 		beego.NSRouter("/score/deviation", superApi, "post:ScoreDeviation"),
+		beego.NSRouter("/writeScoreExcel", superApi, "post:WriteScoreExcel"),
 	)
 	beego.AddNamespace(superNs)
 
