@@ -10,6 +10,7 @@ type AddTopic struct {
 	TopicDetails  []AddTopicDetail `json:"topicDetails"`
 	SelfScoreRate int64            `json:"self_score_rate"`
 }
+
 type AddTopicDetail struct {
 	TopicDetailName  string `json:"topicDetailName"`
 	DetailScoreTypes string `json:"DetailScoreTypes"`
@@ -24,10 +25,12 @@ type QuestionBySubList struct {
 	AdminId     string `json:"adminId"`
 	SubjectName string `json:"subjectName"`
 }
+
 type DistributionInfo struct {
 	AdminId    string `json:"adminId"`
 	QuestionId int64  `json:"questionId"`
 }
+
 type DeleteTest struct {
 	AdminId    string `json:"adminId"`
 	QuestionId int64  `json:"questionId"`
