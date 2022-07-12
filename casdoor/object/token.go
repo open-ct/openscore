@@ -152,7 +152,7 @@ func CheckOAuthLogin(clientId string, responseType string, redirectUri string, s
 	return "", application
 }
 
-func GetOAuthCode(userId int64, clientId string, responseType string, redirectUri string, scope string, state string) *Code {
+func GetOAuthCode(userId string, clientId string, responseType string, redirectUri string, scope string, state string) *Code {
 	user := GetUser(userId)
 	if user == nil {
 		return &Code{

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	beego "github.com/beego/beego/v2/server/web"
-	"github.com/beego/beego/v2/server/web/context"
 	"math"
 	. "openscore/controllers"
 	"openscore/model"
@@ -20,7 +19,7 @@ type SupervisorApiController struct {
 /**
 9.大题选择列表
 */
-func (c *SupervisorApiController) QuestionList(_ *context.Context) {
+func (c *SupervisorApiController) QuestionList() {
 	defer c.ServeJSON()
 	var requestBody QuestionList
 	var resp Response
@@ -67,7 +66,7 @@ func (c *SupervisorApiController) QuestionList(_ *context.Context) {
 /**
 10.用户登入信息表
 */
-func (c *SupervisorApiController) UserInfo(_ *context.Context) {
+func (c *SupervisorApiController) UserInfo() {
 	defer c.ServeJSON()
 	var requestBody UserInfo
 	var resp Response
@@ -104,7 +103,7 @@ func (c *SupervisorApiController) UserInfo(_ *context.Context) {
 /**
 8.教师监控页面
 */
-func (c *SupervisorApiController) TeacherMonitoring(_ *context.Context) {
+func (c *SupervisorApiController) TeacherMonitoring() {
 	defer c.ServeJSON()
 	var requestBody TeacherMonitoring
 	var resp Response
@@ -262,7 +261,7 @@ func (c *SupervisorApiController) TeacherMonitoring(_ *context.Context) {
 /**
 11.分数分布表
 */
-func (c *SupervisorApiController) ScoreDistribution(_ *context.Context) {
+func (c *SupervisorApiController) ScoreDistribution() {
 	defer c.ServeJSON()
 	var requestBody ScoreDistribution
 	var resp Response
@@ -335,7 +334,7 @@ func (c *SupervisorApiController) ScoreDistribution(_ *context.Context) {
 /**
 12.大题教师选择列表
 */
-func (c *SupervisorApiController) TeachersByQuestion(_ *context.Context) {
+func (c *SupervisorApiController) TeachersByQuestion() {
 	defer c.ServeJSON()
 	var requestBody TeachersByQuestion
 	var resp Response
@@ -479,7 +478,7 @@ func (c *SupervisorApiController) SelfScore() {
 /**
 14，平均分监控表
 */
-func (c *SupervisorApiController) AverageScore(_ *context.Context) {
+func (c *SupervisorApiController) AverageScore() {
 	defer c.ServeJSON()
 	var requestBody AverageScore
 	var resp Response
@@ -573,7 +572,7 @@ func (c *SupervisorApiController) AverageScore(_ *context.Context) {
 /**
 17，问题卷表
 */
-func (c *SupervisorApiController) ProblemTest(_ *context.Context) {
+func (c *SupervisorApiController) ProblemTest() {
 	defer c.ServeJSON()
 	var requestBody ProblemTest
 	var resp Response
@@ -639,7 +638,7 @@ func (c *SupervisorApiController) ProblemTest(_ *context.Context) {
 /**
 18，仲裁卷表
 */
-func (c *SupervisorApiController) ArbitramentTest(_ *context.Context) {
+func (c *SupervisorApiController) ArbitramentTest() {
 	defer c.ServeJSON()
 	var requestBody ArbitramentTest
 	var resp Response
@@ -755,7 +754,7 @@ func (c *SupervisorApiController) ArbitramentTest(_ *context.Context) {
 /**
 15.总体进度
 */
-func (c *SupervisorApiController) ScoreProgress(_ *context.Context) {
+func (c *SupervisorApiController) ScoreProgress() {
 	defer c.ServeJSON()
 	var requestBody ScoreProgress
 	var resp Response
@@ -1167,7 +1166,7 @@ func (c *SupervisorApiController) ScoreProgress(_ *context.Context) {
 /**
 19.阅卷组长批改试卷
 */
-func (c *SupervisorApiController) SupervisorPoint(_ *context.Context) {
+func (c *SupervisorApiController) SupervisorPoint() {
 	defer c.ServeJSON()
 	var requestBody SupervisorPoint
 	var resp Response
@@ -1277,7 +1276,7 @@ func (c *SupervisorApiController) SupervisorPoint(_ *context.Context) {
 /**
 20.问题卷列表
 */
-func (c *SupervisorApiController) ProblemUnmarkList(_ *context.Context) {
+func (c *SupervisorApiController) ProblemUnmarkList() {
 	defer c.ServeJSON()
 	var requestBody ProblemUnmarkList
 	var resp Response
@@ -1323,7 +1322,7 @@ func (c *SupervisorApiController) ProblemUnmarkList(_ *context.Context) {
 /**
 20.自评卷列表
 */
-func (c *SupervisorApiController) SelfUnmarkList(_ *context.Context) {
+func (c *SupervisorApiController) SelfUnmarkList() {
 	defer c.ServeJSON()
 	var requestBody SelfUnmarkList
 	var resp Response
@@ -1369,7 +1368,7 @@ func (c *SupervisorApiController) SelfUnmarkList(_ *context.Context) {
 /**
 21.仲裁卷列表
 */
-func (c *SupervisorApiController) ArbitramentUnmarkList(_ *context.Context) {
+func (c *SupervisorApiController) ArbitramentUnmarkList() {
 	defer c.ServeJSON()
 	var requestBody ArbitramentUnmarkList
 	var resp Response
@@ -1414,7 +1413,7 @@ func (c *SupervisorApiController) ArbitramentUnmarkList(_ *context.Context) {
 
 // 16标准差
 
-func (c *SupervisorApiController) ScoreDeviation(_ *context.Context) {
+func (c *SupervisorApiController) ScoreDeviation() {
 	defer c.ServeJSON()
 	var requestBody ScoreDeviation
 	var resp Response
@@ -1510,7 +1509,7 @@ func (c *SupervisorApiController) ScoreDeviation(_ *context.Context) {
 /**
 22.自评卷列表
 */
-func (c *SupervisorApiController) SelfMarkList(_ *context.Context) {
+func (c *SupervisorApiController) SelfMarkList() {
 	defer c.ServeJSON()
 	var requestBody SelfMarkList
 	var resp Response

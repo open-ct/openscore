@@ -29,14 +29,14 @@ type LdapServer struct {
 }
 
 type LdapResp struct {
-	//Groups []LdapRespGroup `json:"groups"`
+	// Groups []LdapRespGroup `json:"groups"`
 	Users []object.LdapRespUser `json:"users"`
 }
 
-//type LdapRespGroup struct {
+// type LdapRespGroup struct {
 //	GroupId   string
 //	GroupName string
-//}
+// }
 
 type LdapSyncResp struct {
 	Exist  []object.LdapRespUser `json:"exist"`
@@ -60,19 +60,19 @@ func (c *ApiController) GetLdapUser() {
 		return
 	}
 
-	//groupsMap, err := conn.GetLdapGroups(ldapServer.BaseDn)
-	//if err != nil {
+	// groupsMap, err := conn.GetLdapGroups(ldapServer.BaseDn)
+	// if err != nil {
 	//	c.Data["json"] = Response{Status: "error", Msg: err.Error()}
 	//	c.ServeJSON()
 	//	return
-	//}
+	// }
 
-	//for _, group := range groupsMap {
+	// for _, group := range groupsMap {
 	//	resp.Groups = append(resp.Groups, LdapRespGroup{
 	//		GroupId:   group.GidNumber,
 	//		GroupName: group.Cn,
 	//	})
-	//}
+	// }
 
 	users, err := conn.GetLdapUsers(ldapServer.BaseDn)
 	if err != nil {
@@ -87,7 +87,7 @@ func (c *ApiController) GetLdapUser() {
 			Uid:       user.Uid,
 			Cn:        user.Cn,
 			GroupId:   user.GidNumber,
-			//GroupName: groupsMap[user.GidNumber].Cn,
+			// GroupName: groupsMap[user.GidNumber].Cn,
 			Uuid:    user.Uuid,
 			Email:   util.GetMaxLenStr(user.Mail, user.Email, user.EmailAddress),
 			Phone:   util.GetMaxLenStr(user.TelephoneNumber, user.Mobile, user.MobileTelephoneNumber),

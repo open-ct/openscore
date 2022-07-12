@@ -10,63 +10,75 @@ import (
 
 func init() {
 	beego.Router("/", &score.TestPaperApiController{})
-	beego.Router("/api/login", &controllers.ApiController{}, "post:Login")
-	beego.Router("/api/logout", &controllers.ApiController{}, "post:Logout")
-	beego.Router("/api/get-account", &controllers.ApiController{}, "get:GetAccount")
-	beego.Router("/openct/marking/score/test/display", &score.TestPaperApiController{}, "post:Display")
-	beego.Router("/openct/marking/score/test/list", &score.TestPaperApiController{}, "post:List")
-	beego.Router("/openct/marking/score/self/list", &score.TestPaperApiController{}, "post:SelfScoreList")
-	// beego.Router("/openct/marking/score/self/point", &score.TestPaperApiController{}, "post:SelfMarkPoint")
-	beego.Router("/openct/marking/score/test/point", &score.TestPaperApiController{}, "post:Point")
-	beego.Router("/openct/marking/score/test/problem", &score.TestPaperApiController{}, "post:Problem")
-	beego.Router("/openct/marking/score/test/answer", &score.TestPaperApiController{}, "post:Answer")
-	beego.Router("/openct/marking/score/test/example/detail", &score.TestPaperApiController{}, "post:ExampleDetail")
-	beego.Router("/openct/marking/score/test/example/list", &score.TestPaperApiController{}, "post:ExampleList")
-	beego.Router("/openct/marking/score/test/review", &score.TestPaperApiController{}, "post:Review")
-	beego.Router("/openct/marking/score/test/review/point", &score.TestPaperApiController{}, "post:ReviewPoint")
-	// beego.Router("/api/get-users", &score.ApiController{}, "GET:GetUsers")
+
+	api := new(controllers.ApiController)
+	beego.Router("/api/login", api, "post:Login")
+	beego.Router("/api/logout", api, "post:Logout")
+	beego.Router("/api/get-account", api, "get:GetAccount")
+
+	testPaperApi := new(score.TestPaperApiController)
+	testNs := beego.NewNamespace("/openct/marking/score",
+		beego.NSNamespace("/test",
+			beego.NSRouter("/display", testPaperApi, "post:Display"),
+			beego.NSRouter("/list", testPaperApi, "post:List"),
+			// beego.NSRouter("/point", testPaperApi, "post:SelfMarkPoint"),
+			beego.NSRouter("/point", testPaperApi, "post:Point"),
+			beego.NSRouter("/problem", testPaperApi, "post:Problem"),
+			beego.NSRouter("/answer", testPaperApi, "post:Answer"),
+			beego.NSRouter("/example/detail", testPaperApi, "post:ExampleDetail"),
+			beego.NSRouter("/example/list", testPaperApi, "post:ExampleList"),
+			beego.NSRouter("/review", testPaperApi, "post:Review"),
+			beego.NSRouter("/review/point", testPaperApi, "post:ReviewPoint"),
+		),
+		beego.NSRouter("/self/list", testPaperApi, "post:SelfScoreList"),
+	)
+	beego.AddNamespace(testNs)
 
 	/**
 	  chen :阅卷组长端
 	*/
-	var super supervisor.SupervisorApiController
-	// beego.Router("/openct/marking/supervisor/question/list", &supervisor.SupervisorApiController{}, "post:QuestionList")
-	beego.Router("/openct/marking/supervisor/user/info", &supervisor.SupervisorApiController{}, "post:UserInfo")
-	beego.Post("/openct/marking/supervisor/user/info", super.UserInfo)
-	beego.Router("/openct/marking/supervisor/teacher/monitoring", &supervisor.SupervisorApiController{}, "post:TeacherMonitoring")
-	beego.Router("/openct/marking/supervisor/score/distribution", &supervisor.SupervisorApiController{}, "post:ScoreDistribution")
-	beego.Router("/openct/marking/supervisor/question/teacher/list", &supervisor.SupervisorApiController{}, "post:TeachersByQuestion")
-	beego.Router("/openct/marking/supervisor/self/score", &supervisor.SupervisorApiController{}, "post:SelfScore")
-	beego.Router("/openct/marking/supervisor/average/score", &supervisor.SupervisorApiController{}, "post:AverageScore")
-	beego.Router("/openct/marking/supervisor/problem/list", &supervisor.SupervisorApiController{}, "post:ProblemTest")
-	beego.Router("/openct/marking/supervisor/arbitrament/list", &supervisor.SupervisorApiController{}, "post:ArbitramentTest")
-	beego.Router("/openct/marking/supervisor/score/progress", &supervisor.SupervisorApiController{}, "post:ScoreProgress")
-	beego.Router("/openct/marking/supervisor/point", &supervisor.SupervisorApiController{}, "post:SupervisorPoint")
-	beego.Router("/openct/marking/supervisor/arbitrament/unmark/list", &supervisor.SupervisorApiController{}, "post:ArbitramentUnmarkList")
-	beego.Router("/openct/marking/supervisor/selfMark/list", &supervisor.SupervisorApiController{}, "post:SelfMarkList")
-	beego.Router("/openct/marking/supervisor/selfMark/unmark/list", &supervisor.SupervisorApiController{}, "post:SelfUnmarkList")
-	beego.Router("/openct/marking/supervisor/problem/unmark/list", &supervisor.SupervisorApiController{}, "post:ProblemUnmarkList")
-	beego.Router("/openct/marking/supervisor/score/deviation", &supervisor.SupervisorApiController{}, "post:ScoreDeviation")
+	superApi := new(supervisor.SupervisorApiController)
+	superNs := beego.NewNamespace("/openct/marking/supervisor",
+		beego.NSRouter("/user/info", superApi, "post:UserInfo"),
+		beego.NSRouter("/teacher/monitoring", superApi, "post:TeacherMonitoring"),
+		// beego.NSRouter("/question/list", superApi, "post:QuestionList"),
+		beego.NSRouter("/score/distribution", superApi, "post:ScoreDistribution"),
+		beego.NSRouter("/question/teacher/list", superApi, "post:TeachersByQuestion"),
+		beego.NSRouter("/self/score", superApi, "post:SelfScore"),
+		beego.NSRouter("/average/score", superApi, "post:AverageScore"),
+		beego.NSRouter("/problem/list", superApi, "post:ProblemTest"),
+		beego.NSRouter("/arbitrament/list", superApi, "post:ArbitramentTest"),
+		beego.NSRouter("/score/progress", superApi, "post:ScoreProgress"),
+		beego.NSRouter("/point", superApi, "post:SupervisorPoint"),
+		beego.NSRouter("/arbitrament/unmark/list", superApi, "post:ArbitramentUnmarkList"),
+		beego.NSRouter("/selfMark/list", superApi, "post:SelfMarkList"),
+		beego.NSRouter("/selfMark/unmark/list", superApi, "post:SelfUnmarkList"),
+		beego.NSRouter("/problem/unmark/list", superApi, "post:ProblemUnmarkList"),
+		beego.NSRouter("/score/deviation", superApi, "post:ScoreDeviation"),
+	)
+	beego.AddNamespace(superNs)
 
 	/**
 	  chen :管理员端
 	*/
-	// beego.Router("/openct/marking/admin/uploadPic",&admin.AdminApiController{},"post:UploadPic")
-	beego.Router("/openct/marking/admin/readExcel", &admin.AdminApiController{}, "post:ReadExcel")
-	beego.Router("/openct/marking/admin/readExcel", &admin.AdminApiController{}, "OPTIONS:ReadExcel")
-	beego.Router("/openct/marking/admin/readUserExcel", &admin.AdminApiController{}, "post:ReadUserExcel")
-	beego.Router("/openct/marking/admin/readExampleExcel", &admin.AdminApiController{}, "post:ReadExampleExcel")
-	beego.Router("/openct/marking/admin/readExampleExcel", &admin.AdminApiController{}, "OPTIONS:ReadExampleExcel")
-	beego.Router("/openct/marking/admin/readAnswerExcel", &admin.AdminApiController{}, "post:ReadAnswerExcel")
-	beego.Router("/openct/marking/admin/readAnswerExcel", &admin.AdminApiController{}, "OPTIONS:ReadAnswerExcel")
-	beego.Router("/openct/marking/admin/distribution", &admin.AdminApiController{}, "post:Distribution")
-	beego.Router("/openct/marking/admin/distribution/info", &admin.AdminApiController{}, "post:DistributionInfo")
-	beego.Router("/openct/marking/admin/questionBySubList", &admin.AdminApiController{}, "post:QuestionBySubList")
-	beego.Router("/openct/marking/admin/insertTopic", &admin.AdminApiController{}, "post:InsertTopic")
-	beego.Router("/openct/marking/admin/subjectList", &admin.AdminApiController{}, "post:SubjectList")
-	beego.Router("/openct/marking/admin/topicList", &admin.AdminApiController{}, "post:TopicList")
-	beego.Router("/openct/marking/admin/DistributionRecord", &admin.AdminApiController{}, "post:DistributionRecord")
-
-	beego.Router("/openct/marking/admin/img", &admin.AdminApiController{}, "post:Pic")
-
+	adminApi := new(admin.AdminApiController)
+	adminNs := beego.NewNamespace("/openct/marking/admin",
+		beego.NSRouter("/readExcel", adminApi, "post:ReadExcel"),
+		beego.NSRouter("/readExcel", adminApi, "OPTIONS:ReadExcel"),
+		// beego.NSRouter("/uploadPic", adminApi, "post:UploadPic"),
+		beego.NSRouter("/readUserExcel", adminApi, "post:ReadUserExcel"),
+		beego.NSRouter("/readExampleExcel", adminApi, "post:ReadExampleExcel"),
+		beego.NSRouter("/readExampleExcel", adminApi, "OPTIONS:ReadExampleExcel"),
+		beego.NSRouter("/readAnswerExcel", adminApi, "post:ReadAnswerExcel"),
+		beego.NSRouter("/readAnswerExcel", adminApi, "OPTIONS:ReadAnswerExcel"),
+		beego.NSRouter("/distribution", adminApi, "post:Distribution"),
+		beego.NSRouter("/distribution/info", adminApi, "post:DistributionInfo"),
+		beego.NSRouter("/questionBySubList", adminApi, "post:QuestionBySubList"),
+		beego.NSRouter("/insertTopic", adminApi, "post:InsertTopic"),
+		beego.NSRouter("/subjectList", adminApi, "post:SubjectList"),
+		beego.NSRouter("/topicList", adminApi, "post:TopicList"),
+		beego.NSRouter("/DistributionRecord", adminApi, "post:DistributionRecord"),
+		beego.NSRouter("/img", adminApi, "post:Pic"),
+	)
+	beego.AddNamespace(adminNs)
 }

@@ -154,7 +154,7 @@ func (c *ApiController) Login() {
 			}
 
 			// get user
-			var userId int64
+			var userId string
 			if form.Username == "" {
 				userId, _ = c.RequireSignedIn()
 			} else {

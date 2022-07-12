@@ -5,30 +5,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="90d49d24-cd7e-4f14-b075-c6e5fe5ae2ce" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/openscore.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/openscore.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/casdoor/controllers/account.go" beforeDir="false" afterPath="$PROJECT_DIR$/casdoor/controllers/account.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/casdoor/controllers/auth.go" beforeDir="false" afterPath="$PROJECT_DIR$/casdoor/controllers/auth.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/casdoor/idp/facebook.go" beforeDir="false" afterPath="$PROJECT_DIR$/casdoor/idp/facebook.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/casdoor/object/token.go" beforeDir="false" afterPath="$PROJECT_DIR$/casdoor/object/token.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/casdoor/controllers/ldap.go" beforeDir="false" afterPath="$PROJECT_DIR$/casdoor/controllers/ldap.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/casdoor/controllers/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/casdoor/controllers/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/casdoor/controllers/verification.go" beforeDir="false" afterPath="$PROJECT_DIR$/casdoor/controllers/verification.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/casdoor/routers/authz_filter.go" beforeDir="false" afterPath="$PROJECT_DIR$/casdoor/routers/authz_filter.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/casdoor/routers/auto_login_filter.go" beforeDir="false" afterPath="$PROJECT_DIR$/casdoor/routers/auto_login_filter.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/casdoor/routers/record.go" beforeDir="false" afterPath="$PROJECT_DIR$/casdoor/routers/record.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/controllers/admin/admin.go" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/admin/admin.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controllers/score/request.go" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/score/request.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controllers/score/response.go" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/score/response.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controllers/default.go" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/default.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/controllers/score/score.go" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/score/score.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controllers/supervisor/request.go" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/supervisor/request.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controllers/supervisor/response.go" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/supervisor/response.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/controllers/supervisor/supervisor.go" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/supervisor/supervisor.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model/paperDistribution.go" beforeDir="false" afterPath="$PROJECT_DIR$/model/paperDistribution.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model/scoreRecord.go" beforeDir="false" afterPath="$PROJECT_DIR$/model/scoreRecord.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model/subTopic.go" beforeDir="false" afterPath="$PROJECT_DIR$/model/subTopic.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model/subject.go" beforeDir="false" afterPath="$PROJECT_DIR$/model/subject.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model/testPaper.go" beforeDir="false" afterPath="$PROJECT_DIR$/model/testPaper.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model/testPaperInfo.go" beforeDir="false" afterPath="$PROJECT_DIR$/model/testPaperInfo.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model/topic.go" beforeDir="false" afterPath="$PROJECT_DIR$/model/topic.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model/underCorrectedPaper.go" beforeDir="false" afterPath="$PROJECT_DIR$/model/underCorrectedPaper.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/model/user.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routers/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/routers/router.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/default_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/tests/default_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/json.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/json.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -120,7 +110,7 @@
     "go.sdk.automatically.set": "true",
     "last_opened_file_path": "/Users/taodei/Desktop/openscore/openscore",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "go.sdk"
+    "settings.editor.selected.configurable": "preferences.keymap"
   },
   "keyToStringList": {
     "DatabaseDriversLRU": [
@@ -263,7 +253,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="fix: beego:direction name must are routers and controllers" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: beego:direction name must are routers and controllers" />
+    <MESSAGE value="fix: 字段改驼峰命名" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: 字段改驼峰命名" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>

@@ -10,6 +10,7 @@ package controllers
 import (
 	"fmt"
 	beego "github.com/beego/beego/v2/server/web"
+	"github.com/beego/beego/v2/server/web/context"
 	"log"
 	"openscore/auth"
 	"openscore/model"
@@ -42,7 +43,7 @@ func (c *ApiController) Get() {
 	c.ServeJSON()
 }
 
-func (c *ApiController) Login() {
+func (c *ApiController) Login(ctx *context.Context) {
 	input, _ := c.Input()
 	code := input.Get("code")
 	state := input.Get("state")
@@ -67,7 +68,7 @@ func (c *ApiController) Login() {
 	c.ServeJSON()
 }
 
-func (c *ApiController) Logout() {
+func (c *ApiController) Logout(ctx *context.Context) {
 	var resp Response
 
 	c.SetSessionUser(nil)
@@ -77,7 +78,7 @@ func (c *ApiController) Logout() {
 	c.ServeJSON()
 }
 
-func (c *ApiController) GetAccount() {
+func (c *ApiController) GetAccount(ctx *context.Context) {
 
 	var resp Response
 

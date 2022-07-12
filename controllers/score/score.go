@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	beego "github.com/beego/beego/v2/server/web"
-	"github.com/beego/beego/v2/server/web/context"
 	"log"
 	"math"
 	. "openscore/controllers"
@@ -21,7 +20,7 @@ type TestPaperApiController struct {
 	beego.Controller
 }
 
-func (c *TestPaperApiController) Display(ctx *context.Context) {
+func (c *TestPaperApiController) Display() {
 	defer c.ServeJSON()
 	var requestBody TestDisplay
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
@@ -91,7 +90,7 @@ func (c *TestPaperApiController) Display(ctx *context.Context) {
 	c.Data["json"] = resp
 }
 
-func (c *TestPaperApiController) List(_ *context.Context) {
+func (c *TestPaperApiController) List() {
 	defer c.ServeJSON()
 	var requestBody TestList
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
@@ -123,7 +122,7 @@ func (c *TestPaperApiController) List(_ *context.Context) {
 
 }
 
-func (c *TestPaperApiController) Point(_ *context.Context) {
+func (c *TestPaperApiController) Point() {
 	defer c.ServeJSON()
 	var requestBody TestPoint
 	var resp Response
@@ -569,7 +568,7 @@ func (c *TestPaperApiController) Point(_ *context.Context) {
 	c.Data["json"] = resp
 }
 
-func (c *TestPaperApiController) Problem(_ *context.Context) {
+func (c *TestPaperApiController) Problem() {
 	defer c.ServeJSON()
 	// var requestBody map[string]interface{}
 	var requestBody TestProblem
@@ -647,7 +646,7 @@ func (c *TestPaperApiController) Problem(_ *context.Context) {
 	c.Data["json"] = resp
 }
 
-func (c *TestPaperApiController) Answer(_ *context.Context) {
+func (c *TestPaperApiController) Answer() {
 	defer c.ServeJSON()
 	var requestBody TestAnswer
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
@@ -700,7 +699,7 @@ func (c *TestPaperApiController) Answer(_ *context.Context) {
 	c.Data["json"] = resp
 }
 
-func (c *TestPaperApiController) ExampleDetail(_ *context.Context) {
+func (c *TestPaperApiController) ExampleDetail() {
 	defer c.ServeJSON()
 	var requestBody ExampleDetail
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
@@ -773,7 +772,7 @@ func (c *TestPaperApiController) ExampleDetail(_ *context.Context) {
 
 }
 
-func (c *TestPaperApiController) ExampleList(_ *context.Context) {
+func (c *TestPaperApiController) ExampleList() {
 	defer c.ServeJSON()
 	var requestBody ExampleList
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
@@ -803,7 +802,7 @@ func (c *TestPaperApiController) ExampleList(_ *context.Context) {
 
 }
 
-func (c *TestPaperApiController) Review(_ *context.Context) {
+func (c *TestPaperApiController) Review() {
 	defer c.ServeJSON()
 	var requestBody TestReview
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
@@ -829,7 +828,7 @@ func (c *TestPaperApiController) Review(_ *context.Context) {
 	resp := Response{"10000", "ok", response}
 	c.Data["json"] = resp
 }
-func (c *TestPaperApiController) ReviewPoint(_ *context.Context) {
+func (c *TestPaperApiController) ReviewPoint() {
 	defer c.ServeJSON()
 	var requestBody TestPoint
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
@@ -929,7 +928,7 @@ func (c *TestPaperApiController) ReviewPoint(_ *context.Context) {
 }
 
 // 自评列表 chen
-func (c *TestPaperApiController) SelfScoreList(_ *context.Context) {
+func (c *TestPaperApiController) SelfScoreList() {
 	defer c.ServeJSON()
 	var requestBody TestList
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
@@ -964,7 +963,7 @@ func (c *TestPaperApiController) SelfScoreList(_ *context.Context) {
 // /**
 // 20.自评卷打分
 // */
-// func (c *TestPaperApiController) SelfMarkPoint(_ *context.Context) {
+// func (c *TestPaperApiController) SelfMarkPoint() {
 //	defer c.ServeJSON()
 //	var requestBody TestPoint
 //

@@ -7,7 +7,6 @@ import (
 	"flag"
 	"fmt"
 	beego "github.com/beego/beego/v2/server/web"
-	"github.com/beego/beego/v2/server/web/context"
 	"github.com/golang/freetype"
 	"github.com/golang/freetype/truetype"
 	"github.com/xuri/excelize/v2"
@@ -147,7 +146,7 @@ func UploadPic(name string, text string) (src string) {
 /**
 2.试卷导入
 */
-func (c *AdminApiController) ReadExcel(_ *context.Context) {
+func (c *AdminApiController) ReadExcel() {
 	c.Ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin", c.Ctx.Request.Header.Get("Origin"))
 	defer c.ServeJSON()
 	var resp Response
@@ -297,7 +296,7 @@ type question struct {
 2.样卷导入
 */
 
-func (c *AdminApiController) ReadExampleExcel(_ *context.Context) {
+func (c *AdminApiController) ReadExampleExcel() {
 	c.Ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin", c.Ctx.Request.Header.Get("Origin"))
 	defer c.ServeJSON()
 	var resp Response
@@ -422,7 +421,7 @@ func (c *AdminApiController) ReadExampleExcel(_ *context.Context) {
 	c.Data["json"] = resp
 
 }
-func (c *AdminApiController) ReadAnswerExcel(_ *context.Context) {
+func (c *AdminApiController) ReadAnswerExcel() {
 	c.Ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin", c.Ctx.Request.Header.Get("Origin"))
 	defer c.ServeJSON()
 	var resp Response
@@ -552,7 +551,7 @@ func (c *AdminApiController) ReadAnswerExcel(_ *context.Context) {
 3.大题列表
 */
 
-func (c *AdminApiController) QuestionBySubList(_ *context.Context) {
+func (c *AdminApiController) QuestionBySubList() {
 	defer c.ServeJSON()
 	var requestBody QuestionBySubList
 	var resp Response
@@ -597,7 +596,7 @@ func (c *AdminApiController) QuestionBySubList(_ *context.Context) {
 4.试卷参数导入
 */
 
-func (c *AdminApiController) InsertTopic(_ *context.Context) {
+func (c *AdminApiController) InsertTopic() {
 
 	defer c.ServeJSON()
 	var requestBody AddTopic
@@ -687,7 +686,7 @@ func (c *AdminApiController) InsertTopic(_ *context.Context) {
 5.科目选择
 */
 
-func (c *AdminApiController) SubjectList(_ *context.Context) {
+func (c *AdminApiController) SubjectList() {
 
 	defer c.ServeJSON()
 	var requestBody SubjectList
@@ -730,7 +729,7 @@ func (c *AdminApiController) SubjectList(_ *context.Context) {
 /**
 6.试卷分配界面
 */
-func (c *AdminApiController) DistributionInfo(_ *context.Context) {
+func (c *AdminApiController) DistributionInfo() {
 
 	defer c.ServeJSON()
 	var requestBody DistributionInfo
@@ -798,7 +797,7 @@ func (c *AdminApiController) DistributionInfo(_ *context.Context) {
 /**
 7.试卷分配
 */
-func (c *AdminApiController) Distribution(_ *context.Context) {
+func (c *AdminApiController) Distribution() {
 
 	defer c.ServeJSON()
 	var requestBody Distribution
@@ -978,7 +977,7 @@ func (c *AdminApiController) Distribution(_ *context.Context) {
 /**
 8.图片显示
 */
-func (c *AdminApiController) Pic(_ *context.Context) {
+func (c *AdminApiController) Pic() {
 	defer c.ServeJSON()
 	var requestBody ReadFile
 	var resp Response
@@ -1052,7 +1051,7 @@ func cutUser(oldData []model.User, n int) (newData []model.User) {
 9.大题展示列表
 */
 
-func (c *AdminApiController) TopicList(_ *context.Context) {
+func (c *AdminApiController) TopicList() {
 	defer c.ServeJSON()
 	var requestBody TopicList
 	var resp Response
@@ -1117,7 +1116,7 @@ func (c *AdminApiController) TopicList(_ *context.Context) {
 /**
 DistributionRecord
 */
-func (c *AdminApiController) DistributionRecord(_ *context.Context) {
+func (c *AdminApiController) DistributionRecord() {
 	defer c.ServeJSON()
 	var requestBody DistributionRecord
 	var resp Response
@@ -1179,7 +1178,7 @@ func (c *AdminApiController) DistributionRecord(_ *context.Context) {
 试卷删除
 */
 
-func (c *AdminApiController) DeleteTest(_ *context.Context) {
+func (c *AdminApiController) DeleteTest() {
 
 	defer c.ServeJSON()
 	var requestBody DeleteTest
@@ -1229,7 +1228,7 @@ func (c *AdminApiController) DeleteTest(_ *context.Context) {
 }
 
 // 导入用户
-func (c *AdminApiController) ReadUserExcel(_ *context.Context) {
+func (c *AdminApiController) ReadUserExcel() {
 	c.Ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin", c.Ctx.Request.Header.Get("Origin"))
 	defer c.ServeJSON()
 
