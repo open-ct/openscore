@@ -4,7 +4,6 @@ import (
 	// "github.com/beego/beego/v2/server/web/"
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	beego "github.com/beego/beego/v2/server/web"
 	"log"
 	"math"
@@ -70,7 +69,6 @@ func (c *TestPaperApiController) Display() {
 		// 图片地址拼接 ，按服务器
 		// src := "C:\\Users\\yang\\Desktop\\阅卷系统\\img\\" + picName
 		src := "./img/" + picName
-		fmt.Println("src: ", src)
 
 		bytes, err := os.ReadFile(src)
 		if err != nil {
@@ -99,7 +97,6 @@ func (c *TestPaperApiController) List() {
 		c.Data["json"] = resp
 		return
 	}
-	log.Println(requestBody)
 	userId := requestBody.UserId
 	var response TestListResponse
 	// ----------------------------------------------------
@@ -828,6 +825,7 @@ func (c *TestPaperApiController) Review() {
 	resp := Response{"10000", "ok", response}
 	c.Data["json"] = resp
 }
+
 func (c *TestPaperApiController) ReviewPoint() {
 	defer c.ServeJSON()
 	var requestBody TestPoint
@@ -837,7 +835,6 @@ func (c *TestPaperApiController) ReviewPoint() {
 		c.Data["json"] = resp
 		return
 	}
-	log.Println(requestBody)
 	userId := requestBody.UserId
 	scoresstr := requestBody.Scores
 	testId := requestBody.TestId

@@ -10,8 +10,8 @@ import (
 
 // 导出成绩
 func (c *SupervisorApiController) WriteScoreExcel() {
-	// c.Ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin", c.Ctx.Request.Header.Get("Origin"))
-	// defer c.ServeJSON()
+	c.Ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin", c.Ctx.Request.Header.Get("Origin"))
+	defer c.ServeJSON()
 
 	f := excelize.NewFile()
 

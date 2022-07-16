@@ -6,6 +6,7 @@ import (
 	"log"
 	. "openscore/controllers"
 	"openscore/model"
+	"openscore/util"
 	"os"
 	"strconv"
 	"strings"
@@ -114,7 +115,7 @@ func (c *AdminApiController) ReadExcel() {
 					num--
 				}
 
-				src := UploadPic(row[0]+rows[0][8+index], content)
+				src := util.UploadPic(row[0]+rows[0][8+index], content)
 
 				var testPaperInfo model.TestPaperInfo
 				testPaperInfo.TicketId = row[0]

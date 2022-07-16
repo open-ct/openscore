@@ -5,6 +5,7 @@ go 1.16
 require (
 	github.com/astaxie/beego v1.12.3
 	github.com/beego/beego/v2 v2.0.1
+	github.com/casdoor/casdoor-go-sdk v0.6.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0

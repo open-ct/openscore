@@ -1,26 +1,15 @@
 package admin
 
 import (
-	"bufio"
 	"encoding/base64"
 	"encoding/json"
-	"flag"
-	"fmt"
 	beego "github.com/beego/beego/v2/server/web"
-	"github.com/golang/freetype"
-	"github.com/golang/freetype/truetype"
 	"github.com/xuri/excelize/v2"
-	"golang.org/x/image/font"
-	"golang.org/x/image/math/fixed"
-	"image"
-	"image/color"
-	"image/draw"
-	"image/png"
 	"io"
-	"io/ioutil"
 	"log"
 	. "openscore/controllers"
 	"openscore/model"
+	"openscore/util"
 	"os"
 	"strconv"
 	"strings"
@@ -31,118 +20,8 @@ type AdminApiController struct {
 	beego.Controller
 }
 
-var (
-	dpi      = flag.Float64("dpi", 200, "screen resolution in Dots Per Inch")
-	fontfile = flag.String("fontfile", "frontend/font/simhei.ttf", "filename of the ttf font")
-	hinting  = flag.String("hinting", "none", "none | full")
-	size     = flag.Float64("size", 12, "font size in points") // TODO 字体调大
-	spacing  = flag.Float64("spacing", 1.5, "line spacing (e.g. 2 means double spaced)")
-	wonb     = flag.Bool("whiteonblack", false, "white text on a black background")
-)
-
 /**
-1.生成图片
-*/
-func UploadPic(name string, text string) (src string) {
-
-	flag.Parse()
-
-	// Read the font data.
-	fontBytes, err := ioutil.ReadFile(*fontfile)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	f, err := freetype.ParseFont(fontBytes)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
-	// Initialize the context.
-	fg, bg := image.Black, image.White
-	ruler := color.RGBA{0xdd, 0xdd, 0xdd, 0xff}
-	if *wonb {
-		fg, bg = image.White, image.Black
-		ruler = color.RGBA{0x22, 0x22, 0x22, 0xff}
-	}
-	rgba := image.NewRGBA(image.Rect(0, 0, 640, 480))
-	draw.Draw(rgba, rgba.Bounds(), bg, image.ZP, draw.Src)
-	c := freetype.NewContext()
-	c.SetDPI(*dpi)
-	c.SetFont(f)
-	c.SetFontSize(*size)
-	c.SetClip(rgba.Bounds())
-	c.SetDst(rgba)
-	c.SetSrc(fg)
-	switch *hinting {
-	default:
-		c.SetHinting(font.HintingNone)
-	case "full":
-		c.SetHinting(font.HintingFull)
-	}
-
-	// Draw the guidelines.
-	for i := 0; i < 200; i++ {
-		rgba.Set(10, 10+i, ruler)
-		rgba.Set(10+i, 10, ruler)
-	}
-
-	// Draw the text.
-	pt := freetype.Pt(10, 10+int(c.PointToFixed(*size)>>6))
-
-	opts := truetype.Options{}
-	opts.Size = *size
-	opts.DPI = *dpi
-	face := truetype.NewFace(f, &opts)
-
-	for _, x := range []rune(text) {
-		w, _ := face.GlyphAdvance(x)
-		if pt.X.Round()+w.Round() > 640 {
-
-			pt.X = fixed.Int26_6(5) << 6
-			pt.Y += c.PointToFixed(*size * *spacing)
-		}
-		pt, err = c.DrawString(string(x), pt)
-	}
-
-	// for _, s := range text {
-	// 	_, err = c.DrawString(s, pt)
-	// 	if err != nil {
-	// 		log.Println(err)
-	// 		return
-	// 	}
-	// 	pt.Y += c.PointToFixed(*size * *spacing)
-	// }
-
-	// Save that RGBA image to disk.
-	name = name + ".png"
-	newPath := "./img/" + name
-
-	outFile, err := os.Create(newPath)
-	if err != nil {
-		log.Println(err)
-		os.Exit(1)
-	}
-
-	defer outFile.Close()
-	b := bufio.NewWriter(outFile)
-	err = png.Encode(b, rgba)
-	if err != nil {
-		log.Println(err)
-		os.Exit(1)
-	}
-	err = b.Flush()
-	if err != nil {
-		log.Println(err)
-		os.Exit(1)
-	}
-	fmt.Println("Wrote out.png OK.")
-	return name
-}
-
-/**
-2.样卷导入
+样卷导入
 */
 
 func (c *AdminApiController) ReadExampleExcel() {
@@ -200,7 +79,7 @@ func (c *AdminApiController) ReadExampleExcel() {
 				testPaperInfo.QuestionDetailId = questionDetailId
 				s := rows[i][j]
 				// split := strings.Split(s, "\n")
-				src := UploadPic(rows[i][0]+rows[0][j], s)
+				src := util.UploadPic(rows[i][0]+rows[0][j], s)
 				testPaperInfo.PicSrc = src
 				// 查看大题试卷是否已经导入
 				has, err := testPaper.GetTestPaper(testId)
@@ -325,7 +204,7 @@ func (c *AdminApiController) ReadAnswerExcel() {
 				testPaperInfo.QuestionDetailId = questionDetailId
 				s := rows[i][j]
 				// split := strings.Split(s, "\n")
-				src := UploadPic(rows[i][0]+rows[0][j], s)
+				src := util.UploadPic(rows[i][0]+rows[0][j], s)
 				testPaperInfo.PicSrc = src
 				// 查看大题试卷是否已经导入
 				has, err := testPaper.GetTestPaper(testId)
@@ -799,7 +678,7 @@ func (c *AdminApiController) Distribution() {
 
 		// 修改user变为已分配
 		var user model.User
-		user.IsDistribute = 1
+		user.IsDistribute = true
 		user.QuestionId = questionId
 		err = user.Update()
 		if err != nil {

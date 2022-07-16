@@ -22,7 +22,7 @@ type TeacherMonitoringVO struct {
 	AverageScore           float64
 	Validity               float64
 	StandardDeviation      float64
-	IsOnline               int64
+	IsOnline               bool
 }
 
 type ScoreDistributionVO struct {

@@ -20,3 +20,4 @@ tmp/
 lastupdate.tmp
 .idea/
 .DS_Store
+test.go

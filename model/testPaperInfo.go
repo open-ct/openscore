@@ -1,7 +1,6 @@
 package model
 
 import (
-	"fmt"
 	"log"
 
 	"xorm.io/builder"
@@ -29,8 +28,6 @@ type TestPaperInfo struct {
 }
 
 func (t *TestPaperInfo) GetTestPaperInfoByTestIdAndQuestionDetailId(testId int64, questionDetailId int64) error {
-	fmt.Println("testId: ", testId, questionDetailId)
-
 	has, err := x.Where("question_detail_id = ? and test_id = ?", questionDetailId, testId).Get(t)
 	if !has || err != nil {
 		log.Println("could not specific info")

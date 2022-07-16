@@ -12,8 +12,8 @@ func init() {
 	beego.Router("/", &score.TestPaperApiController{})
 
 	api := new(controllers.ApiController)
-	beego.Router("/api/login", api, "post:Login")
-	beego.Router("/api/logout", api, "post:Logout")
+	beego.Router("/api/login", api, "post:SignIn")
+	beego.Router("/api/logout", api, "post:SignOut")
 	beego.Router("/api/get-account", api, "get:GetAccount")
 
 	testPaperApi := new(score.TestPaperApiController)
@@ -67,7 +67,7 @@ func init() {
 		beego.NSRouter("/readExcel", adminApi, "post:ReadExcel"),
 		beego.NSRouter("/readExcel", adminApi, "OPTIONS:ReadExcel"),
 		// beego.NSRouter("/uploadPic", adminApi, "post:UploadPic"),
-		beego.NSRouter("/readUserExcel", adminApi, "post:ReadUserExcel"),
+		// beego.NSRouter("/readUserExcel", adminApi, "post:ReadUserExcel"),
 		beego.NSRouter("/readExampleExcel", adminApi, "post:ReadExampleExcel"),
 		beego.NSRouter("/readExampleExcel", adminApi, "OPTIONS:ReadExampleExcel"),
 		beego.NSRouter("/readAnswerExcel", adminApi, "post:ReadAnswerExcel"),
