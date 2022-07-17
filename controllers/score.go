@@ -1,13 +1,10 @@
-package score
+package controllers
 
 import (
-	// "github.com/beego/beego/v2/server/web/"
 	"encoding/base64"
 	"encoding/json"
-	beego "github.com/beego/beego/v2/server/web"
 	"log"
 	"math"
-	. "openscore/controllers"
 	"openscore/model"
 	"os"
 	"strconv"
@@ -15,13 +12,9 @@ import (
 	"time"
 )
 
-type TestPaperApiController struct {
-	beego.Controller
-}
-
-func (c *TestPaperApiController) Display() {
+func (c *ApiController) Display() {
 	defer c.ServeJSON()
-	var requestBody TestDisplay
+	var requestBody TestRequest
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
 	if err != nil {
 		resp := Response{"10001", "cannot unmarshal", err}
@@ -88,18 +81,17 @@ func (c *TestPaperApiController) Display() {
 	c.Data["json"] = resp
 }
 
-func (c *TestPaperApiController) List() {
+func (c *ApiController) List() {
 	defer c.ServeJSON()
-	var requestBody TestList
-	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	var response TestListResponse
+
+	userId, err := c.GetSessionUserId()
+
 	if err != nil {
-		resp := Response{"10001", "cannot unmarshal", err}
+		resp := Response{Status: "10001", Msg: "get user info fail", Data: err}
 		c.Data["json"] = resp
 		return
 	}
-	userId := requestBody.UserId
-	var response TestListResponse
-	// ----------------------------------------------------
 
 	err = model.GetDistributedTestIdPaperByUserId(userId, &response.TestId)
 	if err != nil {
@@ -113,13 +105,13 @@ func (c *TestPaperApiController) List() {
 		return
 
 	}
-	log.Println(response)
+
 	resp := Response{"10000", "OK", response}
 	c.Data["json"] = resp
 
 }
 
-func (c *TestPaperApiController) Point() {
+func (c *ApiController) Point() {
 	defer c.ServeJSON()
 	var requestBody TestPoint
 	var resp Response
@@ -130,8 +122,13 @@ func (c *TestPaperApiController) Point() {
 		c.Data["json"] = resp
 		return
 	}
-	log.Println(requestBody)
-	userId := requestBody.UserId
+
+	userId, err := c.GetSessionUserId()
+	if err != nil {
+		resp := Response{Status: "10001", Msg: "get user info fail", Data: err}
+		c.Data["json"] = resp
+		return
+	}
 	scoresStr := requestBody.Scores
 	testId := requestBody.TestId
 	testDetailIdStr := requestBody.TestDetailId
@@ -565,9 +562,8 @@ func (c *TestPaperApiController) Point() {
 	c.Data["json"] = resp
 }
 
-func (c *TestPaperApiController) Problem() {
+func (c *ApiController) Problem() {
 	defer c.ServeJSON()
-	// var requestBody map[string]interface{}
 	var requestBody TestProblem
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
 	if err != nil {
@@ -576,7 +572,12 @@ func (c *TestPaperApiController) Problem() {
 		return
 	}
 
-	userId := requestBody.UserId
+	userId, err := c.GetSessionUserId()
+	if err != nil {
+		resp := Response{Status: "10001", Msg: "get user info fail", Data: err}
+		c.Data["json"] = resp
+		return
+	}
 	problemType := requestBody.ProblemType
 	testId := requestBody.TestId
 	problemMessage := requestBody.ProblemMessage
@@ -643,9 +644,9 @@ func (c *TestPaperApiController) Problem() {
 	c.Data["json"] = resp
 }
 
-func (c *TestPaperApiController) Answer() {
+func (c *ApiController) Answer() {
 	defer c.ServeJSON()
-	var requestBody TestAnswer
+	var requestBody TestRequest
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
 	if err != nil {
 		resp := Response{"10001", "cannot unmarshal", err}
@@ -696,7 +697,7 @@ func (c *TestPaperApiController) Answer() {
 	c.Data["json"] = resp
 }
 
-func (c *TestPaperApiController) ExampleDetail() {
+func (c *ApiController) ExampleDetail() {
 	defer c.ServeJSON()
 	var requestBody ExampleDetail
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
@@ -769,9 +770,9 @@ func (c *TestPaperApiController) ExampleDetail() {
 
 }
 
-func (c *TestPaperApiController) ExampleList() {
+func (c *ApiController) ExampleList() {
 	defer c.ServeJSON()
-	var requestBody ExampleList
+	var requestBody TestRequest
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
 	if err != nil {
 		resp := Response{"10001", "cannot unmarshal", err}
@@ -799,18 +800,18 @@ func (c *TestPaperApiController) ExampleList() {
 
 }
 
-func (c *TestPaperApiController) Review() {
+func (c *ApiController) Review() {
 	defer c.ServeJSON()
-	var requestBody TestReview
-	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	var response TestReviewResponse
+
+	userId, err := c.GetSessionUserId()
 	if err != nil {
-		resp := Response{"10001", "cannot unmarshal", err}
+		resp := Response{Status: "10001", Msg: "get user info fail", Data: err}
 		c.Data["json"] = resp
 		return
 	}
-	userId := requestBody.UserId
+
 	var records []model.ScoreRecord
-	var response TestReviewResponse
 	err = model.GetLatestRecords(userId, &records)
 	if err != nil {
 		resp := Response{"10002", "get record fail", err}
@@ -826,7 +827,7 @@ func (c *TestPaperApiController) Review() {
 	c.Data["json"] = resp
 }
 
-func (c *TestPaperApiController) ReviewPoint() {
+func (c *ApiController) ReviewPoint() {
 	defer c.ServeJSON()
 	var requestBody TestPoint
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
@@ -835,7 +836,13 @@ func (c *TestPaperApiController) ReviewPoint() {
 		c.Data["json"] = resp
 		return
 	}
-	userId := requestBody.UserId
+
+	userId, err := c.GetSessionUserId()
+	if err != nil {
+		resp := Response{Status: "10001", Msg: "get user info fail", Data: err}
+		c.Data["json"] = resp
+		return
+	}
 	scoresstr := requestBody.Scores
 	testId := requestBody.TestId
 	testDetailIdstr := requestBody.TestDetailId
@@ -925,19 +932,16 @@ func (c *TestPaperApiController) ReviewPoint() {
 }
 
 // 自评列表 chen
-func (c *TestPaperApiController) SelfScoreList() {
+func (c *ApiController) SelfScoreList() {
 	defer c.ServeJSON()
-	var requestBody TestList
-	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	var response TestListResponse
+
+	userId, err := c.GetSessionUserId()
 	if err != nil {
-		resp := Response{"10001", "cannot unmarshal", err}
+		resp := Response{Status: "10001", Msg: "get user info fail", Data: err}
 		c.Data["json"] = resp
 		return
 	}
-	log.Println(requestBody)
-	userId := requestBody.UserId
-	var response TestListResponse
-	// ----------------------------------------------------
 
 	err = model.GetUnMarkSelfTestIdPaperByUserId(userId, &response.TestId)
 	if err != nil {
@@ -960,41 +964,40 @@ func (c *TestPaperApiController) SelfScoreList() {
 // /**
 // 20.自评卷打分
 // */
-// func (c *TestPaperApiController) SelfMarkPoint() {
-//	defer c.ServeJSON()
-//	var requestBody TestPoint
+// func (c *ApiController) SelfMarkPoint() {
+// 	defer c.ServeJSON()
+// 	var requestBody TestPoint
 //
+// 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+// 	if err != nil {
+// 		c.Data["json"] = Response{"10001", "cannot unmarshal", err}
+// 		return
+// 	}
+// 	userId, err := c.GetSessionUserId()
+// 	if err != nil {
+// 		resp := Response{Status: "10001", Msg: "get user info fail", Data: err}
+// 		c.Data["json"] = resp
+// 		return
+// 	}
+// 	testId := requestBody.TestId
+// 	scoreStr := requestBody.Scores
+// 	testDetailIdStr := requestBody.TestDetailId
+// 	testDetailIds := strings.Split(testDetailIdStr, "-")
+// 	scores := strings.Split(scoreStr, "-")
 //
-//	err=json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
-//	if err!=nil {
-//		resp = Response{"10001","cannot unmarshal",err}
-//		c.Data["json"] = resp
-//		return
-//	}
-//	userId := requestBody.UserId
-//	testId := requestBody.TestId
-//	scoreStr:= requestBody.Scores
-//	testDetailIdStr:=requestBody.TestDetailId
-//	testDetailIds := strings.Split(testDetailIdStr, "-")
-//	scores := strings.Split(scoreStr, "-")
+// 	// ---------------------------------------------------------------------------------------
 //
-//	//---------------------------------------------------------------------------------------
+// 	// 查找大题
+// 	var test model.TestPaper
+// 	_, err = test.GetTestPaper(testId)
+// 	if err != nil || test.TestId == 0 {
+// 		resp := Response{"10002", "get test paper fail", err}
+// 		c.Data["json"] = resp
+// 		return
+// 	}
+// 	var topic model.Topic
+// 	topic.GetTopic(test.QuestionId)
 //
-//
-//   //查找大题
-//	var test models.TestPaper
-//	_,err = test.GetTestPaper(testId)
-//	if err != nil || test.TestId == 0 {
-//		resp := Response{"10002", "get test paper fail", err}
-//		c.Data["json"] = resp
-//		return
-//	}
-//	var topic models.Topic
-//	topic.GetTopic(test.QuestionId)
-//
-//
-//
-//	//----------------------------------------
-//	resp = Response{"10000", "OK", nil}
-//	c.Data["json"] = resp
+// 	// ----------------------------------------
+// 	c.Data["json"] = Response{"10000", "OK", nil}
 // }

@@ -2,9 +2,11 @@ package controllers
 
 import (
 	"encoding/gob"
-	// "github.com/astaxie/beego"
+	"errors"
+	"fmt"
 	beego "github.com/beego/beego/v2/server/web"
 	auth "github.com/casdoor/casdoor-go-sdk/casdoorsdk"
+	"openscore/model"
 )
 
 type ApiController struct {
@@ -24,7 +26,7 @@ func GetUserName(user *auth.User) string {
 }
 
 func (c *ApiController) GetSessionClaims() *auth.Claims {
-	s := c.GetSession("user")
+	s := c.Controller.GetSession("user")
 	if s == nil {
 		return nil
 	}
@@ -44,6 +46,8 @@ func (c *ApiController) SetSessionClaims(claims *auth.Claims) {
 
 func (c *ApiController) GetSessionUser() *auth.User {
 	claims := c.GetSessionClaims()
+	fmt.Println("claims: ", claims)
+
 	if claims == nil {
 		return nil
 	}
@@ -71,4 +75,15 @@ func (c *ApiController) GetSessionUsername() string {
 	}
 
 	return GetUserName(user)
+}
+
+func (c *ApiController) GetSessionUserId() (int64, error) {
+	user := c.GetSessionUser()
+	if user == nil {
+		return 0, errors.New("cant find session info")
+	}
+
+	u, err := model.GetUserByCasdoorName(user.Name)
+
+	return u.UserId, err
 }

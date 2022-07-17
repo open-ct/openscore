@@ -1,4 +1,4 @@
-package admin
+package controllers
 
 type AddTopic struct {
 	AdminId       string           `json:"adminId"`
@@ -54,4 +54,42 @@ type TopicList struct {
 type DistributionRecord struct {
 	AdminId     string `json:"adminId"`
 	SubjectName string `json:"subjectName"`
+}
+
+type TestRequest struct {
+	TestId int64 `json:"testId"`
+}
+
+type TestPoint struct {
+	Scores       string `json:"scores"`
+	TestId       int64  `json:"testId"`
+	TestDetailId string `json:"testDetailId"`
+}
+
+type TestProblem struct {
+	ProblemType    int64  `json:"problemType"`
+	TestId         int64  `json:"testId"`
+	ProblemMessage string `json:"problemMessage"`
+}
+
+type ExampleDetail struct {
+	ExampleTestId int64 `json:"exampleTestId"`
+}
+
+type Question struct {
+	QuestionId int64 `joson:"questionId"`
+}
+
+type SelfScore struct {
+	ExaminerId int64 `joson:"examinerId"`
+}
+
+type SupervisorPoint struct {
+	TestId        int64  `joson:"testId"`
+	TestDetailIds string `joson:"testDetailIds"`
+	Scores        string `joson:"scores"`
+}
+
+type ScoreProgress struct {
+	Subject string `json:"subject"`
 }

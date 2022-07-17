@@ -1,11 +1,11 @@
-package supervisor
+package controllers
 
 import (
 	"encoding/json"
 	"fmt"
-	beego "github.com/beego/beego/v2/server/web"
+	"github.com/xuri/excelize/v2"
+	"log"
 	"math"
-	. "openscore/controllers"
 	"openscore/model"
 	"openscore/util"
 	"strconv"
@@ -13,27 +13,117 @@ import (
 	"time"
 )
 
-type SupervisorApiController struct {
-	beego.Controller
+// 导出成绩
+func (c *ApiController) WriteScoreExcel() {
+	c.Ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin", c.Ctx.Request.Header.Get("Origin"))
+	defer c.ServeJSON()
+
+	f := excelize.NewFile()
+
+	subjects := make([]model.Subject, 0)
+	if err := model.FindSubjectList(&subjects); err != nil {
+		log.Println(err)
+		c.Data["json"] = Response{Status: "30008", Msg: "科目列表获取错误  ", Data: err}
+		return
+	}
+
+	for _, subject := range subjects {
+		topics := make([]model.Topic, 0)
+		if err := model.FindTopicBySubNameList(&topics, subject.SubjectName); err != nil {
+			log.Println(err)
+			c.Data["json"] = Response{Status: "30004", Msg: "获取大题列表错误  ", Data: err}
+			return
+		}
+
+		topicMap := make(map[int64]string, len(topics))
+		// 获取subject的小题数
+		var subjectSubTopics []model.SubTopic
+		var subjectTestPapers []model.TestPaper
+		for _, topic := range topics {
+			topicMap[topic.QuestionId] = topic.QuestionName
+			subTopics := make([]model.SubTopic, 0)
+			if err := model.FindSubTopicsByQuestionId(topic.QuestionId, &subTopics); err != nil {
+				log.Println(err)
+				c.Data["json"] = Response{Status: "30022", Msg: "获取小题参数设置记录表失败  ", Data: err}
+				return
+			}
+			subjectSubTopics = append(subjectSubTopics, subTopics...)
+
+			testPapers := make([]model.TestPaper, 0)
+			if err := model.FindTestPaperByQuestionId(topic.QuestionId, &testPapers); err != nil {
+				log.Println(err)
+				c.Data["json"] = Response{Status: "30022", Msg: "获取大题参数设置记录表失败  ", Data: err}
+				return
+			}
+			subjectTestPapers = append(subjectTestPapers, testPapers...)
+		}
+
+		// Create a new sheet.
+		index := f.NewSheet(subject.SubjectName)
+		// Set value of a cell.
+		f.SetCellValue(subject.SubjectName, "A1", "ticket_id")
+		f.SetCellValue(subject.SubjectName, "B1", "name")
+		f.SetCellValue(subject.SubjectName, "C1", "school")
+		f.SetCellValue(subject.SubjectName, "D1", "mobile")
+		// Set active sheet of the workbook.
+		f.SetActiveSheet(index)
+
+		var subjectTestPaperInfos []model.TestPaperInfo
+		for i, subTopic := range subjectSubTopics {
+			testPaperInfos := make([]model.TestPaperInfo, 0)
+			model.FindTestPaperInfoByQuestionDetailId(subTopic.QuestionDetailId, &testPaperInfos)
+			subjectTestPaperInfos = append(subjectTestPaperInfos, testPaperInfos...)
+
+			f.SetCellValue(subject.SubjectName, string(byte(i+'E'))+"1", topicMap[subTopic.QuestionId]+"-"+subTopic.QuestionDetailName)
+		}
+		f.SetCellValue(subject.SubjectName, string(byte(len(subjectSubTopics)+'E'))+"1", "总分")
+
+		for i := 2; i <= len(subjectTestPaperInfos)/len(subjectSubTopics)+1; i++ {
+			f.SetCellValue(subject.SubjectName, "A"+strconv.Itoa(i), subjectTestPapers[(i-2)*len(topics)].TicketId)
+			f.SetCellValue(subject.SubjectName, "B"+strconv.Itoa(i), subjectTestPapers[(i-2)*len(topics)].Candidate)
+			f.SetCellValue(subject.SubjectName, "C"+strconv.Itoa(i), subjectTestPapers[(i-2)*len(topics)].School)
+			f.SetCellValue(subject.SubjectName, "D"+strconv.Itoa(i), subjectTestPapers[(i-2)*len(topics)].Mobile)
+			// 获取该用户的小题成绩
+			infos, err := model.FindTestPaperInfoByTicketId(subjectTestPapers[(i-2)*len(topics)].TicketId)
+			if err != nil {
+				log.Println(err)
+				c.Data["json"] = Response{Status: "30022", Msg: "获取小题参数设置记录表失败  ", Data: err}
+				return
+			}
+			var sum int64
+			for j, info := range infos {
+				f.SetCellValue(subject.SubjectName, string(byte(j+'E'))+strconv.Itoa(i), info.FinalScore)
+				sum += info.FinalScore
+			}
+			f.SetCellValue(subject.SubjectName, string(byte(len(subjectSubTopics)+'E'))+strconv.Itoa(i), sum)
+		}
+
+	}
+
+	// Save spreadsheet by the given path.
+	if err := f.SaveAs("../scores.xlsx"); err != nil {
+		log.Println(err)
+		c.Data["json"] = Response{Status: "30000", Msg: "excel 表导出错误", Data: err}
+		return
+	}
+
+	c.Ctx.Output.Download("../scores.xlsx", "scores.xlsx")
 }
 
 /**
 9.大题选择列表
 */
-func (c *SupervisorApiController) QuestionList() {
+func (c *ApiController) QuestionList() {
 	defer c.ServeJSON()
-	var requestBody QuestionList
 	var resp Response
-	var err error
 
-	err = json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	supervisorId, err := c.GetSessionUserId()
 	if err != nil {
-		resp = Response{"10001", "cannot unmarshal", err}
+		resp := Response{Status: "10001", Msg: "get user info fail", Data: err}
 		c.Data["json"] = resp
 		return
 	}
-	supervisorId := requestBody.SupervisorId
-	// ----------------------------------------------------
+
 	// 获取大题列表
 	var user model.User
 	user.GetUser(supervisorId)
@@ -67,21 +157,17 @@ func (c *SupervisorApiController) QuestionList() {
 /**
 10.用户登入信息表
 */
-func (c *SupervisorApiController) UserInfo() {
+func (c *ApiController) UserInfo() {
 	defer c.ServeJSON()
-	var requestBody UserInfo
 	var resp Response
-	var err error
 
-	err = json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	supervisorId, err := c.GetSessionUserId()
 	if err != nil {
-		resp = Response{"10001", "cannot unmarshal", err}
+		resp := Response{Status: "10001", Msg: "get user info fail", Data: err}
 		c.Data["json"] = resp
 		return
 	}
-	supervisorId := requestBody.SupervisorId
 
-	// ----------------------------------------------------
 	user := model.UserInfo{}
 	if err := user.GetUserInfo(supervisorId); err != nil {
 		resp = Response{"20001", "获取用户信息失败", err}
@@ -103,9 +189,9 @@ func (c *SupervisorApiController) UserInfo() {
 /**
 8.教师监控页面
 */
-func (c *SupervisorApiController) TeacherMonitoring() {
+func (c *ApiController) TeacherMonitoring() {
 	defer c.ServeJSON()
-	var requestBody TeacherMonitoring
+	var requestBody Question
 	var resp Response
 	var err error
 
@@ -265,9 +351,9 @@ func (c *SupervisorApiController) TeacherMonitoring() {
 /**
 11.分数分布表
 */
-func (c *SupervisorApiController) ScoreDistribution() {
+func (c *ApiController) ScoreDistribution() {
 	defer c.ServeJSON()
-	var requestBody ScoreDistribution
+	var requestBody Question
 	var resp Response
 	var err error
 
@@ -338,9 +424,9 @@ func (c *SupervisorApiController) ScoreDistribution() {
 /**
 12.大题教师选择列表
 */
-func (c *SupervisorApiController) TeachersByQuestion() {
+func (c *ApiController) TeachersByQuestion() {
 	defer c.ServeJSON()
-	var requestBody TeachersByQuestion
+	var requestBody Question
 	var resp Response
 	var err error
 
@@ -393,7 +479,7 @@ func (c *SupervisorApiController) TeachersByQuestion() {
 /**
 13.自评监控表
 */
-func (c *SupervisorApiController) SelfScore() {
+func (c *ApiController) SelfScore() {
 	defer c.ServeJSON()
 	var requestBody SelfScore
 	var resp Response
@@ -482,9 +568,9 @@ func (c *SupervisorApiController) SelfScore() {
 /**
 14，平均分监控表
 */
-func (c *SupervisorApiController) AverageScore() {
+func (c *ApiController) AverageScore() {
 	defer c.ServeJSON()
-	var requestBody AverageScore
+	var requestBody Question
 	var resp Response
 	var err error
 
@@ -576,9 +662,9 @@ func (c *SupervisorApiController) AverageScore() {
 /**
 17，问题卷表
 */
-func (c *SupervisorApiController) ProblemTest() {
+func (c *ApiController) ProblemTest() {
 	defer c.ServeJSON()
-	var requestBody ProblemTest
+	var requestBody Question
 	var resp Response
 	var err error
 
@@ -642,9 +728,9 @@ func (c *SupervisorApiController) ProblemTest() {
 /**
 18，仲裁卷表
 */
-func (c *SupervisorApiController) ArbitramentTest() {
+func (c *ApiController) ArbitramentTest() {
 	defer c.ServeJSON()
-	var requestBody ArbitramentTest
+	var requestBody Question
 	var resp Response
 	var err error
 
@@ -757,7 +843,7 @@ func (c *SupervisorApiController) ArbitramentTest() {
 /**
 15.总体进度
 */
-func (c *SupervisorApiController) ScoreProgress() {
+func (c *ApiController) ScoreProgress() {
 	defer c.ServeJSON()
 	var requestBody ScoreProgress
 	var resp Response
@@ -1173,7 +1259,7 @@ func (c *SupervisorApiController) ScoreProgress() {
 /**
 19.阅卷组长批改试卷
 */
-func (c *SupervisorApiController) SupervisorPoint() {
+func (c *ApiController) SupervisorPoint() {
 	defer c.ServeJSON()
 	var requestBody SupervisorPoint
 	var resp Response
@@ -1185,7 +1271,13 @@ func (c *SupervisorApiController) SupervisorPoint() {
 		c.Data["json"] = resp
 		return
 	}
-	supervisorId := requestBody.SupervisorId
+
+	supervisorId, err := c.GetSessionUserId()
+	if err != nil {
+		resp := Response{Status: "10001", Msg: "get user info fail", Data: err}
+		c.Data["json"] = resp
+		return
+	}
 	testId := requestBody.TestId
 	scoreStr := requestBody.Scores
 	testDetailIdStr := requestBody.TestDetailIds
@@ -1283,9 +1375,9 @@ func (c *SupervisorApiController) SupervisorPoint() {
 /**
 20.问题卷列表
 */
-func (c *SupervisorApiController) ProblemUnmarkList() {
+func (c *ApiController) ProblemUnmarkList() {
 	defer c.ServeJSON()
-	var requestBody ProblemUnmarkList
+	var requestBody Question
 	var resp Response
 	var err error
 
@@ -1329,9 +1421,9 @@ func (c *SupervisorApiController) ProblemUnmarkList() {
 /**
 20.自评卷列表
 */
-func (c *SupervisorApiController) SelfUnmarkList() {
+func (c *ApiController) SelfUnmarkList() {
 	defer c.ServeJSON()
-	var requestBody SelfUnmarkList
+	var requestBody Question
 	var resp Response
 	var err error
 
@@ -1375,9 +1467,9 @@ func (c *SupervisorApiController) SelfUnmarkList() {
 /**
 21.仲裁卷列表
 */
-func (c *SupervisorApiController) ArbitramentUnmarkList() {
+func (c *ApiController) ArbitramentUnmarkList() {
 	defer c.ServeJSON()
-	var requestBody ArbitramentUnmarkList
+	var requestBody Question
 	var resp Response
 	var err error
 
@@ -1420,9 +1512,9 @@ func (c *SupervisorApiController) ArbitramentUnmarkList() {
 
 // 16标准差
 
-func (c *SupervisorApiController) ScoreDeviation() {
+func (c *ApiController) ScoreDeviation() {
 	defer c.ServeJSON()
-	var requestBody ScoreDeviation
+	var requestBody Question
 	var resp Response
 	var err error
 
@@ -1516,9 +1608,9 @@ func (c *SupervisorApiController) ScoreDeviation() {
 /**
 22.自评卷列表
 */
-func (c *SupervisorApiController) SelfMarkList() {
+func (c *ApiController) SelfMarkList() {
 	defer c.ServeJSON()
-	var requestBody SelfMarkList
+	var requestBody Question
 	var resp Response
 	var err error
 
