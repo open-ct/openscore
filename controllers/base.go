@@ -3,7 +3,6 @@ package controllers
 import (
 	"encoding/gob"
 	"errors"
-	"fmt"
 	beego "github.com/beego/beego/v2/server/web"
 	auth "github.com/casdoor/casdoor-go-sdk/casdoorsdk"
 	"openscore/model"
@@ -46,7 +45,6 @@ func (c *ApiController) SetSessionClaims(claims *auth.Claims) {
 
 func (c *ApiController) GetSessionUser() *auth.User {
 	claims := c.GetSessionClaims()
-	fmt.Println("claims: ", claims)
 
 	if claims == nil {
 		return nil

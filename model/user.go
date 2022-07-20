@@ -54,9 +54,20 @@ func (u *UserInfo) GetUserInfo(id int64) error {
 
 func GetUserByCasdoorName(name string) (*User, error) {
 	u := &User{}
-	_, err := x.Where(builder.Eq{"casdoor_name": name}).Get(u)
+	has, err := x.Where(builder.Eq{"casdoor_name": name}).Get(u)
+	if !has {
+		return nil, err
+	}
 
 	return u, err
+}
+
+func (u *User) UpdateCols(columns ...string) error {
+	_, err := x.Cols(columns...).Update(u)
+	if err != nil {
+		log.Println("could not Update user")
+	}
+	return err
 }
 
 func (u *User) Update() error {
@@ -131,5 +142,5 @@ func UpdateMemberOnlineStatus(userId int64, isOnline bool, time string) error {
 	user.IsOnlineStatus = isOnline
 	user.LoginTime = time
 
-	return user.Update()
+	return user.UpdateCols("is_online_status", "login_time")
 }

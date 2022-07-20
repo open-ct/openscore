@@ -20,7 +20,8 @@ import (
 func main() {
 
 	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
-
+		// 允许访问所有源
+		// AllowAllOrigins: true,
 		AllowOrigins: []string{"*"},
 		AllowMethods: []string{"GET", "PUT", "PATCH", "POST", "OPTIONS"},
 		// AllowHeaders:     []string{"Origin", "Access-Control-Allow-Origin", "Access-Control-Allow-Headers", "Content-Type"},

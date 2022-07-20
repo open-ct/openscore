@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"log"
 
 	"xorm.io/builder"
@@ -89,6 +90,8 @@ func FindTestPaperInfoByQuestionDetailId(questionDetailId int64, t *[]TestPaperI
 func FindTestPaperInfoByTicketId(ticketId string) ([]*TestPaperInfo, error) {
 	var infos []*TestPaperInfo
 	err := x.Where("ticket_id = ?", ticketId).Find(&infos)
+	fmt.Println("ticketId: ", ticketId, len(infos))
+
 	if err != nil {
 		return nil, err
 	}

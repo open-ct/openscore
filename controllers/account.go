@@ -68,9 +68,10 @@ func (c *ApiController) SignIn() {
 
 		if err := u.Insert(); err != nil {
 			log.Println(err)
-			c.Data["json"] = Response{Status: "30001", Msg: "用户首次错误", Data: err}
+			c.Data["json"] = Response{Status: "30001", Msg: "用户首次登录错误", Data: err}
 			return
 		}
+		user = &u
 	}
 
 	if err := model.UpdateMemberOnlineStatus(user.UserId, true, util.GetCurrentTime()); err != nil {

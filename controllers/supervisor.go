@@ -78,6 +78,8 @@ func (c *ApiController) WriteScoreExcel() {
 		}
 		f.SetCellValue(subject.SubjectName, string(byte(len(subjectSubTopics)+'E'))+"1", "总分")
 
+		fmt.Println("subjectSubTopics: ", subjectSubTopics)
+
 		for i := 2; i <= len(subjectTestPaperInfos)/len(subjectSubTopics)+1; i++ {
 			f.SetCellValue(subject.SubjectName, "A"+strconv.Itoa(i), subjectTestPapers[(i-2)*len(topics)].TicketId)
 			f.SetCellValue(subject.SubjectName, "B"+strconv.Itoa(i), subjectTestPapers[(i-2)*len(topics)].Candidate)
@@ -92,7 +94,10 @@ func (c *ApiController) WriteScoreExcel() {
 			}
 			var sum int64
 			for j, info := range infos {
-				f.SetCellValue(subject.SubjectName, string(byte(j+'E'))+strconv.Itoa(i), info.FinalScore)
+				if j < 22 {
+					fmt.Println("string(byte(j+'E'))+strconv.Itoa(i): ", string(byte(j+'E'))+strconv.Itoa(i))
+					f.SetCellValue(subject.SubjectName, string(byte(j+'E'))+strconv.Itoa(i), info.FinalScore)
+				}
 				sum += info.FinalScore
 			}
 			f.SetCellValue(subject.SubjectName, string(byte(len(subjectSubTopics)+'E'))+strconv.Itoa(i), sum)
