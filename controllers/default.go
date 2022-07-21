@@ -9,11 +9,9 @@ package controllers
 
 import (
 	"fmt"
+	beego "github.com/beego/beego/v2/server/web"
 	"log"
 	"openscore/auth"
-	"openscore/models"
-
-	beego "github.com/beego/beego/v2/server/web"
 )
 
 type Response struct {
@@ -30,17 +28,6 @@ var CasdoorOrganization, _ = beego.AppConfig.String("casdoorOrganization")
 
 func init() {
 	auth.InitConfig(CasdoorEndpoint, ClientId, ClientSecret, JwtSecret, CasdoorOrganization)
-}
-
-func (c *ApiController) Get() {
-	//c.Data["Website"] = "beego.me"
-	//c.Data["Email"] = "astaxie@gmail.com"
-	//c.TplName = "index.tpl"
-	a := new(models.Topic)
-	fmt.Println(a)
-	c.Ctx.WriteString("hello OpenCT")
-	c.Data["json"] = "hello OpenCT"
-	c.ServeJSON()
 }
 
 func (c *ApiController) Login() {
