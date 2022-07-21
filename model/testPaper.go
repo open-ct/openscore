@@ -102,7 +102,7 @@ func FindTestPapersByTestId(testId, t *[]TestPaper) error {
 	return err
 }
 func FindUnDistributeTest(id int64, t *[]TestPaper) error {
-	err := x.Where("correcting_status = 0 AND question_id=?", id).Find(t)
+	err := x.Where("correcting_status = 0 AND question_id = ?", id).Find(t)
 	if err != nil {
 		log.Println("could not GetUnDistributeTest")
 	}

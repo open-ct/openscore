@@ -19,7 +19,7 @@ import (
 
 var (
 	dpi      = flag.Float64("dpi", 200, "screen resolution in Dots Per Inch")
-	fontfile = flag.String("fontfile", "../simhei.ttf", "filename of the ttf font")
+	fontfile = flag.String("fontfile", "./simhei.ttf", "filename of the ttf font")
 	size     = flag.Float64("size", 20, "font size in points")
 	spacing  = flag.Float64("spacing", 1.5, "line spacing (e.g. 2 means double spaced)")
 	width    = 1024

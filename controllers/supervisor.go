@@ -930,7 +930,12 @@ func (c *ApiController) ScoreProgress() {
 		scoreProgressVOList[i].IsAllFinished = isAllFinished
 		// 在线人数
 		var users = make([]model.User, 0)
-		model.FindUserNumberByQuestionId(&users, questionId)
+		if err := model.FindUserNumberByQuestionId(&users, questionId); err != nil {
+			resp = Response{"20010", "FindUserNumberByQuestionId err ", err}
+			c.Data["json"] = resp
+			return
+
+		}
 		usersNumber := len(users)
 		scoreProgressVOList[i].DistributionUserNumber = int64(usersNumber)
 

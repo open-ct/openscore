@@ -18,6 +18,7 @@ type User struct {
 	IsDistribute   bool   `json:"is_distribute"`
 	CasdoorName    string `json:"casdoor_name" xorm:"not null unique"`
 	QuestionId     int64  `json:"question_id"`
+	UserType       int64  `json:"user_type"`
 }
 
 type UserInfo struct {
@@ -78,42 +79,8 @@ func (u *User) Update() error {
 	return err
 }
 
-func CountOnlineNumberUnDistribute() (count int64, err error) {
-	user := new(User)
-	count, err1 := x.Where("status = ? ", 1).Where(" user_type=?", 1).Where("is_distribute = ?", 0).Count(user)
-	if err != nil {
-		log.Println("CountOnlineNumber err ")
-	}
-	return count, err1
-}
-
-func CountOnlineUserNumberByQuestionId(questionId int64) (count int64, err error) {
-	user := new(User)
-	count, err1 := x.Where("status = ? ", 1).Where(" user_type=?", 1).Where("is_distribute = ?", 1).Where("question_id=?", questionId).Count(user)
-	if err != nil {
-		log.Println("CountOnlineNumber err ")
-	}
-	return count, err1
-}
-
-func FindOnlineUserNumberByQuestionId(users *[]User, questionId int64) error {
-	err := x.Where("status = ? ", 1).Where(" user_type=?", 1).Where("is_distribute = ?", 1).Where("question_id=?", questionId).Find(users)
-	if err != nil {
-		log.Println("FindOnlineUserNumberByQuestionId err ")
-	}
-	return err
-}
-
-func FindUserNumberByQuestionId(users *[]User, questionId int64) error {
-	err := x.Where(" user_type=?", 1).Where("is_distribute = ?", 1).Where("question_id=?", questionId).Find(users)
-	if err != nil {
-		log.Println("FindOnlineUserNumberByQuestionId err ")
-	}
-	return err
-}
-
-func FindUsers(u *[]User) error {
-	err := x.Where("status = ? ", 1).Where(" user_type=?", 1).Where("is_distribute = ?", 0).Find(u)
+func FindUsers(u *[]User, subject string) error {
+	err := x.Where("is_online_status = 1 AND user_type = 1 AND is_distribute = 0 AND subject_name = ?", subject).Find(u)
 	if err != nil {
 		log.Println("could not FindUsers ")
 		log.Println(err)
@@ -121,9 +88,26 @@ func FindUsers(u *[]User) error {
 	return err
 }
 
+func CountOnlineUserNumberByQuestionId(questionId int64) (int64, error) {
+	user := new(User)
+	count, err := x.Where("is_online_status = 1").Where(" user_type = ?", 1).Where("is_distribute = ?", 1).Where("question_id=?", questionId).Count(user)
+	if err != nil {
+		log.Println("CountOnlineNumber err ")
+	}
+	return count, err
+}
+
+func FindOnlineUserNumberByQuestionId(users *[]User, questionId int64) error {
+	return x.Where("is_online_status = ? ", 1).Where(" user_type=?", 1).Where("is_distribute = ?", 1).Where("question_id=?", questionId).Find(users)
+}
+
+func FindUserNumberByQuestionId(users *[]User, questionId int64) error {
+	return x.Where(" user_type=?", 1).Where("is_distribute = ?", 1).Where("question_id=?", questionId).Find(users)
+}
+
 func FindNewUserId(id1 int64, id2 int64, questionId int64) (newId int64) {
 	var Ids []int64
-	err := x.Table("user").Where("user_id !=?", id1).Where("user_id !=?", id2).Where("question_id=?", questionId).Where("status=?", 1).Select("user_id").Find(&Ids)
+	err := x.Table("user").Where("user_id !=?", id1).Where("user_id !=?", id2).Where("question_id=?", questionId).Where("is_online_status=?", 1).Select("user_id").Find(&Ids)
 	if err != nil {
 		log.Println("FindNewUserId err")
 		log.Println(err)

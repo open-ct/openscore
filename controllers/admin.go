@@ -555,22 +555,13 @@ func (c *ApiController) InsertTopic() {
 func (c *ApiController) SubjectList() {
 
 	defer c.ServeJSON()
-	var requestBody SubjectList
 	var resp Response
-	var err error
 
-	err = json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
-	if err != nil {
-		log.Println(err)
-		resp = Response{"10001", "cannot unmarshal", err}
-		c.Data["json"] = resp
-		return
-	}
 	// supervisorId := requestBody.SupervisorId
 	// ----------------------------------------------------
 	// 获取科目列表
 	subjects := make([]model.Subject, 0)
-	err = model.FindSubjectList(&subjects)
+	err := model.FindSubjectList(&subjects)
 	if err != nil {
 		log.Println(err)
 		resp = Response{"30008", "科目列表获取错误  ", err}
@@ -634,23 +625,25 @@ func (c *ApiController) DistributionInfo() {
 	// 获取试卷未分配数量
 	// 查询相应试卷
 	papers := make([]model.TestPaper, 0)
-	err = model.FindUnDistributeTest(questionId, &papers)
-	if err != nil {
+	if err := model.FindUnDistributeTest(questionId, &papers); err != nil {
 		log.Println(err)
 		resp = Response{"30012", "试卷分配异常，无法获取未分配试卷 ", err}
 		c.Data["json"] = resp
 		return
 	}
+
 	distributionInfoVO.LeftTestNumber = len(papers)
 	// 获取在线人数
-	var onlineNumber, err1 = model.CountOnlineNumberUnDistribute()
-	if err1 != nil {
+
+	// 查找在线且未分配试卷的人
+	usersList := make([]model.User, 0)
+	if err := model.FindUsers(&usersList, topic.SubjectName); err != nil {
 		log.Println(err)
 		resp = Response{"30010", "获取可分配人数错误  ", err}
 		c.Data["json"] = resp
 		return
 	}
-	distributionInfoVO.OnlineNumber = onlineNumber
+	distributionInfoVO.OnlineNumber = int64(len(usersList))
 
 	// ----------------------------------------------------
 	data := make(map[string]interface{})
@@ -709,14 +702,14 @@ func (c *ApiController) Distribution() {
 
 	// 查找在线且未分配试卷的人
 	usersList := make([]model.User, 0)
-	err = model.FindUsers(&usersList)
+	err = model.FindUsers(&usersList, topic.SubjectName)
 	if err != nil {
 		log.Println(err)
 		resp = Response{"30013", "试卷分配异常，无法获取可分配阅卷员 ", err}
 		c.Data["json"] = resp
 		return
 	}
-	users := cutUser(usersList, userNumber)
+	users := usersList[:userNumber]
 	// 第一次分配试卷
 	countUser := make([]int, userNumber)
 	var ii int
@@ -813,19 +806,18 @@ func (c *ApiController) Distribution() {
 			c.Data["json"] = resp
 			return
 		}
+	}
 
+	for _, user := range users {
 		// 修改user变为已分配
-		var user model.User
 		user.IsDistribute = true
 		user.QuestionId = questionId
-		err = user.Update()
-		if err != nil {
+		if err := user.UpdateCols("is_distribute", "question_id"); err != nil {
 			log.Println(err)
 			resp = Response{"30019", "试卷分配异常，用户分配状态更新失败 ", err}
 			c.Data["json"] = resp
 			return
 		}
-
 	}
 
 	// ----------------------------------------------------
@@ -891,16 +883,6 @@ func revers(users []model.User) {
 	}
 }
 
-/**
-截断数组函数
-*/
-func cutTest(oldData []model.TestPaper, n int) (newData []model.TestPaper) {
-	newData1 := make([]model.TestPaper, n)
-	for i := 0; i < n; i++ {
-		newData1[i] = oldData[i]
-	}
-	return newData1
-}
 func cutUser(oldData []model.User, n int) (newData []model.User) {
 	newData1 := make([]model.User, n)
 	for i := 0; i < n; i++ {
@@ -915,23 +897,13 @@ func cutUser(oldData []model.User, n int) (newData []model.User) {
 
 func (c *ApiController) TopicList() {
 	defer c.ServeJSON()
-	var requestBody TopicList
 	var resp Response
-	var err error
-
-	err = json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
-	if err != nil {
-		log.Println(err)
-		resp = Response{"10001", "cannot unmarshal", err}
-		c.Data["json"] = resp
-		return
-	}
 	// supervisorId := requestBody.SupervisorId
 
 	// ----------------------------------------------------
 	// 获取大题列表
 	topics := make([]model.Topic, 0)
-	err = model.FindTopicList(&topics)
+	err := model.FindTopicList(&topics)
 	if err != nil {
 		log.Println(err)
 		resp = Response{"30021", "获取大题参数设置记录表失败  ", err}

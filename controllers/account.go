@@ -2,6 +2,7 @@ package controllers
 
 import (
 	_ "embed"
+	"encoding/json"
 	"fmt"
 	beego "github.com/beego/beego/v2/server/web"
 	auth "github.com/casdoor/casdoor-go-sdk/casdoorsdk"
@@ -60,8 +61,18 @@ func (c *ApiController) SignIn() {
 
 	// 首次登录
 	if user == nil {
+		tag := &struct {
+			Subject  string `json:"subject"`
+			UserType int64  `json:"user_type"`
+		}{}
+		if err := json.Unmarshal([]byte(claims.Tag), tag); err != nil {
+			log.Println(err)
+			c.Data["json"] = Response{Status: "30001", Msg: "用户首次登录: 解析tag错误", Data: err}
+			return
+		}
 		u := model.User{
-			SubjectName: claims.User.Tag,
+			UserType:    tag.UserType,
+			SubjectName: tag.Subject,
 			CasdoorName: claims.User.Name,
 		}
 		fmt.Println("insert: ", "insert")
