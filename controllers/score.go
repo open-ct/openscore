@@ -3,11 +3,11 @@ package controllers
 import (
 	"encoding/base64"
 	"encoding/json"
+	"github.com/open-ct/openscore/models"
+	"github.com/open-ct/openscore/requests"
+	"github.com/open-ct/openscore/responses"
 	"log"
 	"math"
-	"openscore/models"
-	"openscore/requests"
-	"openscore/responses"
 	"os"
 	"strconv"
 	"strings"
@@ -118,7 +118,7 @@ func (c *TestPaperApiController) Point() {
 	defer c.ServeJSON()
 	var requestBody requests.TestPoint
 	var resp Response
-	var  err error
+	var err error
 	err = json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
 	if err != nil {
 		resp := Response{"10001", "cannot unmarshal", err}
@@ -157,7 +157,7 @@ func (c *TestPaperApiController) Point() {
 		c.Data["json"] = resp
 		return
 	}
-	if underTest.Test_question_type==0 {
+	if underTest.Test_question_type == 0 {
 		standardError := topic.Standard_error
 
 		//分三种情况
@@ -167,12 +167,11 @@ func (c *TestPaperApiController) Point() {
 			for i := 0; i < len(testDetailIds); i++ {
 				//取出小题试卷id,和小题分数
 				var testInfo models.TestPaperInfo
-				testDetailIdString:=testDetailIds[i]
+				testDetailIdString := testDetailIds[i]
 				testDetailId, _ := strconv.ParseInt(testDetailIdString, 10, 64)
-				scoreString:=scores[i]
+				scoreString := scores[i]
 				score, _ := strconv.ParseInt(scoreString, 10, 64)
 				//------------------------------------------------
-
 
 				//查试卷小题
 				err := testInfo.GetTestPaperInfo(testDetailId)
@@ -183,8 +182,7 @@ func (c *TestPaperApiController) Point() {
 				}
 				//修改试卷详情表
 
-
-				testInfo.Examiner_first_self_score=score
+				testInfo.Examiner_first_self_score = score
 
 				err = testInfo.Update()
 				if err != nil {
@@ -208,9 +206,9 @@ func (c *TestPaperApiController) Point() {
 			var record models.ScoreRecord
 			var underTest models.UnderCorrectedPaper
 
-			err = models.GetSelfScorePaperByTestQuestionTypeAndTestId(&underTest, testId,userId)
-			if err!=nil {
-				resp = Response{"20012","GetUnderCorrectedPaperByUserIdAndTestId  fail",err}
+			err = models.GetSelfScorePaperByTestQuestionTypeAndTestId(&underTest, testId, userId)
+			if err != nil {
+				resp = Response{"20012", "GetUnderCorrectedPaperByUserIdAndTestId  fail", err}
 				c.Data["json"] = resp
 				return
 			}
@@ -218,43 +216,42 @@ func (c *TestPaperApiController) Point() {
 			record.Test_id = testId
 			record.Test_record_type = underTest.Test_question_type
 			record.User_id = userId
-			record.Question_id=underTest.Question_id
+			record.Question_id = underTest.Question_id
 
 			err = record.Save()
-			if err!=nil {
-				resp = Response{"20013","Save  fail",err}
+			if err != nil {
+				resp = Response{"20013", "Save  fail", err}
 				c.Data["json"] = resp
 				return
 			}
 			err = underTest.SelfMarkDelete()
-			if err!=nil {
-				resp = Response{"20014","Delete  fail",err}
+			if err != nil {
+				resp = Response{"20014", "Delete  fail", err}
 				c.Data["json"] = resp
 				return
 			}
 
-			if math.Abs(float64(sum-test.Examiner_first_score))>float64(standardError) {
+			if math.Abs(float64(sum-test.Examiner_first_score)) > float64(standardError) {
 				var newUnderTest models.UnderCorrectedPaper
-				newUnderTest.User_id="10000"
-				newUnderTest.Self_score_id=userId
-				newUnderTest.Test_id=testId
-				newUnderTest.Question_id=test.Question_id
-				newUnderTest.Test_question_type=7
+				newUnderTest.User_id = "10000"
+				newUnderTest.Self_score_id = userId
+				newUnderTest.Test_id = testId
+				newUnderTest.Question_id = test.Question_id
+				newUnderTest.Test_question_type = 7
 				newUnderTest.Save()
 			}
 
-		}else if userId==test.Examiner_second_id {
+		} else if userId == test.Examiner_second_id {
 			var sum int64
 			//给试卷详情表打分
 			for i := 0; i < len(testDetailIds); i++ {
 				//取出小题试卷id,和小题分数
 				var testInfo models.TestPaperInfo
-				testDetailIdString:=testDetailIds[i]
+				testDetailIdString := testDetailIds[i]
 				testDetailId, _ := strconv.ParseInt(testDetailIdString, 10, 64)
-				scoreString:=scores[i]
+				scoreString := scores[i]
 				score, _ := strconv.ParseInt(scoreString, 10, 64)
 				//------------------------------------------------
-
 
 				//查试卷小题
 				err := testInfo.GetTestPaperInfo(testDetailId)
@@ -265,8 +262,7 @@ func (c *TestPaperApiController) Point() {
 				}
 				//修改试卷详情表
 
-
-				testInfo.Examiner_second_self_score=score
+				testInfo.Examiner_second_self_score = score
 
 				err = testInfo.Update()
 				if err != nil {
@@ -290,9 +286,9 @@ func (c *TestPaperApiController) Point() {
 			var record models.ScoreRecord
 			var underTest models.UnderCorrectedPaper
 
-			err = models.GetSelfScorePaperByTestQuestionTypeAndTestId(&underTest, testId,userId)
-			if err!=nil {
-				resp = Response{"20012","GetUnderCorrectedPaperByUserIdAndTestId  fail",err}
+			err = models.GetSelfScorePaperByTestQuestionTypeAndTestId(&underTest, testId, userId)
+			if err != nil {
+				resp = Response{"20012", "GetUnderCorrectedPaperByUserIdAndTestId  fail", err}
 				c.Data["json"] = resp
 				return
 			}
@@ -300,41 +296,40 @@ func (c *TestPaperApiController) Point() {
 			record.Test_id = testId
 			record.Test_record_type = underTest.Test_question_type
 			record.User_id = userId
-			record.Question_id=underTest.Question_id
+			record.Question_id = underTest.Question_id
 			err = record.Save()
-			if err!=nil {
-				resp = Response{"20013","Save  fail",err}
+			if err != nil {
+				resp = Response{"20013", "Save  fail", err}
 				c.Data["json"] = resp
 				return
 			}
 			err = underTest.SelfMarkDelete()
-			if err!=nil {
-				resp = Response{"20014","Delete  fail",err}
+			if err != nil {
+				resp = Response{"20014", "Delete  fail", err}
 				c.Data["json"] = resp
 				return
 			}
-			if math.Abs(float64(sum-test.Examiner_second_score))>float64(standardError) {
+			if math.Abs(float64(sum-test.Examiner_second_score)) > float64(standardError) {
 				var newUnderTest models.UnderCorrectedPaper
-				newUnderTest.User_id="10000"
-				newUnderTest.Test_id=testId
-				newUnderTest.Self_score_id=userId
-				newUnderTest.Question_id=test.Question_id
-				newUnderTest.Test_question_type=7
+				newUnderTest.User_id = "10000"
+				newUnderTest.Test_id = testId
+				newUnderTest.Self_score_id = userId
+				newUnderTest.Question_id = test.Question_id
+				newUnderTest.Test_question_type = 7
 				newUnderTest.Save()
 			}
 
-		} else if userId ==test.Examiner_third_id {
+		} else if userId == test.Examiner_third_id {
 			var sum int64
 			//给试卷详情表打分
 			for i := 0; i < len(testDetailIds); i++ {
 				//取出小题试卷id,和小题分数
 				var testInfo models.TestPaperInfo
-				testDetailIdString:=testDetailIds[i]
+				testDetailIdString := testDetailIds[i]
 				testDetailId, _ := strconv.ParseInt(testDetailIdString, 10, 64)
-				scoreString:=scores[i]
+				scoreString := scores[i]
 				score, _ := strconv.ParseInt(scoreString, 10, 64)
 				//------------------------------------------------
-
 
 				//查试卷小题
 				err := testInfo.GetTestPaperInfo(testDetailId)
@@ -345,8 +340,7 @@ func (c *TestPaperApiController) Point() {
 				}
 				//修改试卷详情表
 
-
-				testInfo.Examiner_third_self_score=score
+				testInfo.Examiner_third_self_score = score
 
 				err = testInfo.Update()
 				if err != nil {
@@ -370,9 +364,9 @@ func (c *TestPaperApiController) Point() {
 			var record models.ScoreRecord
 			var underTest models.UnderCorrectedPaper
 
-			err = models.GetSelfScorePaperByTestQuestionTypeAndTestId(&underTest, testId,userId)
-			if err!=nil {
-				resp = Response{"20012","GetUnderCorrectedPaperByUserIdAndTestId  fail",err}
+			err = models.GetSelfScorePaperByTestQuestionTypeAndTestId(&underTest, testId, userId)
+			if err != nil {
+				resp = Response{"20012", "GetUnderCorrectedPaperByUserIdAndTestId  fail", err}
 				c.Data["json"] = resp
 				return
 			}
@@ -380,33 +374,33 @@ func (c *TestPaperApiController) Point() {
 			record.Test_id = testId
 			record.Test_record_type = underTest.Test_question_type
 			record.User_id = userId
-			record.Question_id=underTest.Question_id
+			record.Question_id = underTest.Question_id
 
 			err = record.Save()
-			if err!=nil {
-				resp = Response{"20013","Save  fail",err}
+			if err != nil {
+				resp = Response{"20013", "Save  fail", err}
 				c.Data["json"] = resp
 				return
 			}
 			err = underTest.SelfMarkDelete()
-			if err!=nil {
-				resp = Response{"20014","Delete  fail",err}
+			if err != nil {
+				resp = Response{"20014", "Delete  fail", err}
 				c.Data["json"] = resp
 				return
 			}
-			if math.Abs(float64(sum-test.Examiner_third_score))>float64(standardError) {
+			if math.Abs(float64(sum-test.Examiner_third_score)) > float64(standardError) {
 				var newUnderTest models.UnderCorrectedPaper
-				newUnderTest.User_id="10000"
-				newUnderTest.Test_id=testId
-				newUnderTest.Question_id=test.Question_id
-				newUnderTest.Self_score_id=userId
-				newUnderTest.Test_question_type=7
+				newUnderTest.User_id = "10000"
+				newUnderTest.Test_id = testId
+				newUnderTest.Question_id = test.Question_id
+				newUnderTest.Self_score_id = userId
+				newUnderTest.Test_question_type = 7
 				newUnderTest.Save()
 			}
 
 		}
 
-	}else {	//score数组string转int
+	} else { //score数组string转int
 		var scoreArr []int64
 		var sum int64 = 0
 		var record models.ScoreRecord
@@ -451,7 +445,7 @@ func (c *TestPaperApiController) Point() {
 				}
 			}
 		}
-		if underTest.Test_question_type == 0  {
+		if underTest.Test_question_type == 0 {
 
 			test.Leader_id = userId
 			test.Leader_score = sum
@@ -492,7 +486,7 @@ func (c *TestPaperApiController) Point() {
 		}
 		if final {
 			test.Final_score = sum
-			record.Test_finish=1
+			record.Test_finish = 1
 		}
 
 		err = underTest.Delete()
@@ -547,7 +541,6 @@ func (c *TestPaperApiController) Point() {
 			}
 		}
 
-
 		record.Score = sum
 		record.Question_id = topic.Question_id
 		record.Test_id = testId
@@ -562,7 +555,6 @@ func (c *TestPaperApiController) Point() {
 		}
 
 	}
-
 
 	resp = Response{"10000", "ok", err}
 	c.Data["json"] = resp
@@ -605,7 +597,7 @@ func (c *TestPaperApiController) Problem() {
 	newUnderTest.User_id = userId
 	newUnderTest.Test_question_type = 6
 	newUnderTest.Problem_type = problemType
-	newUnderTest.Problem_message=problemMessage
+	newUnderTest.Problem_message = problemMessage
 	has, _ := newUnderTest.IsDuplicate()
 	if !has {
 		err = newUnderTest.Save()
@@ -635,7 +627,7 @@ func (c *TestPaperApiController) Problem() {
 	record.User_id = userId
 	record.Question_id = test.Question_id
 	record.Test_record_type = 5
-	record.Problem_type=problemType
+	record.Problem_type = problemType
 	err = record.Save()
 	if err != nil {
 		resp := Response{"10006", "insert record fail", err}
@@ -874,7 +866,7 @@ func (c *TestPaperApiController) ReviewPoint() {
 		test.Examiner_first_score = sum
 		if scoreType == 1 {
 			test.Final_score = sum
-			record.Test_finish=1
+			record.Test_finish = 1
 		}
 		var record models.ScoreRecord
 		record.GetRecordByTestId(testId, userId)
@@ -926,6 +918,7 @@ func (c *TestPaperApiController) ReviewPoint() {
 	}
 	c.Data["json"] = Response{"10000", "ok", nil}
 }
+
 //自评列表 chen
 func (c *TestPaperApiController) SelfScoreList() {
 	defer c.ServeJSON()
@@ -958,6 +951,7 @@ func (c *TestPaperApiController) SelfScoreList() {
 	c.Data["json"] = resp
 
 }
+
 ///**
 //20.自评卷打分
 //*/

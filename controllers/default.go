@@ -3,15 +3,15 @@
  * @Date: 2021-07-18 00:45:51
  * @LastEditTime: 2021-07-24 20:25:03
  * @LastEditors: Junlang
- * @FilePath: /openscore/controllers/default.go
+ * @FilePath: /github.com/open-ct/openscore/controllers/default.go
  */
 package controllers
 
 import (
 	"fmt"
 	beego "github.com/beego/beego/v2/server/web"
+	"github.com/open-ct/openscore/auth"
 	"log"
-	"openscore/auth"
 )
 
 type Response struct {

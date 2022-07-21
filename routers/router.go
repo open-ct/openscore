@@ -3,12 +3,12 @@
  * @Date: 2021-07-18 00:42:25
  * @LastEditTime: 2021-07-24 20:32:02
  * @LastEditors: Junlang
- * @FilePath: /openscore/routers/router.go
+ * @FilePath: /github.com/open-ct/openscore/routers/router.go
  */
 package routers
 
 import (
-	"openscore/controllers"
+	"github.com/open-ct/openscore/controllers"
 
 	// "github.com/astaxie/beego"
 	beego "github.com/beego/beego/v2/server/web"
@@ -56,20 +56,20 @@ func init() {
 	  chen :管理员端
 	*/
 	//beego.Router("/openct/marking/admin/uploadPic",&controllers.AdminApiController{},"post:UploadPic")
-	beego.Router("/openct/marking/admin/readExcel",&controllers.AdminApiController{},"post:ReadExcel")
+	beego.Router("/openct/marking/admin/readExcel", &controllers.AdminApiController{}, "post:ReadExcel")
 	beego.Router("/openct/marking/admin/readExcel", &controllers.AdminApiController{}, "OPTIONS:ReadExcel")
-	beego.Router("/openct/marking/admin/readExampleExcel",&controllers.AdminApiController{},"post:ReadExampleExcel")
+	beego.Router("/openct/marking/admin/readExampleExcel", &controllers.AdminApiController{}, "post:ReadExampleExcel")
 	beego.Router("/openct/marking/admin/readExampleExcel", &controllers.AdminApiController{}, "OPTIONS:ReadExampleExcel")
-	beego.Router("/openct/marking/admin/readAnswerExcel",&controllers.AdminApiController{},"post:ReadAnswerExcel")
+	beego.Router("/openct/marking/admin/readAnswerExcel", &controllers.AdminApiController{}, "post:ReadAnswerExcel")
 	beego.Router("/openct/marking/admin/readAnswerExcel", &controllers.AdminApiController{}, "OPTIONS:ReadAnswerExcel")
-	beego.Router("/openct/marking/admin/distribution",&controllers.AdminApiController{},"post:Distribution")
-	beego.Router("/openct/marking/admin/distribution/info",&controllers.AdminApiController{},"post:DistributionInfo")
-	beego.Router("/openct/marking/admin/questionBySubList",&controllers.AdminApiController{},"post:QuestionBySubList")
-	beego.Router("/openct/marking/admin/insertTopic",&controllers.AdminApiController{},"post:InsertTopic")
-	beego.Router("/openct/marking/admin/subjectList",&controllers.AdminApiController{},"post:SubjectList")
-	beego.Router("/openct/marking/admin/topicList",&controllers.AdminApiController{},"post:TopicList")
-	beego.Router("/openct/marking/admin/DistributionRecord",&controllers.AdminApiController{},"post:DistributionRecord")
+	beego.Router("/openct/marking/admin/distribution", &controllers.AdminApiController{}, "post:Distribution")
+	beego.Router("/openct/marking/admin/distribution/info", &controllers.AdminApiController{}, "post:DistributionInfo")
+	beego.Router("/openct/marking/admin/questionBySubList", &controllers.AdminApiController{}, "post:QuestionBySubList")
+	beego.Router("/openct/marking/admin/insertTopic", &controllers.AdminApiController{}, "post:InsertTopic")
+	beego.Router("/openct/marking/admin/subjectList", &controllers.AdminApiController{}, "post:SubjectList")
+	beego.Router("/openct/marking/admin/topicList", &controllers.AdminApiController{}, "post:TopicList")
+	beego.Router("/openct/marking/admin/DistributionRecord", &controllers.AdminApiController{}, "post:DistributionRecord")
 
-	beego.Router("/openct/marking/admin/img",&controllers.AdminApiController{},"post:Pic")
+	beego.Router("/openct/marking/admin/img", &controllers.AdminApiController{},"post:Pic")
 
 }

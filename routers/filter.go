@@ -18,7 +18,7 @@ import (
 	"net/http"
 	"strings"
 
-	"openscore/util"
+	"github.com/open-ct/openscore/util"
 
 	"github.com/beego/beego/v2/server/web/context"
 	// "github.com/astaxie/beego/context"

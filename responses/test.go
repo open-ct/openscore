@@ -1,7 +1,7 @@
 package responses
 
 import (
-	"openscore/models"
+	"github.com/open-ct/openscore/models"
 	"time"
 )
 
@@ -11,16 +11,15 @@ type SubTopicPlus struct {
 }
 type TestPaperInfoPlus struct {
 	models.TestPaperInfo
-	PicCode  string  `json:"picCode"`
+	PicCode string `json:"picCode"`
 }
 
 type TestDisplay struct {
-	QuestionId   int64                  `json:"questionId"`
-	QuestionName string                 `json:"questionName"`
-	TestId       int64                  `json:"testId"`
-	SubTopics    []SubTopicPlus         `json:"subTopic"`
+	QuestionId   int64               `json:"questionId"`
+	QuestionName string              `json:"questionName"`
+	TestId       int64               `json:"testId"`
+	SubTopics    []SubTopicPlus      `json:"subTopic"`
 	TestInfos    []TestPaperInfoPlus `json:"testInfos"`
-
 }
 
 type TestList struct {
@@ -29,7 +28,6 @@ type TestList struct {
 
 type TestAnswer struct {
 	Pics []string `json:"Pics"`
-
 }
 
 type ExampleList struct {

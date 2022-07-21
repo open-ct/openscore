@@ -1,4 +1,4 @@
-module openscore
+module github.com/open-ct/openscore
 
 go 1.16
 

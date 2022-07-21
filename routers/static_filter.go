@@ -15,8 +15,8 @@
 package routers
 
 import (
+	"github.com/open-ct/openscore/util"
 	"net/http"
-	"openscore/util"
 	"strings"
 
 	"github.com/beego/beego/v2/server/web/context"

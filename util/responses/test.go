@@ -1,7 +1,7 @@
 package responses
 
 import (
-	"openscore/models"
+	"github.com/open-ct/openscore/models"
 	"time"
 )
 

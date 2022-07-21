@@ -3,7 +3,7 @@
  * @Date: 2021-07-23 01:02:30
  * @LastEditTime: 2021-07-23 17:10:55
  * @LastEditors: Junlang
- * @FilePath: /openscore/controllers/base.go
+ * @FilePath: /github.com/open-ct/openscore/controllers/base.go
  */
 
 // Copyright 2020 The casbin Authors. All Rights Reserved.
@@ -23,9 +23,9 @@
 package controllers
 
 import (
+	"github.com/open-ct/openscore/auth"
+	"github.com/open-ct/openscore/util"
 	"log"
-	"openscore/auth"
-	"openscore/util"
 
 	beego "github.com/beego/beego/v2/server/web"
 	// "github.com/astaxie/beego"
