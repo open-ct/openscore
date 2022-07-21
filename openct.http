@@ -1,0 +1,71 @@
+
+# POST http://localhost:8080/openct/marking/score/test/display HTTP/1.1
+# Content-Type: application/json
+
+# {
+#     "testId":1
+# }
+
+POST http://localhost:8080/openct/marking/score/test/list HTTP/1.1
+Content-Type: application/json
+
+{
+    "userId":"1"
+}
+
+# POST http://localhost:8080/openct/marking/score/test/point HTTP/1.1
+# Content-Type: application/json
+
+# {
+#     "userId":"1",
+#     "scores": "1-2-3",
+#     "testId":37,
+#     "testDetailId": "109-110-111"
+# }
+
+# POST http://localhost:8080/openct/marking/score/test/problem HTTP/1.1
+# Content-Type: application/json
+
+# {
+#     "userId":"1",
+#     "problemType": "2",
+#     "testId":38
+# }
+
+# POST http://localhost:8080/openct/marking/score/test/answer HTTP/1.1
+# Content-Type: application/json
+
+# {
+#     "userId":"101",
+#     "testId":1
+# }
+
+# POST http://localhost:8080/openct/marking/score/test/example/detail HTTP/1.1
+# Content-Type: application/json
+
+# {
+#     "userId":"101",
+#     "exampleTestId":"1"
+# }
+
+# POST http://localhost:8080/openct/marking/score/test/example/list HTTP/1.1
+# Content-Type: application/json
+
+# {
+#     "userId":"101",
+#     "testId":1
+# }
+
+# POST http://localhost:8080/openct/marking/score/test/review HTTP/1.1
+# Content-Type: application/json
+
+# {
+#     "userId":"1"
+# }
+
+# GET http://localhost:8000/api/get-user HTTP/1.1
+# Content-Type: application/json
+
+# {
+#     "id":"a7efddcb-ec16-48f6-b73f-709a36fd0e7a"
+# }

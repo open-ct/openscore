@@ -23,14 +23,26 @@
 package controllers
 
 import (
+	"log"
 	"openscore/auth"
 	"openscore/util"
 
-	beego "github.com/beego/beego/v2/adapter"
+	beego "github.com/beego/beego/v2/server/web"
 	// "github.com/astaxie/beego"
 )
 
 type ApiController struct {
+	beego.Controller
+}
+
+type TestPaperApiController struct {
+	beego.Controller
+}
+
+type SupervisorApiController struct {
+	beego.Controller
+}
+type AdminApiController struct {
 	beego.Controller
 }
 
@@ -39,6 +51,7 @@ func (c *ApiController) GetSessionUser() *auth.Claims {
 	if s == nil {
 		return nil
 	}
+	log.Println(s)
 
 	claims := &auth.Claims{}
 	err := util.JsonToStruct(s.(string), claims)

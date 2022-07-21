@@ -9,9 +9,11 @@ package controllers
 
 import (
 	"fmt"
+	"log"
 	"openscore/auth"
+	"openscore/models"
 
-	beego "github.com/beego/beego/v2/adapter"
+	beego "github.com/beego/beego/v2/server/web"
 )
 
 type Response struct {
@@ -20,11 +22,11 @@ type Response struct {
 	Data   interface{} `json:"data"`
 }
 
-var CasdoorEndpoint = beego.AppConfig.String("casdoorEndpoint")
-var ClientId = beego.AppConfig.String("clientId")
-var ClientSecret = beego.AppConfig.String("clientSecret")
-var JwtSecret = beego.AppConfig.String("jwtSecret")
-var CasdoorOrganization = beego.AppConfig.String("casdoorOrganization")
+var CasdoorEndpoint, _ = beego.AppConfig.String("casdoorEndpoint")
+var ClientId, _ = beego.AppConfig.String("clientId")
+var ClientSecret, _ = beego.AppConfig.String("clientSecret")
+var JwtSecret, _ = beego.AppConfig.String("jwtSecret")
+var CasdoorOrganization, _ = beego.AppConfig.String("casdoorOrganization")
 
 func init() {
 	auth.InitConfig(CasdoorEndpoint, ClientId, ClientSecret, JwtSecret, CasdoorOrganization)
@@ -34,13 +36,17 @@ func (c *ApiController) Get() {
 	//c.Data["Website"] = "beego.me"
 	//c.Data["Email"] = "astaxie@gmail.com"
 	//c.TplName = "index.tpl"
+	a := new(models.Topic)
+	fmt.Println(a)
 	c.Ctx.WriteString("hello OpenCT")
 	c.Data["json"] = "hello OpenCT"
 	c.ServeJSON()
 }
+
 func (c *ApiController) Login() {
-	code := c.Input().Get("code")
-	state := c.Input().Get("state")
+	input, _ := c.Input()
+	code := input.Get("code")
+	state := input.Get("state")
 
 	token, err := auth.GetOAuthToken(code, state)
 	if err != nil {
@@ -52,6 +58,7 @@ func (c *ApiController) Login() {
 	if err != nil {
 		panic(err)
 	}
+	log.Println(claims)
 
 	claims.AccessToken = token.AccessToken
 	c.SetSessionUser(claims)

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {message} from "antd";
-import {isMobile as isMobileDevice} from "react-device-detect";
+// import {isMobile as isMobileDevice} from "react-device-detect";
 
 export let ServerUrl = "http://localhost:8080";
 
@@ -84,10 +84,10 @@ export function swapRow(array, i, j) {
   return [...array.slice(0, i), array[j], ...array.slice(i + 1, j), array[i], ...array.slice(j + 1)];
 }
 
-export function isMobile() {
-  // return getIsMobileView();
-  return isMobileDevice;
-}
+// export function isMobile() {
+//   // return getIsMobileView();
+//   return isMobileDevice;
+// }
 
 export function getFormattedDate(date) {
   if (date === undefined || date === null) {

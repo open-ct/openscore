@@ -1,0 +1,83 @@
+[data-component=mark-tasks-page]{
+    width: 100%;
+    height: 100%;
+    background-color: #E5E5E5;
+    display: flex;
+    flex-direction: row;
+    > .mark-paper {
+        flex: 4;
+        height: 100%;
+        background-color: #fff;
+        box-sizing: border-box;
+        margin: 0px 70px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        .test-question-img{
+            display: inline-block;
+            max-width: 100%;
+            max-height: calc(33% - 20px);
+            margin-top: 20px;
+            position: relative;
+            img {
+                display: inline-block;
+                width: 100%;
+                max-height: 100%;
+            }
+            &::before{
+                content: attr(data-content-before);
+                position: absolute;
+                width: 50px;
+                height: 50px;
+                border: 2px solid red;
+                border-radius: 50%;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                font-size: 30px;
+                color: red;
+                font-weight: 600;
+            }
+        }   
+    }
+    .mark-score {
+        flex: 1;
+        height: 100%;
+        background-color: #fff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        .score-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            .score-select {
+                margin-top: 24px;
+                font-size: 14px;
+                color: rgba(0, 0, 0, 0.85);
+            }
+        }
+        .push-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 30px;
+            .push-paper {
+                padding: 48px 24px 24px;
+                display: flex;
+                border-bottom: 1px solid #D9D9D9;
+                button {
+                    box-sizing: border-box;
+                    margin:0px 7px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 14px;
+                }
+            }
+        }
+    }
+
+}
