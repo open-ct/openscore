@@ -22,10 +22,10 @@
 import {trim} from "./Util";
 
 export let authConfig = {
-  serverUrl: "http://localhost:8000", // your Casdoor URL, like the official one: https://door.casbin.com
+  serverUrl: "http://localhost:7001", // your Casdoor URL, like the official one: https://door.casbin.com
   clientId: "9162cb3914b3f1559e9e", // your Casdoor OAuth Client ID
-  appName: "application_1", // your Casdoor application name, like: "app-built-in"
-  organizationName: "built-in", // your Casdoor organization name, like: "built-in"
+  appName: "app-openscore", // your Casdoor application name, like: "app-built-in"
+  organizationName: "openct", // your Casdoor organization name, like: "built-in"
 }
 
 export function initAuthWithConfig(config) {

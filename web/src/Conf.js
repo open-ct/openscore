@@ -18,13 +18,3 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-export const DefaultProgramName = "talent2021";
-
-export const AuthConfig = {
-  serverUrl: "http://localhost:8080",
-  clientId: "9162cb3914b3f1559e9e",
-  clientSecret :"470d86682d57a75486ed9ae74e748cfbfa6c8774",
-  appName: "application_1",
-  organizationName: "built-in",
-};
