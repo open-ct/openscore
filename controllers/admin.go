@@ -735,14 +735,26 @@ func (c *ApiController) Distribution() {
 				underCorrectedPaper.QuestionId = testPapers[ii].QuestionId
 				underCorrectedPaper.TestQuestionType = 1
 				underCorrectedPaper.UserId = users[j].UserId
-				err = underCorrectedPaper.Save()
-				if err != nil {
+				if err := underCorrectedPaper.Save(); err != nil {
 					log.Println(err)
 					resp = Response{"30015", "试卷第一次分配异常，无法生成待批改试卷 ", err}
 					c.Data["json"] = resp
 					return
 				}
-				countUser[j] = countUser[j] + 1
+
+				// 修改user变为已分配
+				user := &model.User{}
+				user.GetUser(users[j].UserId)
+				user.IsDistribute = true
+				user.QuestionId = questionId
+				if err := user.UpdateCols("is_distribute", "question_id"); err != nil {
+					log.Println(err)
+					resp = Response{"30019", "试卷分配异常，用户分配状态更新失败 ", err}
+					c.Data["json"] = resp
+					return
+				}
+
+				countUser[j]++
 				testNumber--
 				ii++
 			}
@@ -803,18 +815,6 @@ func (c *ApiController) Distribution() {
 		if err != nil {
 			log.Println(err)
 			resp = Response{"30018", "试卷分配异常，试卷分配添加异常 ", err}
-			c.Data["json"] = resp
-			return
-		}
-	}
-
-	for _, user := range users {
-		// 修改user变为已分配
-		user.IsDistribute = true
-		user.QuestionId = questionId
-		if err := user.UpdateCols("is_distribute", "question_id"); err != nil {
-			log.Println(err)
-			resp = Response{"30019", "试卷分配异常，用户分配状态更新失败 ", err}
 			c.Data["json"] = resp
 			return
 		}
@@ -1060,3 +1060,7 @@ func (c *ApiController) DeleteTest() {
 	c.Data["json"] = resp
 
 }
+
+// 用户增删改查
+// 用户登录
+// 用户导入

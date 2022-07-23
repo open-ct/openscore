@@ -28,13 +28,14 @@ func InitAuthConfig() {
 	auth.InitConfig(casdoorEndpoint, clientId, clientSecret, JwtPublicKey, casdoorOrganization, casdoorApplication)
 }
 
+/*
 // @Title Signin
 // @Description sign in as a member
 // @Param   code     QueryString    string  true        "The code to sign in"
 // @Param   state     QueryString    string  true        "The state"
 // @Success 200 {object} controllers.api_controller.Response The Response object
 // @router /signin [post]
-// @Tag Account API
+// @Tag Account API*/
 func (c *ApiController) SignIn() {
 	input, _ := c.Input()
 	code := input.Get("code")
@@ -96,11 +97,12 @@ func (c *ApiController) SignIn() {
 	c.ResponseOk(claims)
 }
 
+/*
 // @Title Signout
 // @Description sign out the current member
 // @Success 200 {object} controllers.api_controller.Response The Response object
 // @router /signout [post]
-// @Tag Account API
+// @Tag Account API*/
 func (c *ApiController) SignOut() {
 	claims := c.GetSessionClaims()
 	if claims != nil {
@@ -121,11 +123,12 @@ func (c *ApiController) SignOut() {
 	c.ResponseOk()
 }
 
+/*
 // @Title GetAccount
 // @Description Get current account
 // @Success 200 {object} controllers.api_controller.Response The Response object
 // @router /get-account [get]
-// @Tag Account API
+// @Tag Account API*/
 func (c *ApiController) GetAccount() {
 	if c.RequireSignedIn() {
 		return
