@@ -14,6 +14,73 @@ import (
 	"time"
 )
 
+// 用户增删改查 TODO
+
+// ReadUserExcel 导入用户
+func (c *ApiController) ReadUserExcel() {
+	c.Ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin", c.Ctx.Request.Header.Get("Origin"))
+	defer c.ServeJSON()
+
+	file, header, err := c.GetFile("excel")
+
+	if err != nil {
+		log.Println(err)
+		c.Data["json"] = Response{Status: "10001", Msg: "cannot unmarshal", Data: err}
+		return
+	}
+	tempFile, err := os.Create(header.Filename)
+	io.Copy(tempFile, file)
+	f, err := excelize.OpenFile(header.Filename)
+	if err != nil {
+		log.Println(err)
+		c.Data["json"] = Response{Status: "30000", Msg: "excel 表导入错误", Data: err}
+		return
+	}
+
+	// Get all the rows in the Sheet1.
+	rows, err := f.GetRows("Sheet1")
+	if err != nil {
+		log.Println(err)
+		c.Data["json"] = Response{Status: "30000", Msg: "excel 表导入错误", Data: err}
+		return
+	}
+
+	for _, r := range rows[1:] {
+		row := make([]string, len(rows[0]))
+		copy(row, r)
+		var user model.User
+		user.UserName = row[0]
+		user.IdCard = row[1]
+		user.Password = row[2]
+		user.Tel = row[3]
+		user.Address = row[4]
+		user.SubjectName = row[5]
+		user.Email = row[6]
+		userType, _ := strconv.Atoi(row[7])
+		user.UserType = int64(userType)
+		if err := user.Insert(); err != nil {
+			log.Println(err)
+			c.Data["json"] = Response{Status: "30001", Msg: "用户导入错误", Data: err}
+			return
+		}
+
+	}
+
+	err = tempFile.Close()
+	if err != nil {
+		log.Println(err)
+	}
+	err = os.Remove(header.Filename)
+	if err != nil {
+		log.Println(err)
+	}
+
+	// ------------------------------------------------
+	data := make(map[string]interface{})
+	data["data"] = nil
+	c.Data["json"] = Response{Status: "10000", Msg: "OK", Data: data}
+}
+
 /**
 2.试卷导入
 */
@@ -171,7 +238,6 @@ func (c *ApiController) ReadExampleExcel() {
 	// ----------------------------------------------------
 
 	file, header, err := c.GetFile("excel")
-	err = err
 	if err != nil {
 		log.Println(err)
 		resp = Response{"10001", "cannot unmarshal", err}
@@ -296,7 +362,6 @@ func (c *ApiController) ReadAnswerExcel() {
 	// ----------------------------------------------------
 
 	file, header, err := c.GetFile("excel")
-	err = err
 	if err != nil {
 		log.Println(err)
 		resp = Response{"10001", "cannot unmarshal", err}
@@ -686,7 +751,7 @@ func (c *ApiController) Distribution() {
 		c.Data["json"] = resp
 		return
 	}
-	score_type := topic.ScoreType
+	scoreType := topic.ScoreType
 
 	// 查询相应试卷
 	papers := make([]model.TestPaper, 0)
@@ -762,7 +827,7 @@ func (c *ApiController) Distribution() {
 		i = i + userNumber
 	}
 	// 二次阅卷
-	if score_type == 2 {
+	if scoreType == 2 {
 		testNumber = len(testPapers)
 		revers(users)
 		var ii int
@@ -800,7 +865,7 @@ func (c *ApiController) Distribution() {
 					ii++
 				}
 			}
-			i = i + userNumber
+			i += userNumber
 		}
 
 	}
@@ -947,16 +1012,13 @@ func (c *ApiController) TopicList() {
 	c.Data["json"] = resp
 }
 
-/**
-DistributionRecord
-*/
+// DistributionRecord ...
 func (c *ApiController) DistributionRecord() {
 	defer c.ServeJSON()
 	var requestBody DistributionRecord
 	var resp Response
-	var err error
 
-	err = json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
 	if err != nil {
 		log.Println(err)
 		resp = Response{"10001", "cannot unmarshal", err}
@@ -1060,7 +1122,3 @@ func (c *ApiController) DeleteTest() {
 	c.Data["json"] = resp
 
 }
-
-// 用户增删改查
-// 用户登录
-// 用户导入

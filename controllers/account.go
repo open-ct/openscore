@@ -2,13 +2,8 @@ package controllers
 
 import (
 	_ "embed"
-	"encoding/json"
-	"fmt"
 	beego "github.com/beego/beego/v2/server/web"
 	auth "github.com/casdoor/casdoor-go-sdk/casdoorsdk"
-	"log"
-	"openscore/model"
-	"openscore/util"
 )
 
 //go:embed token_jwt_key.pem
@@ -26,6 +21,13 @@ func InitAuthConfig() {
 	var casdoorApplication, _ = beego.AppConfig.String("casdoorApplication")
 
 	auth.InitConfig(casdoorEndpoint, clientId, clientSecret, JwtPublicKey, casdoorOrganization, casdoorApplication)
+}
+
+func (c *ApiController) Login() {
+	// input, _ := c.Input()
+	// idCard := input.Get("id_card")
+	// password := input.Get("password")
+
 }
 
 /*
@@ -54,42 +56,16 @@ func (c *ApiController) SignIn() {
 		return
 	}
 
-	user, err := model.GetUserByCasdoorName(claims.User.Name)
-	if err != nil {
-		c.ResponseError(err.Error())
-		return
-	}
-
-	// 首次登录
-	if user == nil {
-		tag := &struct {
-			Subject  string `json:"subject"`
-			UserType int64  `json:"user_type"`
-		}{}
-		if err := json.Unmarshal([]byte(claims.Tag), tag); err != nil {
-			log.Println(err)
-			c.Data["json"] = Response{Status: "30001", Msg: "用户首次登录: 解析tag错误", Data: err}
-			return
-		}
-		u := model.User{
-			UserType:    tag.UserType,
-			SubjectName: tag.Subject,
-			CasdoorName: claims.User.Name,
-		}
-		fmt.Println("insert: ", "insert")
-
-		if err := u.Insert(); err != nil {
-			log.Println(err)
-			c.Data["json"] = Response{Status: "30001", Msg: "用户首次登录错误", Data: err}
-			return
-		}
-		user = &u
-	}
-
-	if err := model.UpdateMemberOnlineStatus(user.UserId, true, util.GetCurrentTime()); err != nil {
-		c.ResponseError(err.Error())
-		return
-	}
+	// user, err := model.GetUserByCasdoorName(claims.User.Name)
+	// if err != nil {
+	// 	c.ResponseError(err.Error())
+	// 	return
+	// }
+	//
+	// if err := model.UpdateMemberOnlineStatus(user.UserId, true, util.GetCurrentTime()); err != nil {
+	// 	c.ResponseError(err.Error())
+	// 	return
+	// }
 
 	claims.AccessToken = token.AccessToken
 	c.SetSessionClaims(claims)
@@ -104,19 +80,19 @@ func (c *ApiController) SignIn() {
 // @router /signout [post]
 // @Tag Account API*/
 func (c *ApiController) SignOut() {
-	claims := c.GetSessionClaims()
-	if claims != nil {
-		user, err := model.GetUserByCasdoorName(claims.User.Name)
-		if err != nil {
-			c.ResponseError(err.Error())
-			return
-		}
-
-		if err := model.UpdateMemberOnlineStatus(user.UserId, false, util.GetCurrentTime()); err != nil {
-			c.ResponseError(err.Error())
-			return
-		}
-	}
+	// claims := c.GetSessionClaims()
+	// if claims != nil {
+	// 	user, err := model.GetUserByCasdoorName(claims.User.Name)
+	// 	if err != nil {
+	// 		c.ResponseError(err.Error())
+	// 		return
+	// 	}
+	//
+	// 	if err := model.UpdateMemberOnlineStatus(user.UserId, false, util.GetCurrentTime()); err != nil {
+	// 		c.ResponseError(err.Error())
+	// 		return
+	// 	}
+	// }
 
 	c.SetSessionClaims(nil)
 

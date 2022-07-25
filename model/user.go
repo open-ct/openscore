@@ -10,13 +10,18 @@ import (
 type User struct {
 	UserId         int64  `json:"user_id" xorm:"pk autoincr"`
 	ExaminerCount  string `json:"examiner_count"`
+	UserName       string `json:"user_name"`
+	Password       string `json:"password"`
+	Address        string `json:"address"`
+	Tel            string `json:"tel"`
+	Email          string `json:"email"`
+	IdCard         string `json:"id_card"`
 	LoginTime      string `json:"login_time"`
 	ExistTime      string `json:"exist_time"`
 	OnlineTime     int64  `json:"online_time"`
 	SubjectName    string `json:"subject_name"`
 	IsOnlineStatus bool   `json:"is_online_status"`
 	IsDistribute   bool   `json:"is_distribute"`
-	CasdoorName    string `json:"casdoor_name" xorm:"not null unique"`
 	QuestionId     int64  `json:"question_id"`
 	UserType       int64  `json:"user_type"`
 }
@@ -43,25 +48,20 @@ func (u *User) GetUser(id int64) error {
 	return err
 }
 
-func (u *UserInfo) GetUserInfo(id int64) error {
-	err := u.User.GetUser(id)
-	if err != nil {
-		return err
-	}
-
-	u.Casdoor, err = casdoorsdk.GetUser(u.User.CasdoorName)
-	return err
+func (u *User) GetUserInfo(id int64) error {
+	// TODO
+	return u.GetUser(id)
 }
 
-func GetUserByCasdoorName(name string) (*User, error) {
-	u := &User{}
-	has, err := x.Where(builder.Eq{"casdoor_name": name}).Get(u)
-	if !has {
-		return nil, err
-	}
-
-	return u, err
-}
+// func GetUserByCasdoorName(name string) (*User, error) {
+// 	u := &User{}
+// 	has, err := x.Where(builder.Eq{"casdoor_name": name}).Get(u)
+// 	if !has {
+// 		return nil, err
+// 	}
+//
+// 	return u, err
+// }
 
 func (u *User) UpdateCols(columns ...string) error {
 	_, err := x.Cols(columns...).Update(u)

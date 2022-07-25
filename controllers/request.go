@@ -63,17 +63,17 @@ type ExampleDetail struct {
 }
 
 type Question struct {
-	QuestionId int64 `joson:"questionId"`
+	QuestionId int64 `json:"questionId"`
 }
 
 type SelfScore struct {
-	ExaminerId int64 `joson:"examinerId"`
+	ExaminerId int64 `json:"examinerId"`
 }
 
 type SupervisorPoint struct {
-	TestId        int64  `joson:"testId"`
-	TestDetailIds string `joson:"testDetailIds"`
-	Scores        string `joson:"scores"`
+	TestId        int64  `json:"testId"`
+	TestDetailIds string `json:"testDetailIds"`
+	Scores        string `json:"scores"`
 }
 
 type ScoreProgress struct {

@@ -2,10 +2,10 @@ package controllers
 
 import (
 	"encoding/gob"
-	"errors"
+	"encoding/json"
 	beego "github.com/beego/beego/v2/server/web"
 	auth "github.com/casdoor/casdoor-go-sdk/casdoorsdk"
-	"openscore/model"
+	"log"
 )
 
 type ApiController struct {
@@ -14,6 +14,24 @@ type ApiController struct {
 
 func init() {
 	gob.Register(auth.Claims{})
+}
+
+// 用户登录
+
+func (c *ApiController) UserLogin() {
+	defer c.ServeJSON()
+	var requestBody QuestionBySubList
+	var resp Response
+	var err error
+
+	err = json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	if err != nil {
+		log.Println(err)
+		resp = Response{"10001", "cannot unmarshal", err}
+		c.Data["json"] = resp
+		return
+	}
+
 }
 
 func GetUserName(user *auth.User) string {
@@ -76,12 +94,13 @@ func (c *ApiController) GetSessionUsername() string {
 }
 
 func (c *ApiController) GetSessionUserId() (int64, error) {
-	user := c.GetSessionUser()
-	if user == nil {
-		return 0, errors.New("cant find session info")
-	}
+	// user := c.GetSessionUser()
+	// if user == nil {
+	// 	return 0, errors.New("cant find session info")
+	// }
 
-	u, err := model.GetUserByCasdoorName(user.Name)
-
-	return u.UserId, err
+	// u, err := model.GetUserByCasdoorName(user.Name)
+	//
+	// return u.UserId, err
+	return 0, nil
 }
