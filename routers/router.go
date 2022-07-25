@@ -13,6 +13,8 @@ func init() {
 	beego.Router("/api/logout", api, "post:SignOut")
 	beego.Router("/api/get-account", api, "get:GetAccount")
 
+	beego.Router("/openct/login", api, "post:Login")
+
 	testNs := beego.NewNamespace("/openct/marking/score",
 		beego.NSNamespace("/test",
 			beego.NSRouter("/display", api, "post:Display"),

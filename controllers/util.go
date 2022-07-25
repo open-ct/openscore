@@ -1,5 +1,7 @@
 package controllers
 
+import "log"
+
 type Response struct {
 	Status string      `json:"status"`
 	Msg    string      `json:"msg"`
@@ -17,6 +19,7 @@ func (c *ApiController) ResponseOk(data ...interface{}) {
 }
 
 func (c *ApiController) ResponseError(error string, data ...interface{}) {
+	log.Println(error, data)
 	resp := Response{Status: "error", Msg: error}
 	switch len(data) {
 	case 1:

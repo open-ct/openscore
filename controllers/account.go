@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	beego "github.com/beego/beego/v2/server/web"
 	auth "github.com/casdoor/casdoor-go-sdk/casdoorsdk"
+	"openscore/service/user"
 )
 
 //go:embed token_jwt_key.pem
@@ -24,10 +25,21 @@ func InitAuthConfig() {
 }
 
 func (c *ApiController) Login() {
-	// input, _ := c.Input()
-	// idCard := input.Get("id_card")
-	// password := input.Get("password")
+	input, _ := c.Input()
+	idCard := input.Get("id_card")
+	password := input.Get("password")
 
+	token, err := user.Login(idCard, password)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	resp := struct {
+		Token string `json:"token"`
+	}{token}
+
+	c.ResponseOk(resp)
 }
 
 /*

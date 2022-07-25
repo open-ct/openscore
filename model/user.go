@@ -42,6 +42,16 @@ func (u *User) GetUser(id int64) error {
 	return err
 }
 
+func GetUserByIdCard(idCard string) (*User, error) {
+	u := &User{}
+	has, err := x.Where(builder.Eq{"id_card": idCard}).Get(u)
+	if !has || err != nil {
+		log.Println("could not found user by IdCard")
+		return nil, nil
+	}
+	return u, nil
+}
+
 func (u *User) GetUserInfo(id int64) error {
 	// TODO
 	return u.GetUser(id)
