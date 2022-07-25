@@ -173,14 +173,14 @@ func (c *ApiController) UserInfo() {
 		return
 	}
 
-	user := model.UserInfo{}
+	user := model.User{}
 	if err := user.GetUserInfo(supervisorId); err != nil {
 		resp = Response{"20001", "获取用户信息失败", err}
 		c.Data["json"] = resp
 		return
 	}
 	var userInfoVO UserInfoVO
-	userInfoVO.UserName = user.Casdoor.DisplayName
+	userInfoVO.UserName = user.UserName
 	userInfoVO.SubjectName = user.SubjectName
 
 	// --------------------------------------------------
@@ -249,7 +249,7 @@ func (c *ApiController) TeacherMonitoring() {
 		finishCount := paperDistributions[i].TestDistributionNumber - failCount - remainingTestNumber
 		teacherMonitoringList[i].TestSuccessNumber = float64(finishCount)
 		// 用户信息
-		user := model.UserInfo{}
+		user := model.User{}
 		err = user.GetUserInfo(userId)
 		if err != nil {
 			resp = Response{"20001", "无法获取用户信息", err}
@@ -257,7 +257,7 @@ func (c *ApiController) TeacherMonitoring() {
 			return
 		}
 		// 用户名
-		teacherMonitoringList[i].UserName = user.Casdoor.DisplayName
+		teacherMonitoringList[i].UserName = user.UserName
 		// 是否在线
 		isOnline := user.IsOnlineStatus
 		teacherMonitoringList[i].IsOnline = isOnline
@@ -460,14 +460,14 @@ func (c *ApiController) TeachersByQuestion() {
 	// 求教师名和转化输出
 	for i := 0; i < len(paperDistributions); i++ {
 		userId := paperDistributions[i].UserId
-		user := model.UserInfo{}
+		user := model.User{}
 		err := user.GetUserInfo(userId)
 		if err != nil {
 			resp = Response{"20001", "could not found user", err}
 			c.Data["json"] = resp
 			return
 		}
-		userName := user.Casdoor.DisplayName
+		userName := user.UserName
 		teacherVOList[i].UserId = userId
 		teacherVOList[i].UserName = userName
 	}
@@ -604,14 +604,14 @@ func (c *ApiController) AverageScore() {
 	for i := 0; i < len(paperDistributions); i++ {
 		// 求userId 和userName
 		userId := paperDistributions[i].UserId
-		user := model.UserInfo{}
+		user := model.User{}
 		err := user.GetUserInfo(userId)
 		if err != nil {
 			resp = Response{"20001", "could not found user", err}
 			c.Data["json"] = resp
 			return
 		}
-		userName := user.Casdoor.DisplayName
+		userName := user.UserName
 		scoreAverageVOList[i].UserId = userId
 		scoreAverageVOList[i].UserName = userName
 
@@ -704,14 +704,14 @@ func (c *ApiController) ProblemTest() {
 		ProblemUnderCorrectedPaperVOList[i].TestId = problemUnderCorrectedPaper[i].TestId
 		// 存userId  userName
 		userId := problemUnderCorrectedPaper[i].UserId
-		user := model.UserInfo{}
+		user := model.User{}
 		err := user.GetUserInfo(userId)
 		if err != nil {
 			resp = Response{"20001", "could not found user", err}
 			c.Data["json"] = resp
 			return
 		}
-		userName := user.Casdoor.DisplayName
+		userName := user.UserName
 		ProblemUnderCorrectedPaperVOList[i].ExaminerId = userId
 		ProblemUnderCorrectedPaperVOList[i].ExaminerName = userName
 		// 存问题类型
@@ -776,7 +776,7 @@ func (c *ApiController) ArbitramentTest() {
 		var examinerFirstId = testPaper.ExaminerFirstId
 		arbitramentTestVOList[i].ExaminerFirstId = examinerFirstId
 		// 查第一次评分人
-		firstExaminer := model.UserInfo{}
+		firstExaminer := model.User{}
 		err = firstExaminer.GetUserInfo(examinerFirstId)
 		if err != nil {
 			resp = Response{"20001", "could not found user", err}
@@ -784,7 +784,7 @@ func (c *ApiController) ArbitramentTest() {
 			return
 		}
 		// 查第一次评分人姓名
-		examinerFirstName := firstExaminer.Casdoor.DisplayName
+		examinerFirstName := firstExaminer.UserName
 		// 存试卷第一次评分人姓名和分数
 		arbitramentTestVOList[i].ExaminerFirstName = examinerFirstName
 		arbitramentTestVOList[i].ExaminerFirstScore = testPaper.ExaminerFirstScore
@@ -793,7 +793,7 @@ func (c *ApiController) ArbitramentTest() {
 		var examinerSecondId = testPaper.ExaminerSecondId
 		arbitramentTestVOList[i].ExaminerSecondId = examinerSecondId
 		// 查第二次试卷评分人
-		secondExaminer := model.UserInfo{}
+		secondExaminer := model.User{}
 		err := secondExaminer.GetUserInfo(examinerSecondId)
 		if err != nil {
 			resp = Response{"20001", "could not found user", err}
@@ -801,7 +801,7 @@ func (c *ApiController) ArbitramentTest() {
 			return
 		}
 		// 查第二次评分人姓名
-		secondExaminerName := secondExaminer.Casdoor.DisplayName
+		secondExaminerName := secondExaminer.UserName
 		// 存第二次评分人姓名和分数
 		arbitramentTestVOList[i].ExaminerSecondName = secondExaminerName
 		arbitramentTestVOList[i].ExaminerSecondScore = testPaper.ExaminerSecondScore
@@ -810,14 +810,14 @@ func (c *ApiController) ArbitramentTest() {
 		var examinerThirdId = testPaper.ExaminerThirdId
 		arbitramentTestVOList[i].ExaminerThirdId = examinerThirdId
 		// 查第二次试卷评分人
-		thirdExaminer := model.UserInfo{}
+		thirdExaminer := model.User{}
 		if err := thirdExaminer.GetUserInfo(examinerThirdId); err != nil {
 			resp = Response{"20001", "could not found user", err}
 			c.Data["json"] = resp
 			return
 		}
 		// 查第三次评分人姓名
-		thirdExaminerName := thirdExaminer.Casdoor.DisplayName
+		thirdExaminerName := thirdExaminer.UserName
 		// 存第三次评分人姓名和分数
 		arbitramentTestVOList[i].ExaminerThirdName = thirdExaminerName
 		arbitramentTestVOList[i].ExaminerThirdScore = testPaper.ExaminerThirdScore
@@ -1556,14 +1556,14 @@ func (c *ApiController) ScoreDeviation() {
 	for i := 0; i < len(paperDistributions); i++ {
 		// 求userId 和userName
 		userId := paperDistributions[i].UserId
-		user := model.UserInfo{}
+		user := model.User{}
 		err := user.GetUserInfo(userId)
 		if err != nil {
 			resp = Response{"20001", "could not found user", err}
 			c.Data["json"] = resp
 			return
 		}
-		userName := user.Casdoor.DisplayName
+		userName := user.UserName
 		ScoreDeviationVOList[i].UserId = userId
 		ScoreDeviationVOList[i].UserName = userName
 
@@ -1669,10 +1669,10 @@ func (c *ApiController) SelfMarkList() {
 			selfMarkVOList[i].SelfScore = test.ExaminerThirdSelfScore
 		}
 		selfMarkVOList[i].Userid = selfScoreId
-		user := model.UserInfo{}
+		user := model.User{}
 		err = user.GetUserInfo(selfScoreId)
 
-		selfMarkVOList[i].Name = user.Casdoor.DisplayName
+		selfMarkVOList[i].Name = user.UserName
 		selfMarkVOList[i].TestId = testId
 		selfMarkVOList[i].StandardError = standardError
 		selfMarkVOList[i].Error = math.Abs(float64(selfMarkVOList[i].Score - selfMarkVOList[i].SelfScore))

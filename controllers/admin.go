@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"github.com/xuri/excelize/v2"
 	"io"
 	"log"
@@ -775,57 +776,60 @@ func (c *ApiController) Distribution() {
 		return
 	}
 	users := usersList[:userNumber]
+
 	// 第一次分配试卷
 	countUser := make([]int, userNumber)
 	var ii int
 	for i := 0; i < len(testPapers); {
 		ii = i
 		for j := 0; j < len(users); j++ {
-			if testNumber == 0 {
-				break
-			} else {
-				// 修改testPaper改为已分配
-				testPapers[ii].CorrectingStatus = 1
-				err := testPapers[ii].Update()
-				if err != nil {
-					log.Println(err)
-					resp = Response{"30014", "试卷第一次分配异常，无法更改试卷状态 ", err}
-					c.Data["json"] = resp
-					return
-				}
 
-				// 添加试卷未批改记录
-				var underCorrectedPaper model.UnderCorrectedPaper
-				underCorrectedPaper.TestId = testPapers[ii].TestId
-				underCorrectedPaper.QuestionId = testPapers[ii].QuestionId
-				underCorrectedPaper.TestQuestionType = 1
-				underCorrectedPaper.UserId = users[j].UserId
-				if err := underCorrectedPaper.Save(); err != nil {
-					log.Println(err)
-					resp = Response{"30015", "试卷第一次分配异常，无法生成待批改试卷 ", err}
-					c.Data["json"] = resp
-					return
-				}
-
-				// 修改user变为已分配
-				user := &model.User{}
-				user.GetUser(users[j].UserId)
-				user.IsDistribute = true
-				user.QuestionId = questionId
-				if err := user.UpdateCols("is_distribute", "question_id"); err != nil {
-					log.Println(err)
-					resp = Response{"30019", "试卷分配异常，用户分配状态更新失败 ", err}
-					c.Data["json"] = resp
-					return
-				}
-
-				countUser[j]++
-				testNumber--
-				ii++
+			// 修改testPaper改为已分配
+			testPapers[ii].CorrectingStatus = 1
+			err := testPapers[ii].Update()
+			if err != nil {
+				log.Println(err)
+				resp = Response{"30014", "试卷第一次分配异常，无法更改试卷状态 ", err}
+				c.Data["json"] = resp
+				return
 			}
+
+			// 添加试卷未批改记录
+			var underCorrectedPaper model.UnderCorrectedPaper
+			underCorrectedPaper.TestId = testPapers[ii].TestId
+			underCorrectedPaper.QuestionId = testPapers[ii].QuestionId
+			underCorrectedPaper.TestQuestionType = 1
+			underCorrectedPaper.UserId = users[j].UserId
+			if err := underCorrectedPaper.Save(); err != nil {
+				log.Println(err)
+				resp = Response{"30015", "试卷第一次分配异常，无法生成待批改试卷 ", err}
+				c.Data["json"] = resp
+				return
+			}
+
+			countUser[j]++
+			testNumber--
+			ii++
+
 		}
-		i = i + userNumber
+		i += userNumber
 	}
+
+	// 修改user变为已分配
+	for _, user := range users {
+		user.GetUser(user.UserId)
+		fmt.Println("user: ", user)
+
+		user.IsDistribute = true
+		user.QuestionId = questionId
+		if err := user.UpdateCols("is_distribute", "question_id"); err != nil {
+			log.Println(err)
+			resp = Response{"30019", "试卷分配异常，用户分配状态更新失败 ", err}
+			c.Data["json"] = resp
+			return
+		}
+	}
+
 	// 二次阅卷
 	if scoreType == 2 {
 		testNumber = len(testPapers)

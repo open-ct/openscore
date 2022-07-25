@@ -1,7 +1,6 @@
 package model
 
 import (
-	"github.com/casdoor/casdoor-go-sdk/casdoorsdk"
 	"log"
 	"math/rand"
 	"xorm.io/builder"
@@ -26,11 +25,6 @@ type User struct {
 	UserType       int64  `json:"user_type"`
 }
 
-type UserInfo struct {
-	User
-	Casdoor *casdoorsdk.User
-}
-
 func (u *User) Insert() error {
 	code, err := x.Insert(u)
 	if code == 0 || err != nil {
@@ -53,18 +47,8 @@ func (u *User) GetUserInfo(id int64) error {
 	return u.GetUser(id)
 }
 
-// func GetUserByCasdoorName(name string) (*User, error) {
-// 	u := &User{}
-// 	has, err := x.Where(builder.Eq{"casdoor_name": name}).Get(u)
-// 	if !has {
-// 		return nil, err
-// 	}
-//
-// 	return u, err
-// }
-
 func (u *User) UpdateCols(columns ...string) error {
-	_, err := x.Cols(columns...).Update(u)
+	_, err := x.ID(u.UserId).Cols(columns...).Update(u)
 	if err != nil {
 		log.Println("could not Update user")
 	}
