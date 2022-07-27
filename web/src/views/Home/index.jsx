@@ -1,22 +1,18 @@
 import React, { Component } from 'react'
 import { Layout, Menu } from 'antd';
 import DocumentTitle from 'react-document-title'
-import { Switch, Route, Redirect, history } from 'react-router-dom'
-import { CheckCircleOutlined, FormOutlined, HighlightOutlined, ProfileOutlined } from '@ant-design/icons';
+import { Switch, Route, Redirect } from 'react-router-dom'
 import * as Icon from '@ant-design/icons'
-import { Avatar, Badge, Button, Col, Dropdown, Row } from "antd";
+import { Avatar, Dropdown } from "antd";
 import { Link } from "react-router-dom";
-import { BellOutlined, LogoutOutlined, SettingOutlined } from '@ant-design/icons';
-import * as Auth from "../../auth/Auth";
+import { LogoutOutlined, SettingOutlined } from '@ant-design/icons';
 import * as Setting from "../../Setting";
-import * as Conf from "../../Conf";
 import * as AccountBackend from "../../backend/AccountBackend";
 
 import MarkTasks from '../Mark/MarkTasks'
 import Answer from '../Mark/Answer'
 import Sample from '../Mark/Sample'
 import Review from '../Mark/Review'
-import SelfMark from '../Mark/SelfMark'
 
 import all from '../Group/mark_monitor/all'
 import average from '../Group/mark_monitor/average'
@@ -106,7 +102,7 @@ export default class index extends Component {
             submitted: false,
         });
 
-        AccountBackend.logout()
+        AccountBackend.signout()
             .then((res) => {
                 localStorage.setItem("account", "")
                 if (res.status === 'ok') {
@@ -125,7 +121,7 @@ export default class index extends Component {
 
     handleRightDropdownClick(e) {
         if (e.key === '0') {
-            Setting.openLink(Auth.getMyProfileUrl(this.state.account));
+            Setting.openLink(Setting.getMyProfileUrl(this.state.account));
         } else if (e.key === '1') {
             this.logout();
         }
@@ -175,7 +171,7 @@ export default class index extends Component {
     renderAccount() {
         if (this.state.account === undefined || this.state.account === null) {
             return (
-                <a href={Auth.getAuthorizeUrl()} style={{ color: '#ffffff', marginLeft: '50px' }}>
+                <a href={Setting.getSigninUrl()} style={{ color: '#ffffff', marginLeft: '50px' }}>
                     登录
                 </a>
             );
