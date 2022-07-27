@@ -3,11 +3,11 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/open-ct/openscore/model"
+	"github.com/open-ct/openscore/util"
 	"github.com/xuri/excelize/v2"
 	"log"
 	"math"
-	"openscore/model"
-	"openscore/util"
 	"strconv"
 	"strings"
 	"time"

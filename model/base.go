@@ -9,7 +9,7 @@ import (
 	"xorm.io/xorm"
 )
 
-var x *xorm.Engine
+var adapter *xorm.Engine
 
 func init() {
 	var err error
@@ -20,26 +20,26 @@ func init() {
 	database, _ := beego.AppConfig.String("mysql::MYSQL_DATABASE")
 	mysqlDSN := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8", user, password, host, port, database)
 	fmt.Println(mysqlDSN)
-	x, err = xorm.NewEngine("mysql", mysqlDSN)
+	adapter, err = xorm.NewEngine("mysql", mysqlDSN)
 	if err != nil {
 		fmt.Println("Fail to create xorm engine")
 		panic(err)
 	}
-	// x.ShowSQL(true)
+	// adapter.ShowSQL(true)
 	initMarkingModels()
 	initUserModels()
 
 }
 
 func initMarkingModels() {
-	err := x.Sync2(new(Topic), new(SubTopic), new(TestPaper), new(TestPaperInfo), new(ScoreRecord), new(UnderCorrectedPaper), new(PaperDistribution), new(Subject))
+	err := adapter.Sync2(new(Topic), new(SubTopic), new(TestPaper), new(TestPaperInfo), new(ScoreRecord), new(UnderCorrectedPaper), new(PaperDistribution), new(Subject))
 	if err != nil {
 		log.Println(err)
 	}
 }
 
 func initUserModels() {
-	err := x.Sync2(new(User))
+	err := adapter.Sync2(new(User))
 	if err != nil {
 		log.Println(err)
 	}

@@ -1,9 +1,9 @@
 package test
 
 import (
+	_ "github.com/open-ct/openscore/routers"
 	"net/http"
 	"net/http/httptest"
-	_ "openscore/routers"
 	"path/filepath"
 	"runtime"
 	"testing"

@@ -24,7 +24,7 @@ type Topic struct {
 }
 
 func (t *Topic) GetTopic(id int64) error {
-	has, err := x.Where(builder.Eq{"question_id": id}).Get(t)
+	has, err := adapter.Where(builder.Eq{"question_id": id}).Get(t)
 	if !has || err != nil {
 		log.Println("could not find topic")
 	}
@@ -32,28 +32,28 @@ func (t *Topic) GetTopic(id int64) error {
 }
 
 func GetTopicList(topics *[]Topic) error {
-	err := x.Find(topics)
+	err := adapter.Find(topics)
 	if err != nil {
 		log.Println("GetTopicList err ")
 	}
 	return err
 }
 func FindTopicBySubNameList(topics *[]Topic, subjectName string) error {
-	err := x.Where("subject_name=?", subjectName).Find(topics)
+	err := adapter.Where("subject_name=?", subjectName).Find(topics)
 	if err != nil {
 		log.Println("FindTopicBySubNameList err ")
 	}
 	return err
 }
 func FindTopicList(topics *[]Topic) error {
-	err := x.Find(topics)
+	err := adapter.Find(topics)
 	if err != nil {
 		log.Println("FindTopicList err ")
 	}
 	return err
 }
 func InsertTopic(topic *Topic) (err1 error, questionId int64) {
-	_, err := x.Insert(topic)
+	_, err := adapter.Insert(topic)
 	if err != nil {
 		log.Println("GetTopicList err ")
 	}
@@ -62,7 +62,7 @@ func InsertTopic(topic *Topic) (err1 error, questionId int64) {
 }
 
 // func Update ( topic *Topic,questionId int64)error {
-//	_,err:= x.Where("question_id=?",questionId).Update(&topic)
+//	_,err:= adapter.Where("question_id=?",questionId).Update(&topic)
 //	if err!=nil {
 //		log.Println("Update topic err ")
 //	}
@@ -70,7 +70,7 @@ func InsertTopic(topic *Topic) (err1 error, questionId int64) {
 //	return  err
 // }
 func (t *Topic) Update() error {
-	code, err := x.Where(builder.Eq{"question_id": t.QuestionId}).Update(t)
+	code, err := adapter.Where(builder.Eq{"question_id": t.QuestionId}).Update(t)
 	if code == 0 || err != nil {
 		log.Println("update Topic paper fail")
 		log.Printf("%+v", err)

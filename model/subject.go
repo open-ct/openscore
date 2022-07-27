@@ -10,7 +10,7 @@ type Subject struct {
 }
 
 func FindSubjectList(subjects *[]Subject) error {
-	err := x.Find(subjects)
+	err := adapter.Find(subjects)
 	if err != nil {
 		log.Println("FindSubjectList err ")
 	}
@@ -18,7 +18,7 @@ func FindSubjectList(subjects *[]Subject) error {
 }
 
 func InsertSubject(subject *Subject) (err1 error, questionId int64) {
-	_, err := x.Insert(subject)
+	_, err := adapter.Insert(subject)
 	if err != nil {
 		log.Println("GetTopicList err ")
 	}
@@ -26,7 +26,7 @@ func InsertSubject(subject *Subject) (err1 error, questionId int64) {
 	return err, subject.SubjectId
 }
 func GetSubjectBySubjectName(subject *Subject, subjectName string) (bool, error) {
-	get, err := x.Where("subject_name=?", subjectName).Get(subject)
+	get, err := adapter.Where("subject_name=?", subjectName).Get(subject)
 	if err != nil {
 		log.Println("FindSubjectList err ")
 	}

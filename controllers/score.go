@@ -3,9 +3,9 @@ package controllers
 import (
 	"encoding/base64"
 	"encoding/json"
+	"github.com/open-ct/openscore/model"
 	"log"
 	"math"
-	"openscore/model"
 	"os"
 	"strconv"
 	"strings"

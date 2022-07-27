@@ -15,7 +15,7 @@ type SubTopic struct {
 }
 
 func FindSubTopicsByQuestionId(id int64, st *[]SubTopic) error {
-	err := x.Where("question_id = ?", id).Find(st)
+	err := adapter.Where("question_id = ?", id).Find(st)
 	if err != nil {
 		log.Println("could not find any SubTopic")
 	}
@@ -23,7 +23,7 @@ func FindSubTopicsByQuestionId(id int64, st *[]SubTopic) error {
 }
 
 func GetSubTopicsByTestId(id int64, st *[]SubTopic) error {
-	err := x.Where(builder.Eq{"question_id": id}).Find(st)
+	err := adapter.Where(builder.Eq{"question_id": id}).Find(st)
 	if err != nil {
 		log.Println("could not find any SubTopic")
 		log.Println(err)
@@ -32,14 +32,15 @@ func GetSubTopicsByTestId(id int64, st *[]SubTopic) error {
 }
 
 func (st *SubTopic) GetSubTopic(id int64) error {
-	has, err := x.Where(builder.Eq{"question_detail_id": id}).Get(st)
+	has, err := adapter.Where(builder.Eq{"question_detail_id": id}).Get(st)
 	if !has || err != nil {
 		log.Println("could not find SubTopic")
 	}
 	return err
 }
+
 func InsertSubTopic(subTopic *SubTopic) (err1 error, questionDetailId int64) {
-	_, err := x.Insert(subTopic)
+	_, err := adapter.Insert(subTopic)
 	if err != nil {
 		log.Println("GetTopicList err ")
 	}

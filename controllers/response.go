@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"openscore/model"
+	"github.com/open-ct/openscore/model"
 	"time"
 )
 

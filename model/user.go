@@ -22,7 +22,7 @@ type User struct {
 }
 
 func (u *User) Insert() error {
-	code, err := x.Insert(u)
+	code, err := adapter.Insert(u)
 	if code == 0 || err != nil {
 		log.Println("insert user fail")
 		log.Printf("%+v", err)
@@ -31,7 +31,7 @@ func (u *User) Insert() error {
 }
 
 func (u *User) GetUser(id int64) error {
-	has, err := x.Where(builder.Eq{"user_id": id}).Get(u)
+	has, err := adapter.Where(builder.Eq{"user_id": id}).Get(u)
 	if !has || err != nil {
 		log.Println("could not found user")
 	}
@@ -40,7 +40,7 @@ func (u *User) GetUser(id int64) error {
 
 func GetUserByAccount(account string) (*User, error) {
 	u := &User{}
-	has, err := x.Where(builder.Eq{"account": account}).Get(u)
+	has, err := adapter.Where(builder.Eq{"account": account}).Get(u)
 	if !has || err != nil {
 		log.Println("could not found user by account")
 		return nil, nil
@@ -49,7 +49,7 @@ func GetUserByAccount(account string) (*User, error) {
 }
 
 func (u *User) UpdateCols(columns ...string) error {
-	_, err := x.ID(u.UserId).Cols(columns...).Update(u)
+	_, err := adapter.ID(u.UserId).Cols(columns...).Update(u)
 	if err != nil {
 		log.Println("could not Update user")
 	}
@@ -57,7 +57,7 @@ func (u *User) UpdateCols(columns ...string) error {
 }
 
 func (u *User) Update() error {
-	_, err := x.Update(u)
+	_, err := adapter.Update(u)
 	if err != nil {
 		log.Println("could not Update user")
 	}
@@ -65,7 +65,7 @@ func (u *User) Update() error {
 }
 
 func FindUsers(u *[]User, subject string) error {
-	err := x.Where("is_online_status = 1 AND user_type = 1 AND is_distribute = 0 AND subject_name = ?", subject).Find(u)
+	err := adapter.Where("is_online_status = 1 AND user_type = 1 AND is_distribute = 0 AND subject_name = ?", subject).Find(u)
 	if err != nil {
 		log.Println("could not FindUsers ")
 		log.Println(err)
@@ -75,7 +75,7 @@ func FindUsers(u *[]User, subject string) error {
 
 func CountOnlineUserNumberByQuestionId(questionId int64) (int64, error) {
 	user := new(User)
-	count, err := x.Where("is_online_status = 1").Where(" user_type = ?", 1).Where("is_distribute = ?", 1).Where("question_id=?", questionId).Count(user)
+	count, err := adapter.Where("is_online_status = 1").Where(" user_type = ?", 1).Where("is_distribute = ?", 1).Where("question_id=?", questionId).Count(user)
 	if err != nil {
 		log.Println("CountOnlineNumber err ")
 	}
@@ -83,16 +83,16 @@ func CountOnlineUserNumberByQuestionId(questionId int64) (int64, error) {
 }
 
 func FindOnlineUserNumberByQuestionId(users *[]User, questionId int64) error {
-	return x.Where("is_online_status = ? ", 1).Where(" user_type=?", 1).Where("is_distribute = ?", 1).Where("question_id=?", questionId).Find(users)
+	return adapter.Where("is_online_status = ? ", 1).Where(" user_type=?", 1).Where("is_distribute = ?", 1).Where("question_id=?", questionId).Find(users)
 }
 
 func FindUserNumberByQuestionId(users *[]User, questionId int64) error {
-	return x.Where(" user_type=?", 1).Where("is_distribute = ?", 1).Where("question_id=?", questionId).Find(users)
+	return adapter.Where(" user_type=?", 1).Where("is_distribute = ?", 1).Where("question_id=?", questionId).Find(users)
 }
 
 func FindNewUserId(id1 int64, id2 int64, questionId int64) (newId int64) {
 	var Ids []int64
-	err := x.Table("user").Where("user_id !=?", id1).Where("user_id !=?", id2).Where("question_id=?", questionId).Where("is_online_status=?", 1).Select("user_id").Find(&Ids)
+	err := adapter.Table("user").Where("user_id !=?", id1).Where("user_id !=?", id2).Where("question_id=?", questionId).Where("is_online_status=?", 1).Select("user_id").Find(&Ids)
 	if err != nil {
 		log.Println("FindNewUserId err")
 		log.Println(err)

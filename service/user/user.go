@@ -2,9 +2,9 @@ package user
 
 import (
 	"errors"
-	"openscore/model"
-	"openscore/pkg/token"
-	"openscore/util"
+	"github.com/open-ct/openscore/model"
+	"github.com/open-ct/openscore/pkg/token"
+	"github.com/open-ct/openscore/util"
 )
 
 func Login(account string, pwd string) (string, error) {
