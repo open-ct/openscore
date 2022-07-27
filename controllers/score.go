@@ -698,6 +698,7 @@ func (c *ApiController) Answer() {
 }
 
 func (c *ApiController) ExampleDetail() {
+	c.GetSessionUserId()
 	defer c.ServeJSON()
 	var requestBody ExampleDetail
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)

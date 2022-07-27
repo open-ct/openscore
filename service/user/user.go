@@ -4,10 +4,11 @@ import (
 	"errors"
 	"openscore/model"
 	"openscore/pkg/token"
+	"openscore/util"
 )
 
-func Login(idCard string, pwd string) (string, error) {
-	u, err := model.GetUserByIdCard(idCard)
+func Login(account string, pwd string) (string, error) {
+	u, err := model.GetUserByAccount(account)
 	if err != nil {
 		return "", err
 	}
@@ -22,18 +23,16 @@ func Login(idCard string, pwd string) (string, error) {
 	// 生成 auth token
 	token, err := token.GenerateToken(&token.TokenPayload{
 		Id:      u.UserId,
-		Role:    u.UserType,
+		TypeId:  u.UserType,
 		Expired: token.GetExpiredTime(),
 	})
 	if err != nil {
 		return "", err
 	}
 
-	return token, nil
-}
+	if err := u.UpdateOnlineStatus(true, util.GetCurrentTime()); err != nil {
+		return token, err
+	}
 
-func GetUserInfo(token string) (*model.User, error) {
-	user := &model.User{}
-	err := user.GetUser(1)
-	return user, err
+	return token, nil
 }

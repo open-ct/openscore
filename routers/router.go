@@ -2,7 +2,10 @@ package routers
 
 import (
 	beego "github.com/beego/beego/v2/server/web"
+	"github.com/beego/beego/v2/server/web/context"
+	"log"
 	"openscore/controllers"
+	"openscore/pkg/token"
 )
 
 func init() {
@@ -14,6 +17,23 @@ func init() {
 	beego.Router("/api/get-account", api, "get:GetAccount")
 
 	beego.Router("/openct/login", api, "post:Login")
+
+	FilterUser := func(ctx *context.Context) {
+		authorization := ctx.Input.Header("Authorization")
+		if len(authorization) == 0 {
+			api.ResponseError("cant get Authorization")
+			ctx.Redirect(302, "/login")
+		}
+		res, err := token.ResolveToken(authorization)
+		if err != nil {
+			log.Println(err)
+			api.ResponseError("cant resolve Authorization", err)
+		}
+		ctx.Input.SetData("userId", res.Id)
+		ctx.Input.SetData("typeId", res.TypeId)
+	}
+
+	beego.InsertFilter("/openct/marking", beego.BeforeRouter, FilterUser)
 
 	testNs := beego.NewNamespace("/openct/marking/score",
 		beego.NSNamespace("/test",
@@ -63,7 +83,6 @@ func init() {
 		beego.NSRouter("/readExcel", api, "post:ReadExcel"),
 		beego.NSRouter("/readExcel", api, "OPTIONS:ReadExcel"),
 		// beego.NSRouter("/uploadPic", api, "post:UploadPic"),
-		beego.NSRouter("/readUserExcel", api, "post:ReadUserExcel"),
 		beego.NSRouter("/readExampleExcel", api, "post:ReadExampleExcel"),
 		beego.NSRouter("/readExampleExcel", api, "OPTIONS:ReadExampleExcel"),
 		beego.NSRouter("/readAnswerExcel", api, "post:ReadAnswerExcel"),

@@ -8,13 +8,9 @@ import (
 
 type User struct {
 	UserId         int64  `json:"user_id" xorm:"pk autoincr"`
-	ExaminerCount  string `json:"examiner_count"`
+	Account        string `json:"account"`
 	UserName       string `json:"user_name"`
 	Password       string `json:"password"`
-	Address        string `json:"address"`
-	Tel            string `json:"tel"`
-	Email          string `json:"email"`
-	IdCard         string `json:"id_card"`
 	LoginTime      string `json:"login_time"`
 	ExistTime      string `json:"exist_time"`
 	OnlineTime     int64  `json:"online_time"`
@@ -42,19 +38,14 @@ func (u *User) GetUser(id int64) error {
 	return err
 }
 
-func GetUserByIdCard(idCard string) (*User, error) {
+func GetUserByAccount(account string) (*User, error) {
 	u := &User{}
-	has, err := x.Where(builder.Eq{"id_card": idCard}).Get(u)
+	has, err := x.Where(builder.Eq{"account": account}).Get(u)
 	if !has || err != nil {
-		log.Println("could not found user by IdCard")
+		log.Println("could not found user by account")
 		return nil, nil
 	}
 	return u, nil
-}
-
-func (u *User) GetUserInfo(id int64) error {
-	// TODO
-	return u.GetUser(id)
 }
 
 func (u *User) UpdateCols(columns ...string) error {
@@ -111,14 +102,9 @@ func FindNewUserId(id1 int64, id2 int64, questionId int64) (newId int64) {
 	return newId
 }
 
-func UpdateMemberOnlineStatus(userId int64, isOnline bool, time string) error {
-	var user User
-	if err := user.GetUser(userId); err != nil {
-		return err
-	}
+func (u *User) UpdateOnlineStatus(isOnline bool, time string) error {
+	u.IsOnlineStatus = isOnline
+	u.LoginTime = time
 
-	user.IsOnlineStatus = isOnline
-	user.LoginTime = time
-
-	return user.UpdateCols("is_online_status", "login_time")
+	return u.UpdateCols("is_online_status", "login_time")
 }

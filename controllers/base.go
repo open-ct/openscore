@@ -3,9 +3,10 @@ package controllers
 import (
 	"encoding/gob"
 	"encoding/json"
+	"fmt"
 	beego "github.com/beego/beego/v2/server/web"
 	auth "github.com/casdoor/casdoor-go-sdk/casdoorsdk"
-	"log"
+	"openscore/service/user"
 )
 
 type ApiController struct {
@@ -20,18 +21,20 @@ func init() {
 
 func (c *ApiController) UserLogin() {
 	defer c.ServeJSON()
-	var requestBody QuestionBySubList
-	var resp Response
-	var err error
+	var req LoginRequest
 
-	err = json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
-	if err != nil {
-		log.Println(err)
-		resp = Response{"10001", "cannot unmarshal", err}
-		c.Data["json"] = resp
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &req); err != nil {
+		c.ResponseError("cannot unmarshal", err.Error())
 		return
 	}
 
+	token, err := user.Login(req.Account, req.Password)
+	if err != nil {
+		c.ResponseError("cannot login", err.Error())
+		return
+	}
+
+	c.ResponseOk(token)
 }
 
 func GetUserName(user *auth.User) string {
@@ -94,6 +97,9 @@ func (c *ApiController) GetSessionUsername() string {
 }
 
 func (c *ApiController) GetSessionUserId() (int64, error) {
+	id := c.Ctx.Input.GetData("userId").(string)
+	fmt.Println("id: ", id)
+
 	// user := c.GetSessionUser()
 	// if user == nil {
 	// 	return 0, errors.New("cant find session info")

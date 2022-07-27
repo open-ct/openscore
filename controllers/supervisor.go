@@ -174,7 +174,7 @@ func (c *ApiController) UserInfo() {
 	}
 
 	user := model.User{}
-	if err := user.GetUserInfo(supervisorId); err != nil {
+	if err := user.GetUser(supervisorId); err != nil {
 		resp = Response{"20001", "获取用户信息失败", err}
 		c.Data["json"] = resp
 		return
@@ -250,7 +250,7 @@ func (c *ApiController) TeacherMonitoring() {
 		teacherMonitoringList[i].TestSuccessNumber = float64(finishCount)
 		// 用户信息
 		user := model.User{}
-		err = user.GetUserInfo(userId)
+		err = user.GetUser(userId)
 		if err != nil {
 			resp = Response{"20001", "无法获取用户信息", err}
 			c.Data["json"] = resp
@@ -461,7 +461,7 @@ func (c *ApiController) TeachersByQuestion() {
 	for i := 0; i < len(paperDistributions); i++ {
 		userId := paperDistributions[i].UserId
 		user := model.User{}
-		err := user.GetUserInfo(userId)
+		err := user.GetUser(userId)
 		if err != nil {
 			resp = Response{"20001", "could not found user", err}
 			c.Data["json"] = resp
@@ -605,7 +605,7 @@ func (c *ApiController) AverageScore() {
 		// 求userId 和userName
 		userId := paperDistributions[i].UserId
 		user := model.User{}
-		err := user.GetUserInfo(userId)
+		err := user.GetUser(userId)
 		if err != nil {
 			resp = Response{"20001", "could not found user", err}
 			c.Data["json"] = resp
@@ -705,7 +705,7 @@ func (c *ApiController) ProblemTest() {
 		// 存userId  userName
 		userId := problemUnderCorrectedPaper[i].UserId
 		user := model.User{}
-		err := user.GetUserInfo(userId)
+		err := user.GetUser(userId)
 		if err != nil {
 			resp = Response{"20001", "could not found user", err}
 			c.Data["json"] = resp
@@ -777,7 +777,7 @@ func (c *ApiController) ArbitramentTest() {
 		arbitramentTestVOList[i].ExaminerFirstId = examinerFirstId
 		// 查第一次评分人
 		firstExaminer := model.User{}
-		err = firstExaminer.GetUserInfo(examinerFirstId)
+		err = firstExaminer.GetUser(examinerFirstId)
 		if err != nil {
 			resp = Response{"20001", "could not found user", err}
 			c.Data["json"] = resp
@@ -794,7 +794,7 @@ func (c *ApiController) ArbitramentTest() {
 		arbitramentTestVOList[i].ExaminerSecondId = examinerSecondId
 		// 查第二次试卷评分人
 		secondExaminer := model.User{}
-		err := secondExaminer.GetUserInfo(examinerSecondId)
+		err := secondExaminer.GetUser(examinerSecondId)
 		if err != nil {
 			resp = Response{"20001", "could not found user", err}
 			c.Data["json"] = resp
@@ -811,7 +811,7 @@ func (c *ApiController) ArbitramentTest() {
 		arbitramentTestVOList[i].ExaminerThirdId = examinerThirdId
 		// 查第二次试卷评分人
 		thirdExaminer := model.User{}
-		if err := thirdExaminer.GetUserInfo(examinerThirdId); err != nil {
+		if err := thirdExaminer.GetUser(examinerThirdId); err != nil {
 			resp = Response{"20001", "could not found user", err}
 			c.Data["json"] = resp
 			return
@@ -1557,7 +1557,7 @@ func (c *ApiController) ScoreDeviation() {
 		// 求userId 和userName
 		userId := paperDistributions[i].UserId
 		user := model.User{}
-		err := user.GetUserInfo(userId)
+		err := user.GetUser(userId)
 		if err != nil {
 			resp = Response{"20001", "could not found user", err}
 			c.Data["json"] = resp
@@ -1670,7 +1670,7 @@ func (c *ApiController) SelfMarkList() {
 		}
 		selfMarkVOList[i].Userid = selfScoreId
 		user := model.User{}
-		err = user.GetUserInfo(selfScoreId)
+		err = user.GetUser(selfScoreId)
 
 		selfMarkVOList[i].Name = user.UserName
 		selfMarkVOList[i].TestId = testId

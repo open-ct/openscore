@@ -1,5 +1,10 @@
 package controllers
 
+type LoginRequest struct {
+	Account  string `json:"account"`
+	Password string `json:"password"`
+}
+
 type AddTopic struct {
 	TopicName     string           `json:"topicName"`
 	ScoreType     int64            `json:"scoreType"`
