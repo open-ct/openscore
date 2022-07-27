@@ -21,8 +21,8 @@ import (
 
 func init() {
 	beego.Router("/", &controllers.ApiController{})
-	beego.Router("/api/login", &controllers.ApiController{}, "post:Login")
-	beego.Router("/api/logout", &controllers.ApiController{}, "post:Logout")
+	beego.Router("/api/login", &controllers.ApiController{}, "post:Signin")
+	beego.Router("/api/logout", &controllers.ApiController{}, "post:Signout")
 	beego.Router("/api/get-account", &controllers.ApiController{}, "get:GetAccount")
 	beego.Router("/openct/marking/score/test/display", &controllers.ApiController{}, "post:Display")
 	beego.Router("/openct/marking/score/test/list", &controllers.ApiController{}, "post:List")
