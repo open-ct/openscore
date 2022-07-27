@@ -15,33 +15,33 @@ type PaperDistribution struct {
 }
 
 func (u *PaperDistribution) GetPaperDistribution(id string) error {
-	has, err := x.Where(builder.Eq{"user_id": id}).Get(u)
+	has, err := adapter.engine.Where(builder.Eq{"user_id": id}).Get(u)
 	if !has || err != nil {
 		log.Println("could not find paper distribution")
 	}
 	return err
 }
-func FindPaperDistributionByQuestionId(paperDistributions *[]PaperDistribution,questionId int64) error{
-	err:= x.Where("question_id = ?", questionId).Find(paperDistributions)
-	if err!=nil {
+func FindPaperDistributionByQuestionId(paperDistributions *[]PaperDistribution, questionId int64) error {
+	err := adapter.engine.Where("question_id = ?", questionId).Find(paperDistributions)
+	if err != nil {
 		log.Println("FindPaperDistributionByQuestionId err ")
 	}
- return err
+	return err
 }
 
 func (u *PaperDistribution) Save() error {
-	code, err := x.Insert(u)
+	code, err := adapter.engine.Insert(u)
 	if code == 0 || err != nil {
 		log.Println("insert PaperDistribution fail")
 		log.Println(err)
 	}
 	return err
 }
-func CountUserDistributionNumberByQuestionId(questionId int64)(count int64,err error) {
-	paperDistribution :=new (PaperDistribution)
-	count, err1 := x.Where("question_id = ?", questionId).Count(paperDistribution)
-	if err!=nil {
+func CountUserDistributionNumberByQuestionId(questionId int64) (count int64, err error) {
+	paperDistribution := new(PaperDistribution)
+	count, err1 := adapter.engine.Where("question_id = ?", questionId).Count(paperDistribution)
+	if err != nil {
 		log.Println("countUserDistributionNumberByQuestionId err ")
 	}
-	return count ,err1
+	return count, err1
 }

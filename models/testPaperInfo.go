@@ -27,7 +27,7 @@ type TestPaperInfo struct {
 }
 
 func (t *TestPaperInfo) GetTestPaperInfoByTestIdAndQuestionDetailId(testId int64, questionDetailId int64) error {
-	has, err := x.Where("question_detail_id = ? and test_id = ?", questionDetailId, testId).Get(t)
+	has, err := adapter.engine.Where("question_detail_id = ? and test_id = ?", questionDetailId, testId).Get(t)
 	if !has || err != nil {
 		log.Println("could not specific info")
 	}
@@ -35,7 +35,7 @@ func (t *TestPaperInfo) GetTestPaperInfoByTestIdAndQuestionDetailId(testId int64
 }
 
 func (t *TestPaperInfo) GetTestPaperInfo(id int64) error {
-	has, err := x.Where(builder.Eq{"test_detail_id": id}).Get(t)
+	has, err := adapter.engine.Where(builder.Eq{"test_detail_id": id}).Get(t)
 	if !has && err != nil {
 		log.Println("could not find test paper info")
 		log.Println(err)
@@ -44,7 +44,7 @@ func (t *TestPaperInfo) GetTestPaperInfo(id int64) error {
 }
 
 func (t *TestPaperInfo) Update() error {
-	code, err := x.Where(builder.Eq{"test_detail_id": t.Test_detail_id}).AllCols().Update(t)
+	code, err := adapter.engine.Where(builder.Eq{"test_detail_id": t.Test_detail_id}).AllCols().Update(t)
 	if code == 0 && err != nil {
 		log.Println("update test paper info fail")
 		log.Println(err)
@@ -52,7 +52,7 @@ func (t *TestPaperInfo) Update() error {
 	return err
 }
 func (t *TestPaperInfo) Insert() error {
-	code, err := x.Insert(t)
+	code, err := adapter.engine.Insert(t)
 	if code == 0 || err != nil {
 		log.Println("Insert test paper info fail")
 		log.Println(err)
@@ -61,7 +61,7 @@ func (t *TestPaperInfo) Insert() error {
 }
 
 func GetTestInfoListByTestId(id int64, as *[]TestPaperInfo) error {
-	err := x.Where("test_id = ?", id).Find(as)
+	err := adapter.engine.Where("test_id = ?", id).Find(as)
 	if err != nil {
 		log.Println("could not find any paper")
 	}
@@ -69,15 +69,15 @@ func GetTestInfoListByTestId(id int64, as *[]TestPaperInfo) error {
 }
 
 func GetTestInfoPicListByTestId(id int64, as *[]string) error {
-	err := x.Table("test_paper_info").Select("pic_src").Where("test_id = ?", id).Find(as)
+	err := adapter.engine.Table("test_paper_info").Select("pic_src").Where("test_id = ?", id).Find(as)
 	if err != nil {
 		log.Println("could not find any paper")
 	}
 	return err
 }
 
-func FindTestPaperInfoByQuestionDetailId(questionDetailId int64,  t *[]TestPaperInfo) error {
-	err := x.Where("question_detail_id = ?", questionDetailId).Find(t)
+func FindTestPaperInfoByQuestionDetailId(questionDetailId int64, t *[]TestPaperInfo) error {
+	err := adapter.engine.Where("question_detail_id = ?", questionDetailId).Find(t)
 	if err != nil {
 		log.Println("could not FindTestPaperInfoByQuestionId ")
 		log.Println(err)
@@ -85,7 +85,7 @@ func FindTestPaperInfoByQuestionDetailId(questionDetailId int64,  t *[]TestPaper
 	return err
 }
 func (u *TestPaperInfo) Delete() error {
-	_, err := x.Where(builder.Eq{"test_id": u.Test_id}).Delete(u)
+	_, err := adapter.engine.Where(builder.Eq{"test_id": u.Test_id}).Delete(u)
 	if  err != nil {
 		log.Println("delete fail")
 	}
