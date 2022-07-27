@@ -15,37 +15,38 @@
 package main
 
 import (
-	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/plugins/cors"
-	_ "github.com/astaxie/beego/session/redis"
-	"github.com/open-ct/openscore/models"
-	routers "github.com/open-ct/openscore/routers"
+	"github.com/open-ct/openscore/routers"
+
+	beego "github.com/beego/beego/v2/server/web"
+	"github.com/beego/beego/v2/server/web/filter/cors"
 )
 
 func main() {
-	models.InitAdapter()
 
 	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
-		AllowOrigins:     []string{"*"},
-		AllowMethods:     []string{"GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "X-Requested-With", "Content-Type", "Accept"},
-		ExposeHeaders:    []string{"Content-Length"},
+		// 允许访问所有源
+		// AllowAllOrigins: true,
+		AllowOrigins: []string{"*"},
+		AllowMethods: []string{"GET", "PUT", "PATCH", "POST", "OPTIONS"},
+		// AllowHeaders:     []string{"Origin", "Access-Control-Allow-Origin", "Access-Control-Allow-Headers", "Content-Type"},
+		AllowHeaders:     []string{"Content-Type", "Access-Control-Allow-Headers", "X-Requested-With", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length", "Access-Control-Allow-Origin", "Access-Control-Allow-Headers", "Content-Type"},
 		AllowCredentials: true,
 	}))
-
-	//beego.DelStaticPath("/static")
 	beego.SetStaticPath("/static", "web/build/static")
-	// https://studygolang.com/articles/2303
-	beego.InsertFilter("*", beego.BeforeRouter, routers.TransparentStatic)
-
+	// beego.InsertFilter("/", beego.BeforeRouter, routers.TransparentStatic) // must has this for default page
+	// beego.InsertFilter("/*", beego.BeforeRouter, routers.TransparentStatic)
+	beego.InsertFilter("*", beego.BeforeRouter, routers.StaticFilter)
 	beego.BConfig.WebConfig.Session.SessionName = "openscore_session_id"
-	if beego.AppConfig.String("redisEndpoint") == "" {
-		beego.BConfig.WebConfig.Session.SessionProvider = "file"
-		beego.BConfig.WebConfig.Session.SessionProviderConfig = "./tmp"
-	} else {
-		beego.BConfig.WebConfig.Session.SessionProvider = "redis"
-		beego.BConfig.WebConfig.Session.SessionProviderConfig = beego.AppConfig.String("redisEndpoint")
-	}
+	beego.BConfig.WebConfig.Session.SessionProvider = "file"
+	beego.BConfig.WebConfig.Session.SessionProviderConfig = "./tmp"
+	// if beego.AppConfig.String("redisEndpoint") == "" {
+	// 	beego.BConfig.WebConfig.Session.SessionProvider = "file"
+	// 	beego.BConfig.WebConfig.Session.SessionProviderConfig = "./tmp"
+	// } else {
+	// 	beego.BConfig.WebConfig.Session.SessionProvider = "redis"
+	// 	beego.BConfig.WebConfig.Session.SessionProviderConfig = beego.AppConfig.String("redisEndpoint")
+	// }
 	beego.BConfig.WebConfig.Session.SessionGCMaxLifetime = 3600 * 24 * 365
 
 	beego.Run()

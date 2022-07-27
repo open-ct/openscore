@@ -16,9 +16,11 @@ package controllers
 
 import (
 	"encoding/gob"
-
-	"github.com/astaxie/beego"
-	"github.com/casdoor/casdoor-go-sdk/auth"
+	"encoding/json"
+	"fmt"
+	beego "github.com/beego/beego/v2/server/web"
+	auth "github.com/casdoor/casdoor-go-sdk/casdoorsdk"
+	"github.com/open-ct/openscore/service/user"
 )
 
 type ApiController struct {
@@ -27,6 +29,26 @@ type ApiController struct {
 
 func init() {
 	gob.Register(auth.Claims{})
+}
+
+// 用户登录
+
+func (c *ApiController) UserLogin() {
+	defer c.ServeJSON()
+	var req LoginRequest
+
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &req); err != nil {
+		c.ResponseError("cannot unmarshal", err.Error())
+		return
+	}
+
+	token, err := user.Login(req.Account, req.Password)
+	if err != nil {
+		c.ResponseError("cannot login", err.Error())
+		return
+	}
+
+	c.ResponseOk(token)
 }
 
 func GetUserName(user *auth.User) string {
@@ -38,7 +60,7 @@ func GetUserName(user *auth.User) string {
 }
 
 func (c *ApiController) GetSessionClaims() *auth.Claims {
-	s := c.GetSession("user")
+	s := c.Controller.GetSession("user")
 	if s == nil {
 		return nil
 	}
@@ -58,6 +80,7 @@ func (c *ApiController) SetSessionClaims(claims *auth.Claims) {
 
 func (c *ApiController) GetSessionUser() *auth.User {
 	claims := c.GetSessionClaims()
+
 	if claims == nil {
 		return nil
 	}
@@ -85,4 +108,19 @@ func (c *ApiController) GetSessionUsername() string {
 	}
 
 	return GetUserName(user)
+}
+
+func (c *ApiController) GetSessionUserId() (int64, error) {
+	id := c.Ctx.Input.GetData("userId").(string)
+	fmt.Println("id: ", id)
+
+	// user := c.GetSessionUser()
+	// if user == nil {
+	// 	return 0, errors.New("cant find session info")
+	// }
+
+	// u, err := model.GetUserByCasdoorName(user.Name)
+	//
+	// return u.UserId, err
+	return 0, nil
 }

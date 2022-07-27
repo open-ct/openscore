@@ -26,4 +26,7 @@ tmpFiles/
 logs/
 files/
 lastupdate.tmp
+.DS_Store
+test.go
+*.png
 commentsRouter*.go
