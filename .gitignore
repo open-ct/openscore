@@ -21,4 +21,4 @@ lastupdate.tmp
 .idea/
 .DS_Store
 test.go
-img/
+*.png
