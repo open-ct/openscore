@@ -18,10 +18,8 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/astaxie/beego/context"
 	"github.com/open-ct/openscore/util"
-
-	"github.com/beego/beego/v2/server/web/context"
-	// "github.com/astaxie/beego/context"
 )
 
 func TransparentStatic(ctx *context.Context) {

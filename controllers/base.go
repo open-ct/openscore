@@ -1,12 +1,4 @@
-/*
- * @Author: Junlang
- * @Date: 2021-07-23 01:02:30
- * @LastEditTime: 2021-07-23 17:10:55
- * @LastEditors: Junlang
- * @FilePath: /github.com/open-ct/openscore/controllers/base.go
- */
-
-// Copyright 2020 The casbin Authors. All Rights Reserved.
+// Copyright 2022 The OpenCT Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,12 +15,12 @@
 package controllers
 
 import (
-	"github.com/open-ct/openscore/auth"
-	"github.com/open-ct/openscore/util"
 	"log"
 
-	beego "github.com/beego/beego/v2/server/web"
-	// "github.com/astaxie/beego"
+	"github.com/open-ct/openscore/auth"
+	"github.com/open-ct/openscore/util"
+
+	"github.com/astaxie/beego"
 )
 
 type ApiController struct {
@@ -42,6 +34,7 @@ type TestPaperApiController struct {
 type SupervisorApiController struct {
 	beego.Controller
 }
+
 type AdminApiController struct {
 	beego.Controller
 }

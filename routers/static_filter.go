@@ -15,11 +15,11 @@
 package routers
 
 import (
-	"github.com/open-ct/openscore/util"
 	"net/http"
 	"strings"
 
-	"github.com/beego/beego/v2/server/web/context"
+	"github.com/astaxie/beego/context"
+	"github.com/open-ct/openscore/util"
 )
 
 func StaticFilter(ctx *context.Context) {

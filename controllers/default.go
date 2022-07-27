@@ -1,17 +1,25 @@
-/*
- * @Author: Junlang
- * @Date: 2021-07-18 00:45:51
- * @LastEditTime: 2021-07-24 20:25:03
- * @LastEditors: Junlang
- * @FilePath: /github.com/open-ct/openscore/controllers/default.go
- */
+// Copyright 2022 The OpenCT Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package controllers
 
 import (
 	"fmt"
-	beego "github.com/beego/beego/v2/server/web"
-	"github.com/open-ct/openscore/auth"
 	"log"
+
+	"github.com/astaxie/beego"
+	"github.com/open-ct/openscore/auth"
 )
 
 type Response struct {
@@ -20,18 +28,18 @@ type Response struct {
 	Data   interface{} `json:"data"`
 }
 
-var CasdoorEndpoint, _ = beego.AppConfig.String("casdoorEndpoint")
-var ClientId, _ = beego.AppConfig.String("clientId")
-var ClientSecret, _ = beego.AppConfig.String("clientSecret")
-var JwtSecret, _ = beego.AppConfig.String("jwtSecret")
-var CasdoorOrganization, _ = beego.AppConfig.String("casdoorOrganization")
+var CasdoorEndpoint = beego.AppConfig.String("casdoorEndpoint")
+var ClientId = beego.AppConfig.String("clientId")
+var ClientSecret = beego.AppConfig.String("clientSecret")
+var JwtSecret = beego.AppConfig.String("jwtSecret")
+var CasdoorOrganization = beego.AppConfig.String("casdoorOrganization")
 
 func init() {
 	auth.InitConfig(CasdoorEndpoint, ClientId, ClientSecret, JwtSecret, CasdoorOrganization)
 }
 
 func (c *ApiController) Login() {
-	input, _ := c.Input()
+	input := c.Input()
 	code := input.Get("code")
 	state := input.Get("state")
 
