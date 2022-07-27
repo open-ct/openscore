@@ -6,11 +6,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/golang/freetype"
-	"github.com/open-ct/openscore/models"
-	"github.com/open-ct/openscore/requests"
-	"github.com/xuri/excelize/v2"
-	"golang.org/x/image/font"
 	"image"
 	"image/color"
 	"image/draw"
@@ -23,7 +18,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/golang/freetype"
+	"github.com/open-ct/openscore/models"
+	"github.com/open-ct/openscore/requests"
 	"github.com/open-ct/openscore/responses"
+	"github.com/xuri/excelize/v2"
+	"golang.org/x/image/font"
 )
 
 var (
@@ -124,7 +124,7 @@ func UploadPic(name string, text []string) (src string) {
 2.试卷导入
 */
 
-func (c *AdminApiController) ReadExcel() {
+func (c *ApiController) ReadExcel() {
 	c.Ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin", c.Ctx.Request.Header.Get("Origin"))
 	defer c.ServeJSON()
 	var resp Response
@@ -252,7 +252,7 @@ func (c *AdminApiController) ReadExcel() {
 2.样卷导入
 */
 
-func (c *AdminApiController) ReadExampleExcel() {
+func (c *ApiController) ReadExampleExcel() {
 	c.Ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin", c.Ctx.Request.Header.Get("Origin"))
 	defer c.ServeJSON()
 	var resp Response
@@ -377,7 +377,7 @@ func (c *AdminApiController) ReadExampleExcel() {
 	c.Data["json"] = resp
 
 }
-func (c *AdminApiController) ReadAnswerExcel() {
+func (c *ApiController) ReadAnswerExcel() {
 	c.Ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin", c.Ctx.Request.Header.Get("Origin"))
 	defer c.ServeJSON()
 	var resp Response
@@ -507,7 +507,7 @@ func (c *AdminApiController) ReadAnswerExcel() {
 3.大题列表
 */
 
-func (c *AdminApiController) QuestionBySubList() {
+func (c *ApiController) QuestionBySubList() {
 	defer c.ServeJSON()
 	var requestBody requests.QuestionBySubList
 	var resp Response
@@ -552,7 +552,7 @@ func (c *AdminApiController) QuestionBySubList() {
 4.试卷参数导入
 */
 
-func (c *AdminApiController) InsertTopic() {
+func (c *ApiController) InsertTopic() {
 
 	defer c.ServeJSON()
 	var requestBody requests.AddTopic
@@ -642,7 +642,7 @@ func (c *AdminApiController) InsertTopic() {
 5.科目选择
 */
 
-func (c *AdminApiController) SubjectList() {
+func (c *ApiController) SubjectList() {
 
 	defer c.ServeJSON()
 	var requestBody requests.SubjectList
@@ -685,7 +685,7 @@ func (c *AdminApiController) SubjectList() {
 /**
 6.试卷分配界面
 */
-func (c *AdminApiController) DistributionInfo() {
+func (c *ApiController) DistributionInfo() {
 
 	defer c.ServeJSON()
 	var requestBody requests.DistributionInfo
@@ -753,7 +753,7 @@ func (c *AdminApiController) DistributionInfo() {
 /**
 7.试卷分配
 */
-func (c *AdminApiController) Distribution() {
+func (c *ApiController) Distribution() {
 
 	defer c.ServeJSON()
 	var requestBody requests.Distribution
@@ -927,7 +927,7 @@ func (c *AdminApiController) Distribution() {
 /**
 8.图片显示
 */
-func (c *AdminApiController) Pic() {
+func (c *ApiController) Pic() {
 	defer c.ServeJSON()
 	var requestBody requests.ReadFile
 	var resp Response
@@ -1001,7 +1001,7 @@ func cutUser(oldData []models.User, n int) (newData []models.User) {
 9.大题展示列表
 */
 
-func (c *AdminApiController) TopicList() {
+func (c *ApiController) TopicList() {
 	defer c.ServeJSON()
 	var requestBody requests.TopicList
 	var resp Response
@@ -1066,7 +1066,7 @@ func (c *AdminApiController) TopicList() {
 /**
 DistributionRecord
 */
-func (c *AdminApiController) DistributionRecord() {
+func (c *ApiController) DistributionRecord() {
 	defer c.ServeJSON()
 	var requestBody requests.DistributionRecord
 	var resp Response
@@ -1128,7 +1128,7 @@ func (c *AdminApiController) DistributionRecord() {
 试卷删除
 */
 
-func (c *AdminApiController) DeleteTest() {
+func (c *ApiController) DeleteTest() {
 
 	defer c.ServeJSON()
 	var requestBody requests.DeleteTest

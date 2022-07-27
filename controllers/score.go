@@ -3,18 +3,19 @@ package controllers
 import (
 	"encoding/base64"
 	"encoding/json"
-	"github.com/open-ct/openscore/models"
-	"github.com/open-ct/openscore/requests"
-	"github.com/open-ct/openscore/responses"
 	"log"
 	"math"
 	"os"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/open-ct/openscore/models"
+	"github.com/open-ct/openscore/requests"
+	"github.com/open-ct/openscore/responses"
 )
 
-func (c *TestPaperApiController) Display() {
+func (c *ApiController) Display() {
 	defer c.ServeJSON()
 	var requestBody requests.TestDisplay
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
@@ -82,7 +83,7 @@ func (c *TestPaperApiController) Display() {
 	c.Data["json"] = resp
 }
 
-func (c *TestPaperApiController) List() {
+func (c *ApiController) List() {
 	defer c.ServeJSON()
 	var requestBody requests.TestList
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
@@ -114,7 +115,7 @@ func (c *TestPaperApiController) List() {
 
 }
 
-func (c *TestPaperApiController) Point() {
+func (c *ApiController) Point() {
 	defer c.ServeJSON()
 	var requestBody requests.TestPoint
 	var resp Response
@@ -560,7 +561,7 @@ func (c *TestPaperApiController) Point() {
 	c.Data["json"] = resp
 }
 
-func (c *TestPaperApiController) Problem() {
+func (c *ApiController) Problem() {
 	defer c.ServeJSON()
 	// var requestBody map[string]interface{}
 	var requestBody requests.TestProblem
@@ -638,7 +639,7 @@ func (c *TestPaperApiController) Problem() {
 	c.Data["json"] = resp
 }
 
-func (c *TestPaperApiController) Answer() {
+func (c *ApiController) Answer() {
 	defer c.ServeJSON()
 	var requestBody requests.TestAnswer
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
@@ -691,7 +692,7 @@ func (c *TestPaperApiController) Answer() {
 	c.Data["json"] = resp
 }
 
-func (c *TestPaperApiController) ExampleDetail() {
+func (c *ApiController) ExampleDetail() {
 	defer c.ServeJSON()
 	var requestBody requests.ExampleDetail
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
@@ -764,7 +765,7 @@ func (c *TestPaperApiController) ExampleDetail() {
 
 }
 
-func (c *TestPaperApiController) ExampleList() {
+func (c *ApiController) ExampleList() {
 	defer c.ServeJSON()
 	var requestBody requests.ExampleList
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
@@ -794,7 +795,7 @@ func (c *TestPaperApiController) ExampleList() {
 
 }
 
-func (c *TestPaperApiController) Review() {
+func (c *ApiController) Review() {
 	defer c.ServeJSON()
 	var requestBody requests.TestReview
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
@@ -820,7 +821,7 @@ func (c *TestPaperApiController) Review() {
 	resp := Response{"10000", "ok", response}
 	c.Data["json"] = resp
 }
-func (c *TestPaperApiController) ReviewPoint() {
+func (c *ApiController) ReviewPoint() {
 	defer c.ServeJSON()
 	var requestBody requests.TestPoint
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
@@ -920,7 +921,7 @@ func (c *TestPaperApiController) ReviewPoint() {
 }
 
 //自评列表 chen
-func (c *TestPaperApiController) SelfScoreList() {
+func (c *ApiController) SelfScoreList() {
 	defer c.ServeJSON()
 	var requestBody requests.TestList
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
@@ -955,7 +956,7 @@ func (c *TestPaperApiController) SelfScoreList() {
 ///**
 //20.自评卷打分
 //*/
-//func (c *TestPaperApiController) SelfMarkPoint() {
+//func (c *ApiController) SelfMarkPoint() {
 //	defer c.ServeJSON()
 //	var requestBody requests.TestPoint
 //

@@ -3,20 +3,20 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
-
-	"github.com/open-ct/openscore/models"
-	"github.com/open-ct/openscore/requests"
-	"github.com/open-ct/openscore/responses"
 	"math"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/open-ct/openscore/models"
+	"github.com/open-ct/openscore/requests"
+	"github.com/open-ct/openscore/responses"
 )
 
 ///**
 // 9.大题选择列表
 // */
-//func (c *SupervisorApiController) QuestionList() {
+//func (c *ApiController) QuestionList() {
 //	defer c.ServeJSON()
 //	var requestBody requests.QuestionList
 //	var resp Response
@@ -62,7 +62,7 @@ import (
 /**
 10.用户登入信息表
 */
-func (c *SupervisorApiController) UserInfo() {
+func (c *ApiController) UserInfo() {
 	defer c.ServeJSON()
 	var requestBody requests.UserInfo
 	var resp Response
@@ -99,7 +99,7 @@ func (c *SupervisorApiController) UserInfo() {
 /**
 8.教师监控页面
 */
-func (c *SupervisorApiController) TeacherMonitoring() {
+func (c *ApiController) TeacherMonitoring() {
 	defer c.ServeJSON()
 	var requestBody requests.TeacherMonitoring
 	var resp Response
@@ -257,7 +257,7 @@ func (c *SupervisorApiController) TeacherMonitoring() {
 /**
 11.分数分布表
 */
-func (c *SupervisorApiController) ScoreDistribution() {
+func (c *ApiController) ScoreDistribution() {
 	defer c.ServeJSON()
 	var requestBody requests.ScoreDistribution
 	var resp Response
@@ -330,7 +330,7 @@ func (c *SupervisorApiController) ScoreDistribution() {
 /**
 12.大题教师选择列表
 */
-func (c *SupervisorApiController) TeachersByQuestion() {
+func (c *ApiController) TeachersByQuestion() {
 	defer c.ServeJSON()
 	var requestBody requests.TeachersByQuestion
 	var resp Response
@@ -355,7 +355,7 @@ func (c *SupervisorApiController) TeachersByQuestion() {
 		return
 	}
 
-	//输出标准	
+	//输出标准
 	teacherVOList := make([]responses.TeacherVO, len(paperDistributions))
 
 	//求教师名和转化输出
@@ -385,7 +385,7 @@ func (c *SupervisorApiController) TeachersByQuestion() {
 /**
 13.自评监控表
 */
-func (c *SupervisorApiController) SelfScore() {
+func (c *ApiController) SelfScore() {
 	defer c.ServeJSON()
 	var requestBody requests.SelfScore
 	var resp Response
@@ -474,7 +474,7 @@ func (c *SupervisorApiController) SelfScore() {
 /**
 14，平均分监控表
 */
-func (c *SupervisorApiController) AverageScore() {
+func (c *ApiController) AverageScore() {
 	defer c.ServeJSON()
 	var requestBody requests.AverageScore
 	var resp Response
@@ -568,7 +568,7 @@ func (c *SupervisorApiController) AverageScore() {
 /**
 17，问题卷表
 */
-func (c *SupervisorApiController) ProblemTest() {
+func (c *ApiController) ProblemTest() {
 	defer c.ServeJSON()
 	var requestBody requests.ProblemTest
 	var resp Response
@@ -633,7 +633,7 @@ func (c *SupervisorApiController) ProblemTest() {
 /**
 18，仲裁卷表
 */
-func (c *SupervisorApiController) ArbitramentTest() {
+func (c *ApiController) ArbitramentTest() {
 	defer c.ServeJSON()
 	var requestBody requests.ArbitramentTest
 	var resp Response
@@ -749,7 +749,7 @@ func (c *SupervisorApiController) ArbitramentTest() {
 /**
 15.总体进度
 */
-func (c *SupervisorApiController) ScoreProgress() {
+func (c *ApiController) ScoreProgress() {
 	defer c.ServeJSON()
 	var requestBody requests.ScoreProgress
 	var resp Response
@@ -1161,7 +1161,7 @@ func (c *SupervisorApiController) ScoreProgress() {
 /**
 19.阅卷组长批改试卷
 */
-func (c *SupervisorApiController) SupervisorPoint() {
+func (c *ApiController) SupervisorPoint() {
 	defer c.ServeJSON()
 	var requestBody requests.SupervisorPoint
 	var resp Response
@@ -1271,7 +1271,7 @@ func (c *SupervisorApiController) SupervisorPoint() {
 /**
 20.问题卷列表
 */
-func (c *SupervisorApiController) ProblemUnmarkList() {
+func (c *ApiController) ProblemUnmarkList() {
 	defer c.ServeJSON()
 	var requestBody requests.ProblemUnmarkList
 	var resp Response
@@ -1317,7 +1317,7 @@ func (c *SupervisorApiController) ProblemUnmarkList() {
 /**
 20.自评卷列表
 */
-func (c *SupervisorApiController) SelfUnmarkList() {
+func (c *ApiController) SelfUnmarkList() {
 	defer c.ServeJSON()
 	var requestBody requests.SelfUnmarkList
 	var resp Response
@@ -1363,7 +1363,7 @@ func (c *SupervisorApiController) SelfUnmarkList() {
 /**
 21.仲裁卷列表
 */
-func (c *SupervisorApiController) ArbitramentUnmarkList() {
+func (c *ApiController) ArbitramentUnmarkList() {
 	defer c.ServeJSON()
 	var requestBody requests.ArbitramentUnmarkList
 	var resp Response
@@ -1408,7 +1408,7 @@ func (c *SupervisorApiController) ArbitramentUnmarkList() {
 
 //16标准差
 
-func (c *SupervisorApiController) ScoreDeviation() {
+func (c *ApiController) ScoreDeviation() {
 	defer c.ServeJSON()
 	var requestBody requests.ScoreDeviation
 	var resp Response
@@ -1504,7 +1504,7 @@ func (c *SupervisorApiController) ScoreDeviation() {
 /**
 22.自评卷列表
 */
-func (c *SupervisorApiController) SelfMarkList() {
+func (c *ApiController) SelfMarkList() {
 	defer c.ServeJSON()
 	var requestBody requests.SelfMarkList
 	var resp Response

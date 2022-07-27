@@ -15,11 +15,10 @@
 package main
 
 import (
-	_ "github.com/open-ct/openscore/routers"
-	routers "github.com/open-ct/openscore/routers"
-
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/plugins/cors"
+	_ "github.com/astaxie/beego/session/redis"
+	routers "github.com/open-ct/openscore/routers"
 )
 
 func main() {

@@ -15,60 +15,74 @@
 package controllers
 
 import (
-	"log"
-
-	"github.com/open-ct/openscore/auth"
-	"github.com/open-ct/openscore/util"
+	"encoding/gob"
 
 	"github.com/astaxie/beego"
+	"github.com/casdoor/casdoor-go-sdk/auth"
 )
 
 type ApiController struct {
 	beego.Controller
 }
 
-type TestPaperApiController struct {
-	beego.Controller
+func init() {
+	gob.Register(auth.Claims{})
 }
 
-type SupervisorApiController struct {
-	beego.Controller
+func GetUserName(user *auth.User) string {
+	if user == nil {
+		return ""
+	}
+
+	return user.Name
 }
 
-type AdminApiController struct {
-	beego.Controller
-}
-
-func (c *ApiController) GetSessionUser() *auth.Claims {
+func (c *ApiController) GetSessionClaims() *auth.Claims {
 	s := c.GetSession("user")
 	if s == nil {
 		return nil
 	}
-	log.Println(s)
 
-	claims := &auth.Claims{}
-	err := util.JsonToStruct(s.(string), claims)
-	if err != nil {
-		panic(err)
-	}
-
-	return claims
+	claims := s.(auth.Claims)
+	return &claims
 }
 
-func (c *ApiController) SetSessionUser(claims *auth.Claims) {
+func (c *ApiController) SetSessionClaims(claims *auth.Claims) {
 	if claims == nil {
 		c.DelSession("user")
 		return
 	}
 
-	s := util.StructToJson(claims)
-	c.SetSession("user", s)
+	c.SetSession("user", *claims)
+}
+
+func (c *ApiController) GetSessionUser() *auth.User {
+	claims := c.GetSessionClaims()
+	if claims == nil {
+		return nil
+	}
+
+	return &claims.User
+}
+
+func (c *ApiController) SetSessionUser(user *auth.User) {
+	if user == nil {
+		c.DelSession("user")
+		return
+	}
+
+	claims := c.GetSessionClaims()
+	if claims != nil {
+		claims.User = *user
+		c.SetSessionClaims(claims)
+	}
 }
 
 func (c *ApiController) GetSessionUsername() string {
-	claims := c.GetSessionUser()
-	if claims == nil {
+	user := c.GetSessionUser()
+	if user == nil {
 		return ""
 	}
-	return claims.Username
+
+	return GetUserName(user)
 }
