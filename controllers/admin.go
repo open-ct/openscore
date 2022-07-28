@@ -17,6 +17,94 @@ import (
 
 // 用户增删改查 TODO
 
+// WriteUserExcel 导出用户
+func (c *ApiController) WriteUserExcel() {
+	var req WriteUserRequest
+
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &req); err != nil {
+		c.ResponseError("cannot unmarshal", err)
+		return
+	}
+
+	subjectName, err := model.GetSubjectById(req.SubjectId)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+	if subjectName == "" {
+		c.ResponseError("cant get subjectName")
+		return
+	}
+
+	f := excelize.NewFile()
+	// Create a new sheet.
+	activeSheet := f.NewSheet(subjectName)
+
+	// Set value of a cell.
+	f.SetCellValue(subjectName, "A1", "账号")
+	f.SetCellValue(subjectName, "B1", "密码")
+	f.SetCellValue(subjectName, "C1", "学科")
+	f.SetCellValue(subjectName, "D1", "身份")
+	f.SetCellValue(subjectName, "E1", "大题号")
+	// Set active sheet of the workbook.
+	f.SetActiveSheet(activeSheet)
+
+	for i := 0; i < req.SupervisorNumber; i++ {
+		index := 2 + i
+		f.SetCellValue(subjectName, "A"+strconv.Itoa(index), "n"+strconv.Itoa(int(req.SubjectId))+strconv.Itoa(10000+i))
+		f.SetCellValue(subjectName, "B"+strconv.Itoa(index), "123")
+		f.SetCellValue(subjectName, "C"+strconv.Itoa(index), subjectName)
+		f.SetCellValue(subjectName, "D"+strconv.Itoa(index), "阅卷组长")
+
+		u := model.User{
+			Account:        subjectName + strconv.Itoa(10000+i),
+			Password:       "123",
+			SubjectName:    subjectName,
+			IsOnlineStatus: false,
+			IsDistribute:   false,
+			QuestionId:     0,
+			UserType:       1,
+		}
+		if err := u.Insert(); err != nil {
+			c.ResponseError(err.Error())
+		}
+	}
+
+	index := req.SupervisorNumber + 2
+	for _, item := range req.List {
+		for i := 0; i < item.Num; i++ {
+			f.SetCellValue(subjectName, "A"+strconv.Itoa(index), "s"+strconv.Itoa(int(req.SubjectId))+strconv.Itoa(10000+index))
+			f.SetCellValue(subjectName, "B"+strconv.Itoa(index), "123")
+			f.SetCellValue(subjectName, "C"+strconv.Itoa(index), subjectName)
+			f.SetCellValue(subjectName, "D"+strconv.Itoa(index), "阅卷员")
+			f.SetCellValue(subjectName, "E"+strconv.Itoa(index), item.Id)
+
+			u := model.User{
+				Account:        subjectName + strconv.Itoa(10000+index),
+				Password:       "123",
+				SubjectName:    subjectName,
+				IsOnlineStatus: false,
+				IsDistribute:   false,
+				QuestionId:     item.Id,
+				UserType:       2,
+			}
+			if err := u.Insert(); err != nil {
+				c.ResponseError(err.Error())
+			}
+
+			index++
+		}
+	}
+
+	// Save spreadsheet by the given path.
+	if err := f.SaveAs("../users.xlsx"); err != nil {
+		c.ResponseError(err.Error(), "users 表导出错误")
+		return
+	}
+
+	c.Ctx.Output.Download("../users.xlsx", "users.xlsx")
+}
+
 // ReadUserExcel 导入用户
 // func (c *ApiController) ReadUserExcel() {
 // 	c.Ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin", c.Ctx.Request.Header.Get("Origin"))
@@ -234,7 +322,6 @@ func (c *ApiController) ReadExampleExcel() {
 	c.Ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin", c.Ctx.Request.Header.Get("Origin"))
 	defer c.ServeJSON()
 	var resp Response
-	var err error
 
 	// ----------------------------------------------------
 
@@ -358,7 +445,6 @@ func (c *ApiController) ReadAnswerExcel() {
 	c.Ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin", c.Ctx.Request.Header.Get("Origin"))
 	defer c.ServeJSON()
 	var resp Response
-	var err error
 
 	// ----------------------------------------------------
 
@@ -487,9 +573,8 @@ func (c *ApiController) QuestionBySubList() {
 	defer c.ServeJSON()
 	var requestBody QuestionBySubList
 	var resp Response
-	var err error
 
-	err = json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
 	if err != nil {
 		log.Println(err)
 		resp = Response{"10001", "cannot unmarshal", err}

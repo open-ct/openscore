@@ -7,6 +7,8 @@ import (
 )
 
 func Auth(ctx *context.Context) {
+	ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin", ctx.Request.Header.Get("Origin"))
+
 	authorization := ctx.Input.Header("Authorization")
 
 	if len(authorization) == 0 {

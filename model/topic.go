@@ -38,6 +38,7 @@ func GetTopicList(topics *[]Topic) error {
 	}
 	return err
 }
+
 func FindTopicBySubNameList(topics *[]Topic, subjectName string) error {
 	err := adapter.Where("subject_name=?", subjectName).Find(topics)
 	if err != nil {
@@ -45,6 +46,7 @@ func FindTopicBySubNameList(topics *[]Topic, subjectName string) error {
 	}
 	return err
 }
+
 func FindTopicList(topics *[]Topic) error {
 	err := adapter.Find(topics)
 	if err != nil {

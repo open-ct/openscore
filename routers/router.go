@@ -80,6 +80,8 @@ func init() {
 		beego.NSRouter("/readExcel", api, "post:ReadExcel"),
 		beego.NSRouter("/readExcel", api, "OPTIONS:ReadExcel"),
 		// beego.NSRouter("/uploadPic", api, "post:UploadPic"),
+
+		beego.NSRouter("/WriteUserExcel", api, "post:WriteUserExcel"),
 		beego.NSRouter("/readExampleExcel", api, "post:ReadExampleExcel"),
 		beego.NSRouter("/readExampleExcel", api, "OPTIONS:ReadExampleExcel"),
 		beego.NSRouter("/readAnswerExcel", api, "post:ReadAnswerExcel"),

@@ -1,5 +1,16 @@
 package controllers
 
+type WriteUserRequest struct {
+	SubjectId        int64               `json:"subject_id"`
+	SupervisorNumber int                 `json:"supervisor_number"`
+	List             []QuestionAndNumber `json:"list"`
+}
+
+type QuestionAndNumber struct {
+	Id  int64 `json:"id"`
+	Num int   `json:"num"`
+}
+
 type LoginRequest struct {
 	Account  string `json:"account"`
 	Password string `json:"password"`
