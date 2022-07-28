@@ -16,10 +16,8 @@ package routers
 
 import (
 	beego "github.com/beego/beego/v2/server/web"
-	"github.com/beego/beego/v2/server/web/context"
 	"github.com/open-ct/openscore/controllers"
-	"github.com/open-ct/openscore/pkg/token"
-	"log"
+	"github.com/open-ct/openscore/routers/filter"
 )
 
 func init() {
@@ -30,24 +28,9 @@ func init() {
 	beego.Router("/api/logout", api, "post:SignOut")
 	beego.Router("/api/get-account", api, "get:GetAccount")
 
-	beego.Router("/openct/login", api, "post:Login")
+	beego.Router("/openct/login", api, "post:UserLogin")
 
-	FilterUser := func(ctx *context.Context) {
-		authorization := ctx.Input.Header("Authorization")
-		if len(authorization) == 0 {
-			api.ResponseError("cant get Authorization")
-			ctx.Redirect(302, "/login")
-		}
-		res, err := token.ResolveToken(authorization)
-		if err != nil {
-			log.Println(err)
-			api.ResponseError("cant resolve Authorization", err)
-		}
-		ctx.Input.SetData("userId", res.Id)
-		ctx.Input.SetData("typeId", res.TypeId)
-	}
-
-	beego.InsertFilter("/openct/marking", beego.BeforeRouter, FilterUser)
+	beego.InsertFilter("/openct/marking/*", beego.BeforeRouter, filter.Auth)
 
 	testNs := beego.NewNamespace("/openct/marking/score",
 		beego.NSNamespace("/test",

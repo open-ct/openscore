@@ -16,6 +16,7 @@ package controllers
 
 import (
 	_ "embed"
+	"encoding/json"
 	beego "github.com/beego/beego/v2/server/web"
 	auth "github.com/casdoor/casdoor-go-sdk/casdoorsdk"
 	"github.com/open-ct/openscore/service/user"
@@ -38,14 +39,19 @@ func InitAuthConfig() {
 	auth.InitConfig(casdoorEndpoint, clientId, clientSecret, JwtPublicKey, casdoorOrganization, casdoorApplication)
 }
 
-func (c *ApiController) Login() {
-	input, _ := c.Input()
-	idCard := input.Get("id_card")
-	password := input.Get("password")
+// UserLogin 用户登录
+func (c *ApiController) UserLogin() {
+	defer c.ServeJSON()
+	var req LoginRequest
 
-	token, err := user.Login(idCard, password)
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &req); err != nil {
+		c.ResponseError("cannot unmarshal", err.Error())
+		return
+	}
+
+	token, err := user.Login(req.Account, req.Password)
 	if err != nil {
-		c.ResponseError(err.Error())
+		c.ResponseError("cannot login", err.Error())
 		return
 	}
 
@@ -55,6 +61,24 @@ func (c *ApiController) Login() {
 
 	c.ResponseOk(resp)
 }
+
+// func (c *ApiController) Login() {
+// 	input, _ := c.Input()
+// 	account := input.Get("account")
+// 	password := input.Get("password")
+//
+// 	fmt.Println("account: ", account)
+//
+// 	token, err := user.Login(account, password)
+// 	if err != nil {
+// 		c.ResponseError(err.Error())
+// 		return
+// 	}
+//
+//
+//
+// 	c.ResponseOk(resp)
+// }
 
 /*
 // @Title Signin
@@ -142,13 +166,13 @@ func (c *ApiController) GetAccount() {
 }
 
 func (c *ApiController) UpdateAccountBalance(amount int) {
-	user := c.GetSessionUser()
-	user.Score += amount
-	c.SetSessionUser(user)
+	u := c.GetSessionUser()
+	u.Score += amount
+	c.SetSessionUser(u)
 }
 
 func (c *ApiController) UpdateAccountConsumptionSum(amount int) {
-	user := c.GetSessionUser()
-	user.Karma += amount
-	c.SetSessionUser(user)
+	u := c.GetSessionUser()
+	u.Karma += amount
+	c.SetSessionUser(u)
 }
