@@ -79,9 +79,7 @@ func init() {
 	adminNs := beego.NewNamespace("/openct/marking/admin",
 		beego.NSRouter("/readExcel", api, "post:ReadExcel"),
 		beego.NSRouter("/readExcel", api, "OPTIONS:ReadExcel"),
-		// beego.NSRouter("/uploadPic", api, "post:UploadPic"),
-
-		beego.NSRouter("/WriteUserExcel", api, "post:WriteUserExcel"),
+		beego.NSRouter("/writeUserExcel", api, "post:WriteUserExcel"),
 		beego.NSRouter("/readExampleExcel", api, "post:ReadExampleExcel"),
 		beego.NSRouter("/readExampleExcel", api, "OPTIONS:ReadExampleExcel"),
 		beego.NSRouter("/readAnswerExcel", api, "post:ReadAnswerExcel"),
@@ -92,8 +90,12 @@ func init() {
 		beego.NSRouter("/insertTopic", api, "post:InsertTopic"),
 		beego.NSRouter("/subjectList", api, "post:SubjectList"),
 		beego.NSRouter("/topicList", api, "post:TopicList"),
-		beego.NSRouter("/DistributionRecord", api, "post:DistributionRecord"),
+		beego.NSRouter("/distributionRecord", api, "post:DistributionRecord"),
 		beego.NSRouter("/img", api, "post:Pic"),
+		beego.NSRouter("/createUser", api, "post:CreateUser"),
+		beego.NSRouter("/deleteUser", api, "post:DeleteUser"),
+		beego.NSRouter("/updateUser", api, "post:UpdateUser"),
+		beego.NSRouter("/listUsers", api, "post:ListUsers"),
 	)
 	beego.AddNamespace(adminNs)
 }

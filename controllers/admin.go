@@ -15,7 +15,91 @@ import (
 	"time"
 )
 
-// 用户增删改查 TODO
+func (c *ApiController) CreateUser() {
+	var req CreateUserRequest
+
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &req); err != nil {
+		c.ResponseError("cannot unmarshal", err)
+		return
+	}
+
+	u := &model.User{
+		Account:     req.Account,
+		UserName:    req.UserName,
+		Password:    req.Password,
+		SubjectName: req.SubjectName,
+		QuestionId:  req.QuestionId,
+		UserType:    req.UserType,
+	}
+
+	if err := u.Insert(); err != nil {
+		c.ResponseError("insert user", err)
+		return
+	}
+
+	c.ResponseOk()
+}
+
+func (c *ApiController) DeleteUser() {
+	var req DeleteUserRequest
+
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &req); err != nil {
+		c.ResponseError("cannot unmarshal", err)
+		return
+	}
+
+	u, err := model.GetUserByAccount(req.Account)
+	if err != nil {
+		c.ResponseError("cant get user", err)
+		return
+	}
+
+	if err := u.Delete(); err != nil {
+		c.ResponseError("delete user", err)
+		return
+	}
+
+	c.ResponseOk()
+}
+
+func (c *ApiController) UpdateUser() {
+	var req UpdateUserRequest
+
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &req); err != nil {
+		c.ResponseError("cannot unmarshal", err)
+		return
+	}
+
+	u, err := model.GetUserByAccount(req.Account)
+	if err != nil {
+		c.ResponseError("cant get user", err)
+		return
+	}
+
+	fmt.Println("u: ", u)
+
+	u.UserType = req.UserType
+	u.UserName = req.UserName
+	u.SubjectName = req.SubjectName
+	u.Password = req.Password
+
+	if err := u.UpdateCols("user_type", "user_name", "subject_name", "password"); err != nil {
+		c.ResponseError("update user error", err)
+		return
+	}
+
+	c.ResponseOk()
+}
+
+func (c *ApiController) ListUsers() {
+	users, err := model.ListUsers()
+	if err != nil {
+		c.ResponseError("list users error", err)
+		return
+	}
+
+	c.ResponseOk(users)
+}
 
 // WriteUserExcel 导出用户
 func (c *ApiController) WriteUserExcel() {
@@ -26,15 +110,16 @@ func (c *ApiController) WriteUserExcel() {
 		return
 	}
 
-	subjectName, err := model.GetSubjectById(req.SubjectId)
-	if err != nil {
-		c.ResponseError(err.Error())
-		return
-	}
-	if subjectName == "" {
-		c.ResponseError("cant get subjectName")
-		return
-	}
+	// subjectName, err := model.GetSubjectById(req.SubjectId)
+	// if err != nil {
+	// 	c.ResponseError(err.Error())
+	// 	return
+	// }
+	// if subjectName == "" {
+	// 	c.ResponseError("cant get subjectName")
+	// 	return
+	// }
+	subjectName := req.SubjectName
 
 	f := excelize.NewFile()
 	// Create a new sheet.
@@ -51,7 +136,7 @@ func (c *ApiController) WriteUserExcel() {
 
 	for i := 0; i < req.SupervisorNumber; i++ {
 		index := 2 + i
-		f.SetCellValue(subjectName, "A"+strconv.Itoa(index), "n"+strconv.Itoa(int(req.SubjectId))+strconv.Itoa(10000+i))
+		f.SetCellValue(subjectName, "A"+strconv.Itoa(index), "n"+req.SubjectName+strconv.Itoa(10000+i))
 		f.SetCellValue(subjectName, "B"+strconv.Itoa(index), "123")
 		f.SetCellValue(subjectName, "C"+strconv.Itoa(index), subjectName)
 		f.SetCellValue(subjectName, "D"+strconv.Itoa(index), "阅卷组长")
@@ -73,7 +158,7 @@ func (c *ApiController) WriteUserExcel() {
 	index := req.SupervisorNumber + 2
 	for _, item := range req.List {
 		for i := 0; i < item.Num; i++ {
-			f.SetCellValue(subjectName, "A"+strconv.Itoa(index), "s"+strconv.Itoa(int(req.SubjectId))+strconv.Itoa(10000+index))
+			f.SetCellValue(subjectName, "A"+strconv.Itoa(index), "s"+req.SubjectName+strconv.Itoa(10000+index))
 			f.SetCellValue(subjectName, "B"+strconv.Itoa(index), "123")
 			f.SetCellValue(subjectName, "C"+strconv.Itoa(index), subjectName)
 			f.SetCellValue(subjectName, "D"+strconv.Itoa(index), "阅卷员")

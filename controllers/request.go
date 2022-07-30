@@ -1,7 +1,28 @@
 package controllers
 
+type UpdateUserRequest struct {
+	Account     string `json:"account"`
+	UserName    string `json:"user_name"`
+	Password    string `json:"password"`
+	SubjectName string `json:"subject_name"`
+	UserType    int64  `json:"user_type"`
+}
+
+type DeleteUserRequest struct {
+	Account string `json:"account"`
+}
+
+type CreateUserRequest struct {
+	Account     string `json:"account"`
+	UserName    string `json:"user_name"`
+	Password    string `json:"password"`
+	SubjectName string `json:"subject_name"`
+	QuestionId  int64  `json:"question_id"`
+	UserType    int64  `json:"user_type"`
+}
+
 type WriteUserRequest struct {
-	SubjectId        int64               `json:"subject_id"`
+	SubjectName      string              `json:"subject_name"`
 	SupervisorNumber int                 `json:"supervisor_number"`
 	List             []QuestionAndNumber `json:"list"`
 }

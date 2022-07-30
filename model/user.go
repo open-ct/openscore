@@ -8,7 +8,7 @@ import (
 
 type User struct {
 	UserId         int64  `json:"user_id" xorm:"pk autoincr"`
-	Account        string `json:"account"`
+	Account        string `json:"account" xorm:"unique"`
 	UserName       string `json:"user_name"`
 	Password       string `json:"password"`
 	LoginTime      string `json:"login_time"`
@@ -27,6 +27,11 @@ func (u *User) Insert() error {
 		log.Println("insert user fail")
 		log.Printf("%+v", err)
 	}
+	return err
+}
+
+func (u *User) Delete() error {
+	_, err := adapter.Where("account = ?", u.Account).Delete(u)
 	return err
 }
 
@@ -107,4 +112,10 @@ func (u *User) UpdateOnlineStatus(isOnline bool, time string) error {
 	u.LoginTime = time
 
 	return u.UpdateCols("is_online_status", "login_time")
+}
+
+func ListUsers() ([]*User, error) {
+	var users []*User
+	err := adapter.Find(&users)
+	return users, err
 }
