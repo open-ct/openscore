@@ -15,6 +15,126 @@ import (
 	"time"
 )
 
+func (c *ApiController) CreateSmallQuestion() {
+	var req CreateSmallQuestionRequest
+
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &req); err != nil {
+		c.ResponseError("cannot unmarshal", err)
+		return
+	}
+
+	subTopic := model.SubTopic{
+		QuestionDetailName:  req.QuestionDetailName,
+		QuestionId:          req.QuestionId,
+		QuestionDetailScore: req.QuestionDetailScore,
+		ScoreType:           req.ScoreType,
+	}
+
+	if err := model.InsertSubTopic(&subTopic); err != nil {
+		c.ResponseError("insert subTopic fail", err)
+		return
+	}
+
+	c.ResponseOk(subTopic)
+}
+
+func (c *ApiController) DeleteSmallQuestion() {
+	var req DeleteSmallQuestionRequest
+
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &req); err != nil {
+		c.ResponseError("cannot unmarshal", err)
+		return
+	}
+
+	var subTopic model.SubTopic
+	if err := subTopic.GetSubTopic(req.QuestionDetailId); err != nil {
+		c.ResponseError("get subTopic fail", err)
+		return
+	}
+
+	if err := subTopic.Delete(); err != nil {
+		c.ResponseError("delete subTopic fail", err)
+		return
+	}
+
+	c.ResponseOk()
+}
+
+func (c *ApiController) UpdateSmallQuestion() {
+	var req UpdateSmallQuestionRequest
+
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &req); err != nil {
+		c.ResponseError("cannot unmarshal", err)
+		return
+	}
+
+	var subTopic model.SubTopic
+	if err := subTopic.GetSubTopic(req.QuestionDetailId); err != nil {
+		c.ResponseError("get subTopic fail", err)
+		return
+	}
+
+	subTopic.QuestionDetailName = req.QuestionDetailName
+	subTopic.ScoreType = req.ScoreType
+	subTopic.QuestionDetailScore = req.QuestionDetailScore
+
+	if err := subTopic.Update(); err != nil {
+		c.ResponseError("update subTopic fail", err)
+		return
+	}
+
+	c.ResponseOk()
+}
+
+func (c *ApiController) DeleteQuestion() {
+	var req DeleteQuestionRequest
+
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &req); err != nil {
+		c.ResponseError("cannot unmarshal", err)
+		return
+	}
+
+	var topic model.Topic
+	if err := topic.GetTopic(req.QuestionId); err != nil {
+		c.ResponseError("get topic fail", err)
+		return
+	}
+
+	if err := topic.Delete(); err != nil {
+		c.ResponseError("delete topic fail", err)
+		return
+	}
+
+	c.ResponseOk()
+}
+
+func (c *ApiController) UpdateQuestion() {
+	var req UpdateQuestionRequest
+
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &req); err != nil {
+		c.ResponseError("cannot unmarshal", err)
+		return
+	}
+
+	var topic model.Topic
+	if err := topic.GetTopic(req.QuestionId); err != nil {
+		c.ResponseError("get topic fail", err)
+		return
+	}
+
+	topic.QuestionName = req.QuestionName
+	topic.ScoreType = req.ScoreType
+	topic.StandardError = req.StandardError
+	topic.QuestionScore = req.QuestionScore
+
+	if err := topic.Update(); err != nil {
+		c.ResponseError("update topic fail", err)
+		return
+	}
+
+	c.ResponseOk()
+}
+
 func (c *ApiController) CreateUser() {
 	var req CreateUserRequest
 
@@ -75,8 +195,6 @@ func (c *ApiController) UpdateUser() {
 		c.ResponseError("cant get user", err)
 		return
 	}
-
-	fmt.Println("u: ", u)
 
 	u.UserType = req.UserType
 	u.UserName = req.UserName
@@ -312,16 +430,45 @@ func (c *ApiController) ReadExcel() {
 		}
 	}
 
-	for _, smallQuestion := range smallQuestions {
-		var topic model.Topic
-		topic.QuestionId = int64(smallQuestion.Id)
+	subjectName := rows[0][5]
+	var topics []model.Topic
+	if err := model.FindTopicBySubNameList(&topics, subjectName); err != nil {
+		c.ResponseError("get topic list err", err)
+		return
+	}
+
+	if len(topics) != len(bigQuestions) {
+		c.ResponseError("len(topics) != len(bigQuestions)")
+		return
+	}
+
+	smallIndex := 0
+	for i, topic := range topics {
+		// TODO 测试 可能有顺序问题
+		fmt.Println("bigQuestions[i].Id: ", bigQuestions[i].Id)
+		fmt.Println("topic.QuestionId: ", topic.QuestionId)
+
 		topic.ImportNumber = int64(len(rows) - 1)
+		bigQuestions[i].Id = int(topic.QuestionId) // id映射
 
 		if err := topic.Update(); err != nil {
 			log.Println(err)
 			resp = Response{"30003", "大题导入试卷数更新错误", err}
 			c.Data["json"] = resp
 			return
+		}
+
+		var subTopics []model.SubTopic
+		if err := model.FindSubTopicsByQuestionId(topic.QuestionId, &subTopics); err != nil {
+			c.ResponseError("get subTopic list err", err)
+			return
+		}
+		for _, subTopic := range subTopics {
+			fmt.Println("smallQuestions[smallIndex].Id: ", smallQuestions[smallIndex].Id)
+			fmt.Println("subTopic.QuestionDetailId: ", subTopic.QuestionDetailId)
+
+			smallQuestions[smallIndex].Id = int(subTopic.QuestionDetailId)
+			smallIndex++
 		}
 	}
 
@@ -765,14 +912,13 @@ func (c *ApiController) InsertTopic() {
 		subTopic.QuestionDetailScore = details[i].DetailScore
 		subTopic.ScoreType = details[i].DetailScoreTypes
 		subTopic.QuestionId = questionId
-		err, questionDetailId := model.InsertSubTopic(&subTopic)
-		if err != nil {
+		if err := model.InsertSubTopic(&subTopic); err != nil {
 			log.Println(err)
 			resp = Response{"30007", "小题参数导入错误  ", err}
 			c.Data["json"] = resp
 			return
 		}
-		addTopicDetailVOList[i].QuestionDetailId = questionDetailId
+		addTopicDetailVOList[i].QuestionDetailId = subTopic.QuestionDetailId
 	}
 	addTopicVO.QuestionId = questionId
 	addTopicVO.QuestionDetailIds = addTopicDetailVOList
@@ -789,7 +935,10 @@ func (c *ApiController) InsertTopic() {
 */
 
 func (c *ApiController) SubjectList() {
-
+	fmt.Println("subject: ")
+	fmt.Println("subject: ")
+	fmt.Println("subject: ")
+	fmt.Println("subject: ")
 	defer c.ServeJSON()
 	var resp Response
 
@@ -804,6 +953,7 @@ func (c *ApiController) SubjectList() {
 		c.Data["json"] = resp
 		return
 	}
+	fmt.Println("subject: ", subjects)
 
 	var subjectVOList = make([]SubjectListVO, len(subjects))
 	for i := 0; i < len(subjects); i++ {

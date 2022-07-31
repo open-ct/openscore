@@ -30,7 +30,8 @@ func init() {
 
 	beego.Router("/openct/login", api, "post:UserLogin")
 
-	beego.InsertFilter("/openct/marking/*", beego.BeforeRouter, filter.Auth)
+	beego.InsertFilter("/openct/marking/score|supervisor/*", beego.BeforeRouter, filter.Auth)
+	// beego.InsertFilter("/openct/marking/supervisor/*", beego.BeforeRouter, filter.Auth)
 
 	testNs := beego.NewNamespace("/openct/marking/score",
 		beego.NSNamespace("/test",
@@ -96,6 +97,11 @@ func init() {
 		beego.NSRouter("/deleteUser", api, "post:DeleteUser"),
 		beego.NSRouter("/updateUser", api, "post:UpdateUser"),
 		beego.NSRouter("/listUsers", api, "post:ListUsers"),
+		beego.NSRouter("/createSmallQuestion", api, "post:CreateSmallQuestion"),
+		beego.NSRouter("/deleteSmallQuestion", api, "post:DeleteSmallQuestion"),
+		beego.NSRouter("/updateSmallQuestion", api, "post:UpdateSmallQuestion"),
+		beego.NSRouter("/deleteQuestion", api, "post:DeleteQuestion"),
+		beego.NSRouter("/updateQuestion", api, "post:UpdateQuestion"),
 	)
 	beego.AddNamespace(adminNs)
 }

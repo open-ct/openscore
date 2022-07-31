@@ -31,19 +31,33 @@ func GetSubTopicsByTestId(id int64, st *[]SubTopic) error {
 	return err
 }
 
-func (st *SubTopic) GetSubTopic(id int64) error {
-	has, err := adapter.Where(builder.Eq{"question_detail_id": id}).Get(st)
+func (s *SubTopic) GetSubTopic(id int64) error {
+	has, err := adapter.Where(builder.Eq{"question_detail_id": id}).Get(s)
 	if !has || err != nil {
 		log.Println("could not find SubTopic")
 	}
 	return err
 }
 
-func InsertSubTopic(subTopic *SubTopic) (err1 error, questionDetailId int64) {
+func InsertSubTopic(subTopic *SubTopic) error {
 	_, err := adapter.Insert(subTopic)
 	if err != nil {
 		log.Println("GetTopicList err ")
 	}
 
-	return err, subTopic.QuestionDetailId
+	return err
+}
+
+func (s *SubTopic) Delete() error {
+	_, err := adapter.Where("question_detail_id = ?", s.QuestionDetailId).Delete(s)
+	return err
+}
+
+func (s *SubTopic) Update() error {
+	code, err := adapter.Where(builder.Eq{"question_detail_id": s.QuestionDetailId}).Update(s)
+	if code == 0 || err != nil {
+		log.Println("update subTopic fail")
+		log.Printf("%+v", err)
+	}
+	return err
 }

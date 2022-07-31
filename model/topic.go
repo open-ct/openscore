@@ -74,8 +74,13 @@ func InsertTopic(topic *Topic) (err1 error, questionId int64) {
 func (t *Topic) Update() error {
 	code, err := adapter.Where(builder.Eq{"question_id": t.QuestionId}).Update(t)
 	if code == 0 || err != nil {
-		log.Println("update Topic paper fail")
+		log.Println("update Topic fail")
 		log.Printf("%+v", err)
 	}
+	return err
+}
+
+func (t *Topic) Delete() error {
+	_, err := adapter.Where("question_id = ?", t.QuestionId).Delete(t)
 	return err
 }

@@ -1,5 +1,35 @@
 package controllers
 
+type UpdateSmallQuestionRequest struct {
+	QuestionDetailId    int64  `json:"question_detail_id"`
+	QuestionDetailName  string `json:"question_detail_name"`
+	QuestionDetailScore int64  `json:"question_detail_score"`
+	ScoreType           string `json:"score_type"`
+}
+
+type CreateSmallQuestionRequest struct {
+	QuestionDetailName  string `json:"question_detail_name"`
+	QuestionId          int64  `json:"question_id"`
+	QuestionDetailScore int64  `json:"question_detail_score"`
+	ScoreType           string `json:"score_type"`
+}
+
+type DeleteSmallQuestionRequest struct {
+	QuestionDetailId int64 `json:"question_detail_id"`
+}
+
+type DeleteQuestionRequest struct {
+	QuestionId int64 `json:"question_id"`
+}
+
+type UpdateQuestionRequest struct {
+	QuestionId    int64  `json:"question_id"`
+	QuestionName  string `json:"question_name"`
+	StandardError int64  `json:"standard_error"`
+	QuestionScore int64  `json:"question_score"`
+	ScoreType     int64  `json:"score_type"`
+}
+
 type UpdateUserRequest struct {
 	Account     string `json:"account"`
 	UserName    string `json:"user_name"`
