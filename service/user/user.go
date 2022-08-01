@@ -4,20 +4,19 @@ import (
 	"errors"
 	"github.com/open-ct/openscore/model"
 	"github.com/open-ct/openscore/pkg/token"
-	"github.com/open-ct/openscore/util"
 )
 
-func Login(account string, pwd string) (string, error) {
+func Login(account string, pwd string) (string, int64, error) {
 	u, err := model.GetUserByAccount(account)
 	if err != nil {
-		return "", err
+		return "", 0, err
 	}
 	if u == nil {
-		return "", errors.New("user not found")
+		return "", 0, errors.New("user not found")
 	}
 
 	if u.Password != pwd {
-		return "", errors.New("pwd not correct")
+		return "", 0, errors.New("pwd not correct")
 	}
 
 	// 生成 auth token
@@ -27,12 +26,12 @@ func Login(account string, pwd string) (string, error) {
 		Expired: token.GetExpiredTime(),
 	})
 	if err != nil {
-		return "", err
+		return "", 0, err
 	}
+	//
+	// if err := u.UpdateOnlineStatus(true, util.GetCurrentTime()); err != nil {
+	// 	return token, 0, err
+	// }
 
-	if err := u.UpdateOnlineStatus(true, util.GetCurrentTime()); err != nil {
-		return token, err
-	}
-
-	return token, nil
+	return token, u.UserType, nil
 }

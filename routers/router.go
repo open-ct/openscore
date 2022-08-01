@@ -31,7 +31,6 @@ func init() {
 	beego.Router("/openct/login", api, "post:UserLogin")
 
 	beego.InsertFilter("/openct/marking/score|supervisor/*", beego.BeforeRouter, filter.Auth)
-	// beego.InsertFilter("/openct/marking/supervisor/*", beego.BeforeRouter, filter.Auth)
 
 	testNs := beego.NewNamespace("/openct/marking/score",
 		beego.NSNamespace("/test",

@@ -49,15 +49,16 @@ func (c *ApiController) UserLogin() {
 		return
 	}
 
-	token, err := user.Login(req.Account, req.Password)
+	token, userType, err := user.Login(req.Account, req.Password)
 	if err != nil {
 		c.ResponseError("cannot login", err.Error())
 		return
 	}
 
 	resp := struct {
-		Token string `json:"token"`
-	}{token}
+		Token    string `json:"token"`
+		UserType int64  `json:"user_type"`
+	}{token, userType}
 
 	c.ResponseOk(resp)
 }
