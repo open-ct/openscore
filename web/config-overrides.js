@@ -6,7 +6,7 @@
  * @Description: less相关配置
  * @FilePath: \OpenItem\web-client\config-overrides.js
  */
-const { override, addLessLoader } = require("customize-cra");
+const {override, addLessLoader} = require("customize-cra");
 module.exports = override(
   addLessLoader({
     javascriptEnabled: true,

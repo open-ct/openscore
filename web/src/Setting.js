@@ -2,12 +2,12 @@ import {message} from "antd";
 import Sdk from "casdoor-js-sdk";
 // import {isMobile as isMobileDevice} from "react-device-detect";
 
-export let ServerUrl = '';
+export let ServerUrl = "";
 export let CasdoorSdk;
 
 export function initServerUrl() {
   const hostname = window.location.hostname;
-  if (hostname === 'localhost') {
+  if (hostname === "localhost") {
     ServerUrl = `http://${hostname}:8080`;
   }
 }
@@ -55,7 +55,7 @@ export function myParseInt(i) {
 
 export function openLink(link) {
   // this.props.history.push(link);
-  const w = window.open('about:blank');
+  const w = window.open("about:blank");
   w.location.href = link;
 }
 
@@ -71,7 +71,7 @@ export function showMessage(type, text) {
   } else if (type === "error") {
     message.error(text);
   } else if (type === "warn") {
-    message.warn(text)
+    message.warn(text);
   }
 }
 
@@ -110,8 +110,8 @@ export function getFormattedDate(date) {
     return null;
   }
 
-  date = date.replace('T', ' ');
-  date = date.replace('+08:00', ' ');
+  date = date.replace("T", " ");
+  date = date.replace("+08:00", " ");
   return date;
 }
 
@@ -120,7 +120,7 @@ export function getFormattedDateShort(date) {
 }
 
 export function getShortName(s) {
-  return s.split('/').slice(-1)[0];
+  return s.split("/").slice(-1)[0];
 }
 
 export function toCsv(s) {
@@ -129,7 +129,7 @@ export function toCsv(s) {
   }
 
   if (typeof s === "string") {
-    return s.replace(/"/g, '""');
+    return s.replace(/"/g, "\"\"");
   } else {
     return s;
   }
@@ -146,7 +146,7 @@ export function getPercentage(f) {
 function getRandomInt(s) {
   let hash = 0;
   if (s.length !== 0) {
-    for (let i = 0; i < s.length; i ++) {
+    for (let i = 0; i < s.length; i++) {
       let char = s.charCodeAt(i);
       hash = ((hash << 5) - hash) + char;
       hash = hash & hash;
@@ -157,7 +157,7 @@ function getRandomInt(s) {
 }
 
 export function getAvatarColor(s) {
-  const colorList = ['#f56a00', '#7265e6', '#ffbf00', '#00a2ae'];
+  const colorList = ["#f56a00", "#7265e6", "#ffbf00", "#00a2ae"];
   let random = getRandomInt(s);
   if (random < 0) {
     random = -random;
@@ -171,6 +171,6 @@ export function isChineseStr(s) {
   }
 
   // https://www.cnblogs.com/weihanli/p/validrealnameandidcardno.html
-  const re =/^[\u4E00-\u9FA5]{2,4}$/u;
+  const re = /^[\u4E00-\u9FA5]{2,4}$/u;
   return re.test(s);
 }

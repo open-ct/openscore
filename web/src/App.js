@@ -1,8 +1,8 @@
 import React from "react";
-import { Route, BrowserRouter } from "react-router-dom";
-import './App.less';
+import {BrowserRouter, Route} from "react-router-dom";
+import "./App.less";
 import AuthCallback from "./AuthCallback";
-import Home from './views/Home';
+import Home from "./views/Home";
 import * as Setting from "./Setting";
 import * as Conf from "./Conf";
 
