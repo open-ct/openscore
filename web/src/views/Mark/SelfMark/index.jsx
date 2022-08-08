@@ -1,14 +1,13 @@
-import React, { Component, useState } from 'react'
-import DocumentTitle from 'react-document-title'
-import { Modal, Dropdown, Button, message, Space, Tooltip, Select, Radio, Input } from 'antd';
-import { ExclamationCircleOutlined } from '@ant-design/icons';
-import Zmage from 'react-zmage'
+import React, {Component} from "react";
+import DocumentTitle from "react-document-title";
+import {Button, Modal, Select, message} from "antd";
+import {ExclamationCircleOutlined} from "@ant-design/icons";
 
-import './index.less'
+import "./index.less";
 
 import * as Util from "../../../util/Util";
 import Marking from "../../../api/marking";
-const { Option } = Select;
+const {Option} = Select;
 export default class index extends Component {
 
   userId = "1"
@@ -16,7 +15,7 @@ export default class index extends Component {
   state = {
     problemVisible: false,
     problemValue: 1,
-    inpValu: '',
+    inpValu: "",
     papers: [],
     currentPaper: {},
     testLength: 0,
@@ -32,58 +31,58 @@ export default class index extends Component {
 
   // 总试卷获取 
   getAllPaper = () => {
-    Marking.testSelf({ userId: this.userId })
+    Marking.testSelf({userId: this.userId})
       .then((res) => {
         if (res.data.status == "10000") {
-          let papers = [...res.data.data.TestIds]
+          let papers = [...res.data.data.TestIds];
           this.setState(
             {
               papers,
             }
-          )
+          );
           this.getCurrentPaper();
         }
       })
       .catch((e) => {
-        console.log(e)
-      })
+        console.log(e);
+      });
   }
 
   // 当前试卷
   getCurrentPaper = () => {
-    Marking.testDisplay({ userId: this.userId, testId: this.state.papers[0] })
+    Marking.testDisplay({userId: this.userId, testId: this.state.papers[0]})
       .then((res) => {
         if (res.data.status == "10000") {
-          let currentPaper = res.data.data
-          let subTopic = res.data.data.subTopic
-          let testLength = res.data.data.subTopic.length
-          let markScore = []
+          let currentPaper = res.data.data;
+          let subTopic = res.data.data.subTopic;
+          let testLength = res.data.data.subTopic.length;
+          let markScore = [];
           for (let i = 0; i < subTopic.length; i++) {
-            markScore.push(subTopic[i].score_type.split('-'))
+            markScore.push(subTopic[i].score_type.split("-"));
           }
           this.setState({
             currentPaper,
             subTopic,
             markScore,
-            testLength
-          })
+            testLength,
+          });
         }
       })
       .catch((e) => {
-        console.log(e)
-      })
+        console.log(e);
+      });
   }
 
   // 打分展示
   imgScore = (item) => {
-    let index
+    let index;
     for (let i = 0; i < this.state.selectId.length; i++) {
       if (item == this.state.selectId[i]) {
-        index = i
+        index = i;
       }
     }
-    console.log(this.state.selectScore[index])
-    return this.state.selectScore[index]
+    console.log(this.state.selectScore[index]);
+    return this.state.selectScore[index];
   }
 
   // 阅卷区
@@ -92,12 +91,12 @@ export default class index extends Component {
     if (this.state.currentPaper.testInfos != undefined) {
       testPaper = this.state.currentPaper.testInfos.map((item) => {
         return <div className="test-question-img" data-content-before={this.imgScore(item.test_detail_id)}>
-          <img src={'data:image/jpg;base64,'+item.picCode} alt="加载失败" />
-        </div>
-      })
+          <img src={"data:image/jpg;base64," + item.picCode} alt="加载失败" />
+        </div>;
+      });
     }
 
-    return testPaper
+    return testPaper;
   }
 
   render() {
@@ -119,20 +118,20 @@ export default class index extends Component {
           </div>
         </div>
       </DocumentTitle>
-    )
+    );
   }
 
   // 评分区
   selectBox = (index) => {
-    let selectList
+    let selectList;
     if (this.state.markScore.length != 0) {
       selectList = this.state.markScore[index].map((item, i) => {
-        return <Option key={i} value={item} label={item}>{item}</Option>
-      })
+        return <Option key={i} value={item} label={item}>{item}</Option>;
+      });
     } else {
-      return null
+      return null;
     }
-    return selectList
+    return selectList;
   }
 
   showSelect = () => {
@@ -144,7 +143,7 @@ export default class index extends Component {
             showSearch
             key={index}
             placeholder="请选择分数"
-            style={{ width: 120 }}
+            style={{width: 120}}
             onSelect={this.select.bind(this, item.test_detail_id)}
             optionFilterProp="label"
             filterOption={(input, option) =>
@@ -159,39 +158,39 @@ export default class index extends Component {
               // this.selectBox(item.question_detail_score)
             }
           </Select>
-        </div>
-      })
+        </div>;
+      });
     }
 
-    return scoreSelect
+    return scoreSelect;
   }
   select = (item, value) => {
-    console.log(item)
+    console.log(item);
     if (this.state.selectId.length < this.state.testLength) {
       this.setState({
         selectId: [...this.state.selectId, item],
-        selectScore: [...this.state.selectScore, value]
-      })
+        selectScore: [...this.state.selectScore, value],
+      });
     } else {
       let reviseSelectNo = 0;
       let newSelectScore = [];
       for (let i = 0; i < this.state.selectId.length; i++) {
         if (this.state.selectId[i] == item) {
-          reviseSelectNo = i
+          reviseSelectNo = i;
         }
       }
       this.state.selectScore.map((e, index) => {
         if (index == reviseSelectNo) {
-          newSelectScore.push(value)
+          newSelectScore.push(value);
         } else {
-          newSelectScore.push(e)
+          newSelectScore.push(e);
         }
-      })
+      });
       this.setState({
-        selectScore: newSelectScore
-      })
+        selectScore: newSelectScore,
+      });
     }
-    console.log(this.state.selectId, this.state.selectScore)
+    console.log(this.state.selectId, this.state.selectScore);
   }
   renderScoreDropDown() {
 
@@ -209,8 +208,8 @@ export default class index extends Component {
     return (
       <div className="push-container">
         <div>
-          <Button type="primary" style={{ width: 60 }} className="push-submit" onClick={() => {
-            this.showWarning(1)
+          <Button type="primary" style={{width: 60}} className="push-submit" onClick={() => {
+            this.showWarning(1);
           }}>自评</Button>
         </div>
         {/* <div className="push-paper" >
@@ -229,78 +228,78 @@ export default class index extends Component {
   }
 
   showWarning = (value) => {
-    let title = '';
-    let okContent = '提交后系统将记录该试卷';
+    let title = "";
+    let okContent = "提交后系统将记录该试卷";
     switch (value) {
-      case 1:
-        title = '请确认是否提交该试卷';
-        break;
-      case 2:
-        title = '请确认是否提交该问题卷';
-        break;
-      case 3:
-        title = '请确认是否提交该优秀卷';
-        break;
+    case 1:
+      title = "请确认是否提交该试卷";
+      break;
+    case 2:
+      title = "请确认是否提交该问题卷";
+      break;
+    case 3:
+      title = "请确认是否提交该优秀卷";
+      break;
     }
 
     if (value == 1) {
-      let selectOrdered = []
+      let selectOrdered = [];
       for (let i = 0; i < this.state.subTopic.length; i++) {
         for (let j = 0; j < this.state.selectId.length; j++) {
           if (this.state.selectId[j] == this.state.subTopic[i].test_detail_id) {
-            selectOrdered.push(this.state.selectScore[j])
+            selectOrdered.push(this.state.selectScore[j]);
           }
         }
       }
-      let content = '该试卷评分记录为：';
+      let content = "该试卷评分记录为：";
       for (let i = 0; i < selectOrdered.length; i++) {
-        content += selectOrdered[i] + '\n'
+        content += selectOrdered[i] + "\n";
       }
-      okContent = content + '提交后系统将记录该试卷';
+      okContent = content + "提交后系统将记录该试卷";
     }
     Modal.confirm({
       title: title,
       icon: <ExclamationCircleOutlined />,
       content: okContent,
-      okText: '确认',
-      cancelText: '取消',
+      okText: "确认",
+      cancelText: "取消",
       onOk: () => {
         let Qustion_detail_id = Util.getTextByJs(this.state.selectId);
         let Question_detail_score = Util.getTextByJs(this.state.selectScore);
         if (value == 1) {
           if (this.state.selectScore.length < this.state.testLength) {
-            message.warning('请将分数打全')
+            message.warning("请将分数打全");
           } else {
             Marking.testSelfScore({
               userId: this.userId,
               testId: this.state.currentPaper.testId,
               scores: Question_detail_score,
-              testDetailId: Qustion_detail_id
+              testDetailId: Qustion_detail_id,
             })
               .then((res) => {
                 if (res.data.status == "10000") {
                   this.setState({
                     selectId: [],
                     selectScore: [],
-                    currentPaper: {}
-                  })
+                    currentPaper: {},
+                  });
                   this.getAllPaper();
-                  message.success('自评成功')
+                  message.success("自评成功");
                 }
               })
               .catch((e) => {
-                console.log(e)
-              })
+                console.log(e);
+              });
           }
         } else if (value == 3) {
-          console.log('3')
+          console.log("3");
         } else {
-          console.log('2', this)
+          console.log("2", this);
           this.setState({
             problemVisible: true,
           });
         }
-      }
+      },
     });
   }
 
@@ -310,19 +309,19 @@ export default class index extends Component {
         userId: this.userId,
         testId: this.state.currentPaper.testId,
         problemType: this.state.problemValue,
-        problemMessage :this.state.inpValu
+        problemMessage: this.state.inpValu,
       })
         .then((res) => {
           this.setState({
             selectId: [],
             selectScore: [],
-            currentPaper: {}
-          })
+            currentPaper: {},
+          });
           this.getAllPaper();
         })
         .catch((e) => {
-          console.log(e)
-        })
+          console.log(e);
+        });
     } else {
       // Marking.testProblem({
       //   userId: this.userId,
