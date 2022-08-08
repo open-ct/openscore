@@ -84,9 +84,9 @@ export default class index extends Component {
 
   showTest = () => {
     let testPaper = null;
-    if (this.state.samplePaper !== undefined || this.state.samplePaper !== null) {
-      testPaper = this.state.samplePaper.map((item) => {
-        return <img src={"data:image/jpg;base64," + item.pic_src} alt="加载失败" className="test-question-img" />;
+    if (this.state.samplePaper !== undefined) {
+      testPaper = this.state.samplePaper.map((item, index) => {
+        return <img key={index} src={"data:image/jpg;base64," + item.pic_src} alt="加载失败" className="test-question-img" />;
       });
     }
 
@@ -130,7 +130,7 @@ export default class index extends Component {
     console.log(record.order);
     Marking.testDetail({userId: this.userId, exampleTestId: record.question_id})
       .then((res) => {
-        if (res.data.status == "10000") {
+        if (res.data.status === "10000") {
           this.setState({
             samplePaper: res.data.data.test[record.order],
           });

@@ -14,7 +14,7 @@ export default class index extends Component {
     Marking.testList({userId: this.userId})
       .then((res) => {
         console.log(res);
-        if (res.data.status == "10000") {
+        if (res.data.status === "10000") {
           let papers = [...res.data.data.TestIds];
           this.setState(
             {
@@ -34,7 +34,7 @@ export default class index extends Component {
     Marking.testAnswer({userId: this.userId, testId: this.state.papers[0]})
       .then((res) => {
         console.log(res);
-        if (res.data.status == "10000") {
+        if (res.data.status === "10000") {
           this.setState({
             keyTest: res.data.data.Pics,
           });
@@ -51,9 +51,9 @@ export default class index extends Component {
   // 答案区
   showTest = () => {
     let testPaper = null;
-    if (this.state.keyTest != undefined || this.state.keyTest != null) {
-      testPaper = this.state.keyTest.map((item) => {
-        return <div className="test-question-img">
+    if (this.state.keyTest !== undefined) {
+      testPaper = this.state.keyTest.map((item, index) => {
+        return <div key={index} className="test-question-img">
           <img src={"data:image/jpg;base64," + item} alt="加载失败" />
         </div>;
       });

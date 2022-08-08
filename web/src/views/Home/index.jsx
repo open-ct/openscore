@@ -1,10 +1,8 @@
 import React, {Component} from "react";
-import {Layout, Menu} from "antd";
+import {Avatar, Dropdown, Layout, Menu} from "antd";
 import DocumentTitle from "react-document-title";
-import {Redirect, Route, Switch} from "react-router-dom";
+import {Link, Redirect, Route, Switch} from "react-router-dom";
 import * as Icon from "@ant-design/icons";
-import {Avatar, Dropdown} from "antd";
-import {Link} from "react-router-dom";
 import {LogoutOutlined, SettingOutlined} from "@ant-design/icons";
 import * as Setting from "../../Setting";
 import * as AccountBackend from "../../backend/AccountBackend";
@@ -37,6 +35,7 @@ import menuList from "../../menu/menuTab.js";
 import logoUrl from "../../asset/images/OpenCT_Logo.png";
 import group from "../../api/group";
 import "./index.less";
+
 const {Header, Sider, Content} = Layout;
 const {SubMenu} = Menu;
 
@@ -74,7 +73,7 @@ export default class index extends Component {
     userInfo = () => {
       group.userInfo({supervisorId: "1"})
         .then((res) => {
-          if (res.data.status == "10000") {
+          if (res.data.status === "10000") {
             this.setState({
               userInfo: res.data.data.userInfo,
             });
@@ -183,9 +182,10 @@ export default class index extends Component {
     }
 
     bindMenu = (menulist) => {
-      let MenuList = menulist.map((item) => {
+      return menulist.map((item) => {
         if (item.chidPermissions.length === 0) {  // 没有子菜单
-          return <Menu.Item key={item.key} icon={item.icon ? React.createElement(Icon[item.icon]) : null} ><Link to={item.menu_url}>{item.menu_name}</Link></Menu.Item>;
+          return <Menu.Item key={item.key} icon={item.icon ? React.createElement(Icon[item.icon]) : null}><Link
+            to={item.menu_url}>{item.menu_name}</Link></Menu.Item>;
         } else {
           return <SubMenu key={item.key} title={item.menu_name} icon={React.createElement(Icon[item.icon])}>
             {this.bindMenu(item.chidPermissions)}
@@ -193,7 +193,6 @@ export default class index extends Component {
         }
 
       });
-      return MenuList;
     }
 
     onOpenChange = (openKeys) => {
