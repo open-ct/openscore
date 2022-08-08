@@ -6,44 +6,92 @@ import group from "../../../../api/group";
 const {Option} = Select;
 export default class index extends Component {
 
-  componentDidMount() {
-    this.questionList();
-  }
-    columns = [
-      {
-        title: "试卷号",
-        width: 150,
-        dataIndex: "TestId",
-      },
-      {
-        title: "阅卷人一账号",
-        width: 150,
-        dataIndex: "ExaminerId",
-      },
-      {
-        title: "阅卷人一名称",
-        width: 150,
-        dataIndex: "ExaminerName",
-      },
-      {
-        title: "问题原因",
-        width: 150,
-        dataIndex: "ProblemType",
-      },
-    ]
+    supervisorId = "2"
 
-    // 选择区
     state = {
+      userInfo: {},
       questionList: [],
       tableData: [],
-      count: 0,
-      questionIndex: 0,
+    }
+
+    columns = [
+      {
+        title: "老师",
+        width: 120,
+        dataIndex: "UserName",
+      },
+      {
+        title: "评卷数量",
+        width: 120,
+        dataIndex: "TestDistributionNumber",
+      },
+      {
+        title: "阅卷完成数",
+        width: 120,
+        dataIndex: "TestSuccessNumber",
+      },
+      {
+        title: "阅卷失败数量",
+        width: 120,
+        dataIndex: "TestProblemNumber",
+      },
+      {
+        title: "未评数量",
+        width: 120,
+        dataIndex: "TestRemainingNumber",
+      },
+      {
+        title: "评卷速度（秒/份）",
+        width: 180,
+        dataIndex: "MarkingSpeed",
+      },
+      {
+        title: "预计时间（小时）",
+        width: 120,
+        dataIndex: "PredictTime",
+      },
+      {
+        title: "平均分",
+        width: 120,
+        dataIndex: "AverageScore",
+      },
+      {
+        title: "有效度",
+        width: 120,
+        dataIndex: "Validity",
+      },
+      {
+        title: "标准差",
+        width: 120,
+        dataIndex: "StandardDeviation",
+      },
+      {
+        title: "在线情况",
+        width: 120,
+        dataIndex: "IsOnline",
+      },
+
+    ]
+
+    userInfo = () => {
+      group.userInfo({supervisorId: this.supervisorId})
+        .then((res) => {
+          if (res.data.status === "10000") {
+            this.setState({
+              userInfo: res.data.data.userInfo,
+            });
+            console.log(res.data.data.userInfo);
+          }
+        })
+        .catch((e) => {
+          console.log(e);
+        });
     }
 
     questionList = () => {
       group.questionList({adminId: "1", subjectName: JSON.parse(localStorage.getItem("userInfo")).SubjectName})
         .then((res) => {
-          if (res.data.status == "10000") {
+          if (res.data.status === "10000") {
             this.setState({
               questionList: res.data.data.questionsList,
             });
@@ -56,30 +104,28 @@ export default class index extends Component {
         });
     }
     tableData = (questionId) => {
-      group.problemList({supervisorId: "2", questionId: questionId})
+      group.teacherMonitor({supervisorId: "2", questionId: questionId})
         .then((res) => {
-          if (res.data.status == "10000") {
+          if (res.data.status === "10000") {
             let tableData = [];
-            for (let i = 0; i < res.data.data.ProblemUnderCorrectedPaperVOList.length; i++) {
-              let item = res.data.data.ProblemUnderCorrectedPaperVOList[i];
-              let mes;
-              if (item.ProblemType === 0) {
-                mes = "图片不清";
-              }else if(item.ProblemType === 1) {
-                mes = "答错题目";
-              }else{
-                mes = item.ProblemMes;
-              }
+            for (let i = 0; i < res.data.data.teacherMonitoringList.length; i++) {
+              let item = res.data.data.teacherMonitoringList[i];
               tableData.push({
-                TestId: item.TestId,
-                ExaminerId: item.ExaminerId,
-                ExaminerName: item.ExaminerName,
-                ProblemType: mes,
+                UserName: item.UserName,
+                TestDistributionNumber: item.TestDistributionNumber,
+                TestSuccessNumber: item.TestSuccessNumber,
+                TestRemainingNumber: item.TestRemainingNumber,
+                TestProblemNumber: item.TestProblemNumber,
+                MarkingSpeed: item.MarkingSpeed,
+                AverageScore: item.AverageScore,
+                Validity: item.Validity,
+                StandardDeviation: item.StandardDeviation,
+                PredictTime: item.PredictTime,
+                IsOnline: item.IsOnline === 1 ? "在线" : "离线",
               });
             }
             this.setState({
               tableData,
-              count: res.data.data.count,
             });
           }
         })
@@ -87,10 +133,15 @@ export default class index extends Component {
           console.log(e);
         });
     }
+    componentDidMount() {
+      this.userInfo();
+      this.questionList();
+    }
+
     // 题目选择区
     selectBox = () => {
       let selectList;
-      if (this.state.questionList.length != 0) {
+      if (this.state.questionList.length !== 0) {
         selectList = this.state.questionList.map((item, i) => {
           return <Option key={i} value={item.QuestionName} label={item.QuestionName}>{item.QuestionName}</Option>;
         });
@@ -106,20 +157,12 @@ export default class index extends Component {
           index = i;
         }
       }
-      this.setState({
-        questionIndex: index,
-      });
       this.tableData(this.state.questionList[index].QuestionId);
-    }
-    // 选择区
-
-    paperMark =() => {
-      this.props.history.push("/home/group/markTasks/2/" + this.state.questionList[this.state.questionIndex].QuestionId);
     }
     render() {
       return (
-        <DocumentTitle title="阅卷系统-问题卷">
-          <div className="group-problem-page" data-component="group-problem-page">
+        <DocumentTitle title="阅卷系统-教师监控">
+          <div className="teacher-monitor-page" data-component="teacher-monitor-page">
             <div className="search-container">
               <div className="question-select">
                             题目选择：<Select
@@ -142,19 +185,12 @@ export default class index extends Component {
 
                 </Select>
               </div>
-              <div className="paper-num">
-                            问题卷数：{this.state.count}
-              </div>
-              <div className="paper-mark" onClick={() => {this.paperMark();}}>
-                            评阅所有问题卷
-              </div>
             </div>
             <div className="display-container">
               <Table
                 pagination={{position: ["bottomCenter"]}}
                 columns={this.columns}
                 dataSource={this.state.tableData}
-
               />
             </div>
           </div>

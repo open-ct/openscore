@@ -14,13 +14,14 @@ export default class index extends Component {
     state = {
       questionList: [],
       tableData: [],
-      fullScore: undefined,
+      count: 0,
+      questionIndex: 0,
     }
 
     questionList = () => {
       group.questionList({adminId: "1", subjectName: JSON.parse(localStorage.getItem("userInfo")).SubjectName})
         .then((res) => {
-          if (res.data.status == "10000") {
+          if (res.data.status === "10000") {
             this.setState({
               questionList: res.data.data.questionsList,
             });
@@ -32,10 +33,58 @@ export default class index extends Component {
           console.log(e);
         });
     }
+    columns = [
+      {
+        title: "用户Id",
+        width: 150,
+        dataIndex: "Userid",
+      },
+      {
+        title: "用户名",
+        width: 150,
+        dataIndex: "Name",
+      },
+      {
+        title: "试卷号",
+        width: 150,
+        dataIndex: "TestId",
+      },
+      {
+        title: "上次评分",
+        width: 150,
+        dataIndex: "Score",
+      },
+      {
+        title: "本次评分",
+        width: 150,
+        dataIndex: "SelfScore",
+      },
+
+    ]
+
+    tableData = (questionId) => {
+      group.selfMarkList({supervisorId: "2", questionId: questionId})
+        .then((res) => {
+          if (res.data.status === "10000") {
+            let tableData = [];
+            for (let i = 0; i < res.data.data.selfMarkVOList.length; i++) {
+              let item = res.data.data.selfMarkVOList[i];
+              tableData.push(item);
+            }
+            this.setState({
+              tableData,
+              count: res.data.data.selfMarkVOList.length,
+            });
+          }
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    }
     // 题目选择区
     selectBox = () => {
       let selectList;
-      if (this.state.questionList.length != 0) {
+      if (this.state.questionList.length !== 0) {
         selectList = this.state.questionList.map((item, i) => {
           return <Option key={i} value={item.QuestionName} label={item.QuestionName}>{item.QuestionName}</Option>;
         });
@@ -44,7 +93,6 @@ export default class index extends Component {
       }
       return selectList;
     }
-
     select = (e) => {
       let index;
       for (let i = 0; i < this.state.questionList.length; i++) {
@@ -52,46 +100,20 @@ export default class index extends Component {
           index = i;
         }
       }
+      this.setState({
+        questionIndex: index,
+      });
       this.tableData(this.state.questionList[index].QuestionId);
     }
-    tableData = (questionId) => {
-      group.standardMonitor({supervisorId: "2", questionId: questionId})
-        .then((res) => {
-          if (res.data.status == "10000") {
-            let tableData = [];
-            for (let i = 0; i < res.data.data.ScoreDeviationVOList.length; i++) {
-              let item = res.data.data.ScoreDeviationVOList[i];
-              tableData.push({
-                UserName: item.UserName,
-                Deviation: item.DeviationScore,
-              });
-            }
-            this.setState({
-              tableData,
-              fullScore: res.data.data.fullScore,
-            });
-          }
-        })
-        .catch((e) => {
-          console.log(e);
-        });
+    // 选择区
+
+    paperMark =() => {
+      this.props.history.push("/home/group/markTasks/3/" + this.state.questionList[this.state.questionIndex].QuestionId);
     }
-    columns = [
-      {
-        title: "教师",
-        width: 150,
-        dataIndex: "UserName",
-      },
-      {
-        title: "标准差",
-        width: 180,
-        dataIndex: "Deviation",
-      },
-    ]
     render() {
       return (
-        <DocumentTitle title="阅卷系统-标准差监控">
-          <div className="standard-monitor-page" data-component="standard-monitor-page">
+        <DocumentTitle title="阅卷系统-自评卷">
+          <div className="group-marking-page" data-component="group-marking-page">
             <div className="search-container">
               <div className="question-select">
                             题目选择：<Select
@@ -111,11 +133,13 @@ export default class index extends Component {
                   {
                     this.selectBox()
                   }
-
                 </Select>
               </div>
-              <div className="question-score">
-                {/* 满分：{this.state.fullScore} */}
+              <div className="paper-num">
+                            待自评数：{this.state.count}
+              </div>
+              <div className="paper-mark" onClick={() => {this.paperMark();}}>
+                            评阅所有自评卷
               </div>
             </div>
             <div className="display-container">

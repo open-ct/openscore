@@ -21,7 +21,7 @@ export default class index extends Component {
     questionList = () => {
       group.questionList({adminId: "1", subjectName: JSON.parse(localStorage.getItem("userInfo")).SubjectName})
         .then((res) => {
-          if (res.data.status == "10000") {
+          if (res.data.status === "10000") {
             this.setState({
               questionList: res.data.data.questionsList,
             });
@@ -35,45 +35,80 @@ export default class index extends Component {
     }
     columns = [
       {
-        title: "用户Id",
-        width: 150,
-        dataIndex: "Userid",
-      },
-      {
-        title: "用户名",
-        width: 150,
-        dataIndex: "Name",
-      },
-      {
         title: "试卷号",
         width: 150,
         dataIndex: "TestId",
       },
       {
-        title: "上次评分",
+        title: "阅卷人一账号",
         width: 150,
-        dataIndex: "Score",
+        dataIndex: "ExaminerFirstId",
       },
       {
-        title: "本次评分",
+        title: "阅卷人一名称",
         width: 150,
-        dataIndex: "SelfScore",
+        dataIndex: "ExaminerFirstName",
+      },
+      {
+        title: "阅卷人一分数",
+        width: 150,
+        dataIndex: "ExaminerFirstScore",
+      },
+      {
+        title: "阅卷人二账号",
+        width: 150,
+        dataIndex: "ExaminerSecondId",
+      },
+      {
+        title: "阅卷人二名称",
+        width: 150,
+        dataIndex: "ExaminerSecondName",
+      },
+      {
+        title: "阅卷人二分数",
+        width: 150,
+        dataIndex: "ExaminerSecondScore",
+      },
+      {
+        title: "阅卷人三账号",
+        width: 150,
+        dataIndex: "ExaminerThirdId",
+      },
+      {
+        title: "阅卷人三名称",
+        width: 150,
+        dataIndex: "ExaminerThirdName",
+      },
+      {
+        title: "阅卷人三分数",
+        width: 150,
+        dataIndex: "ExaminerThirdScore",
+      },
+      {
+        title: "标准误差",
+        width: 150,
+        dataIndex: "StandardError",
+      },
+      {
+        title: "实际误差",
+        width: 150,
+        dataIndex: "PracticeError",
       },
 
     ]
 
     tableData = (questionId) => {
-      group.selfMarkList({supervisorId: "2", questionId: questionId})
+      group.arbitramentList({supervisorId: "2", questionId: questionId})
         .then((res) => {
-          if (res.data.status == "10000") {
+          if (res.data.status === "10000") {
             let tableData = [];
-            for (let i = 0; i < res.data.data.selfMarkVOList.length; i++) {
-              let item = res.data.data.selfMarkVOList[i];
+            for (let i = 0; i < res.data.data.arbitramentTestVOList.length; i++) {
+              let item = res.data.data.arbitramentTestVOList[i];
               tableData.push(item);
             }
             this.setState({
               tableData,
-              count: res.data.data.selfMarkVOList.length,
+              count: res.data.data.count,
             });
           }
         })
@@ -84,7 +119,7 @@ export default class index extends Component {
     // 题目选择区
     selectBox = () => {
       let selectList;
-      if (this.state.questionList.length != 0) {
+      if (this.state.questionList.length !== 0) {
         selectList = this.state.questionList.map((item, i) => {
           return <Option key={i} value={item.QuestionName} label={item.QuestionName}>{item.QuestionName}</Option>;
         });
@@ -108,12 +143,12 @@ export default class index extends Component {
     // 选择区
 
     paperMark =() => {
-      this.props.history.push("/home/group/markTasks/3/" + this.state.questionList[this.state.questionIndex].QuestionId);
+      this.props.history.push("/home/group/markTasks/1/" + this.state.questionList[this.state.questionIndex].QuestionId);
     }
     render() {
       return (
-        <DocumentTitle title="阅卷系统-自评卷">
-          <div className="group-marking-page" data-component="group-marking-page">
+        <DocumentTitle title="阅卷系统-仲裁卷">
+          <div className="group-arbitration-page" data-component="group-arbitration-page">
             <div className="search-container">
               <div className="question-select">
                             题目选择：<Select
@@ -136,10 +171,10 @@ export default class index extends Component {
                 </Select>
               </div>
               <div className="paper-num">
-                            待自评数：{this.state.count}
+                            待仲裁数：{this.state.count}
               </div>
               <div className="paper-mark" onClick={() => {this.paperMark();}}>
-                            评阅所有自评卷
+                            评阅所有仲裁卷
               </div>
             </div>
             <div className="display-container">

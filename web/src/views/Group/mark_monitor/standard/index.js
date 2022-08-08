@@ -14,14 +14,13 @@ export default class index extends Component {
     state = {
       questionList: [],
       tableData: [],
-      count: 0,
-      questionIndex: 0,
+      fullScore: undefined,
     }
 
     questionList = () => {
       group.questionList({adminId: "1", subjectName: JSON.parse(localStorage.getItem("userInfo")).SubjectName})
         .then((res) => {
-          if (res.data.status == "10000") {
+          if (res.data.status === "10000") {
             this.setState({
               questionList: res.data.data.questionsList,
             });
@@ -33,93 +32,10 @@ export default class index extends Component {
           console.log(e);
         });
     }
-    columns = [
-      {
-        title: "试卷号",
-        width: 150,
-        dataIndex: "TestId",
-      },
-      {
-        title: "阅卷人一账号",
-        width: 150,
-        dataIndex: "ExaminerFirstId",
-      },
-      {
-        title: "阅卷人一名称",
-        width: 150,
-        dataIndex: "ExaminerFirstName",
-      },
-      {
-        title: "阅卷人一分数",
-        width: 150,
-        dataIndex: "ExaminerFirstScore",
-      },
-      {
-        title: "阅卷人二账号",
-        width: 150,
-        dataIndex: "ExaminerSecondId",
-      },
-      {
-        title: "阅卷人二名称",
-        width: 150,
-        dataIndex: "ExaminerSecondName",
-      },
-      {
-        title: "阅卷人二分数",
-        width: 150,
-        dataIndex: "ExaminerSecondScore",
-      },
-      {
-        title: "阅卷人三账号",
-        width: 150,
-        dataIndex: "ExaminerThirdId",
-      },
-      {
-        title: "阅卷人三名称",
-        width: 150,
-        dataIndex: "ExaminerThirdName",
-      },
-      {
-        title: "阅卷人三分数",
-        width: 150,
-        dataIndex: "ExaminerThirdScore",
-      },
-      {
-        title: "标准误差",
-        width: 150,
-        dataIndex: "StandardError",
-      },
-      {
-        title: "实际误差",
-        width: 150,
-        dataIndex: "PracticeError",
-      },
-
-    ]
-
-    tableData = (questionId) => {
-      group.arbitramentList({supervisorId: "2", questionId: questionId})
-        .then((res) => {
-          if (res.data.status == "10000") {
-            let tableData = [];
-            for (let i = 0; i < res.data.data.arbitramentTestVOList.length; i++) {
-              let item = res.data.data.arbitramentTestVOList[i];
-              tableData.push(item);
-            }
-            this.setState({
-              tableData,
-              count: res.data.data.count,
-            });
-          }
-        })
-        .catch((e) => {
-          console.log(e);
-        });
-    }
     // 题目选择区
     selectBox = () => {
       let selectList;
-      if (this.state.questionList.length != 0) {
+      if (this.state.questionList.length !== 0) {
         selectList = this.state.questionList.map((item, i) => {
           return <Option key={i} value={item.QuestionName} label={item.QuestionName}>{item.QuestionName}</Option>;
         });
@@ -128,6 +44,7 @@ export default class index extends Component {
       }
       return selectList;
     }
+
     select = (e) => {
       let index;
       for (let i = 0; i < this.state.questionList.length; i++) {
@@ -135,20 +52,46 @@ export default class index extends Component {
           index = i;
         }
       }
-      this.setState({
-        questionIndex: index,
-      });
       this.tableData(this.state.questionList[index].QuestionId);
     }
-    // 选择区
-
-    paperMark =() => {
-      this.props.history.push("/home/group/markTasks/1/" + this.state.questionList[this.state.questionIndex].QuestionId);
+    tableData = (questionId) => {
+      group.standardMonitor({supervisorId: "2", questionId: questionId})
+        .then((res) => {
+          if (res.data.status === "10000") {
+            let tableData = [];
+            for (let i = 0; i < res.data.data.ScoreDeviationVOList.length; i++) {
+              let item = res.data.data.ScoreDeviationVOList[i];
+              tableData.push({
+                UserName: item.UserName,
+                Deviation: item.DeviationScore,
+              });
+            }
+            this.setState({
+              tableData,
+              fullScore: res.data.data.fullScore,
+            });
+          }
+        })
+        .catch((e) => {
+          console.log(e);
+        });
     }
+    columns = [
+      {
+        title: "教师",
+        width: 150,
+        dataIndex: "UserName",
+      },
+      {
+        title: "标准差",
+        width: 180,
+        dataIndex: "Deviation",
+      },
+    ]
     render() {
       return (
-        <DocumentTitle title="阅卷系统-仲裁卷">
-          <div className="group-arbitration-page" data-component="group-arbitration-page">
+        <DocumentTitle title="阅卷系统-标准差监控">
+          <div className="standard-monitor-page" data-component="standard-monitor-page">
             <div className="search-container">
               <div className="question-select">
                             题目选择：<Select
@@ -168,13 +111,11 @@ export default class index extends Component {
                   {
                     this.selectBox()
                   }
+
                 </Select>
               </div>
-              <div className="paper-num">
-                            待仲裁数：{this.state.count}
-              </div>
-              <div className="paper-mark" onClick={() => {this.paperMark();}}>
-                            评阅所有仲裁卷
+              <div className="question-score">
+                {/* 满分：{this.state.fullScore} */}
               </div>
             </div>
             <div className="display-container">

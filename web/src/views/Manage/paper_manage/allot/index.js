@@ -103,7 +103,7 @@ export default class index extends Component {
     }
     distributePaper = () => {
       console.log(this.state.questionValue, this.state.testNumber, this.state.userNumber);
-      if (this.state.questionValue != undefined && this.state.testNumber && this.state.userNumber) {
+      if (this.state.questionValue !== undefined && this.state.testNumber && this.state.userNumber) {
         Modal.confirm({
           title: "确认分配",
           icon: <ExclamationCircleOutlined />,

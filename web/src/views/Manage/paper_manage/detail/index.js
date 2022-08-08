@@ -118,7 +118,7 @@ export default class index extends Component {
             },
           ];
 
-          let data = [];
+          let data;
           data = this.state.detailList[index].SubTopicVOList;
           return <Table columns={columns} dataSource={data} pagination={false} />;
         };
