@@ -38,19 +38,34 @@ func InitAuthConfig() {
 	auth.InitConfig(casdoorEndpoint, clientId, clientSecret, JwtPublicKey, casdoorOrganization, casdoorApplication)
 }
 
+
 func (c *ApiController) Signin() {
 	code := c.Input().Get("code")
 	state := c.Input().Get("state")
 
 	token, err := auth.GetOAuthToken(code, state)
+
 	if err != nil {
-		panic(err)
+		c.ResponseError(err.Error())
+		return
 	}
 
 	claims, err := auth.ParseJwtToken(token.AccessToken)
 	if err != nil {
-		panic(err)
+		c.ResponseError(err.Error())
+		return
 	}
+
+	// user, err := model.GetUserByCasdoorName(claims.User.Name)
+	// if err != nil {
+	// 	c.ResponseError(err.Error())
+	// 	return
+	// }
+	//
+	// if err := model.UpdateMemberOnlineStatus(user.UserId, true, util.GetCurrentTime()); err != nil {
+	// 	c.ResponseError(err.Error())
+	// 	return
+	// }
 
 	claims.AccessToken = token.AccessToken
 	c.SetSessionClaims(claims)
