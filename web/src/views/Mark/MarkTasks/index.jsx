@@ -2,9 +2,7 @@ import React, {Component} from "react";
 import DocumentTitle from "react-document-title";
 import {Button, Input, Modal, Radio, Select, Space, message} from "antd";
 import {ExclamationCircleOutlined} from "@ant-design/icons";
-
 import "./index.less";
-
 import * as Util from "../../../util/Util";
 import Marking from "../../../api/marking";
 const {Option} = Select;
@@ -42,7 +40,7 @@ export default class index extends Component {
           );
           this.getCurrentPaper();
         }else if(res.data.status === "10003") {
-          if (res.data.msg == "there is no paper to correct") {
+          if (res.data.msg === "there is no paper to correct") {
             message.warning("没有试卷待批改");
           }
         }
@@ -56,7 +54,7 @@ export default class index extends Component {
   getCurrentPaper = () => {
     Marking.testDisplay({userId: this.userId, testId: this.state.papers[0]})
       .then((res) => {
-        if (res.data.status == "10000") {
+        if (res.data.status === "10000") {
           let currentPaper = res.data.data;
           let subTopic = res.data.data.subTopic;
           let testLength = res.data.data.subTopic.length;
@@ -81,7 +79,7 @@ export default class index extends Component {
   imgScore = (item) => {
     let index;
     for (let i = 0; i < this.state.selectId.length; i++) {
-      if (item == this.state.selectId[i]) {
+      if (item === this.state.selectId[i]) {
         index = i;
       }
     }
@@ -92,9 +90,9 @@ export default class index extends Component {
   // 阅卷区
   showTest = () => {
     let testPaper = null;
-    if (this.state.currentPaper.testInfos != undefined) {
-      testPaper = this.state.currentPaper.testInfos.map((item) => {
-        return <div className="test-question-img" data-content-before={this.imgScore(item.test_detail_id)}>
+    if (this.state.currentPaper.testInfos !== undefined) {
+      testPaper = this.state.currentPaper.testInfos.map((item, index) => {
+        return <div key={index} className="test-question-img" data-content-before={this.imgScore(item.test_detail_id)}>
           <img src={"data:image/jpg;base64," + item.picCode} alt="加载失败" />
         </div>;
       });
@@ -128,7 +126,7 @@ export default class index extends Component {
   // 评分区
   selectBox = (index) => {
     let selectList;
-    if (this.state.markScore.length != 0) {
+    if (this.state.markScore.length !== 0) {
       selectList = this.state.markScore[index].map((item, i) => {
         return <Option key={i} value={item} label={item}>{item}</Option>;
       });
@@ -140,9 +138,9 @@ export default class index extends Component {
 
   showSelect = () => {
     let scoreSelect = null;
-    if (this.state.currentPaper.testInfos != undefined) {
+    if (this.state.currentPaper.testInfos !== undefined) {
       scoreSelect = this.state.currentPaper.subTopic.map((item, index) => {
-        return <div className="score-select">
+        return <div key={index} className="score-select">
           {item.question_detail_name}：<Select
             showSearch
             key={index}
@@ -159,7 +157,7 @@ export default class index extends Component {
           >
             {
               this.selectBox(index)
-              // this.selectBox(item.question_detail_score)
+            // this.selectBox(item.question_detail_score)
             }
           </Select>
         </div>;
@@ -179,12 +177,12 @@ export default class index extends Component {
       let reviseSelectNo = 0;
       let newSelectScore = [];
       for (let i = 0; i < this.state.selectId.length; i++) {
-        if (this.state.selectId[i] == item) {
+        if (this.state.selectId[i] === item) {
           reviseSelectNo = i;
         }
       }
       this.state.selectScore.map((e, index) => {
-        if (index == reviseSelectNo) {
+        if (index === reviseSelectNo) {
           newSelectScore.push(value);
         } else {
           newSelectScore.push(e);
@@ -246,11 +244,11 @@ export default class index extends Component {
       break;
     }
 
-    if (value == 1) {
+    if (value === 1) {
       let selectOrdered = [];
       for (let i = 0; i < this.state.subTopic.length; i++) {
         for (let j = 0; j < this.state.selectId.length; j++) {
-          if (this.state.selectId[j] == this.state.subTopic[i].test_detail_id) {
+          if (this.state.selectId[j] === this.state.subTopic[i].test_detail_id) {
             selectOrdered.push(this.state.selectScore[j]);
           }
         }
@@ -270,7 +268,7 @@ export default class index extends Component {
       onOk: () => {
         let Qustion_detail_id = Util.getTextByJs(this.state.selectId);
         let Question_detail_score = Util.getTextByJs(this.state.selectScore);
-        if (value == 1) {
+        if (value === 1) {
           if (this.state.selectScore.length < this.state.testLength) {
             message.warning("请将分数打全");
           } else {
@@ -281,7 +279,7 @@ export default class index extends Component {
               testDetailId: Qustion_detail_id,
             })
               .then((res) => {
-                if (res.data.status == "10000") {
+                if (res.data.status === "10000") {
                   this.setState({
                     selectId: [],
                     selectScore: [],
@@ -295,7 +293,7 @@ export default class index extends Component {
                 console.log(e);
               });
           }
-        } else if (value == 3) {
+        } else if (value === 3) {
           console.log("3");
         } else {
           console.log("2", this);
@@ -308,14 +306,14 @@ export default class index extends Component {
   }
 
   handleOk = () => {
-    if (this.state.problemValue == 3) {
+    if (this.state.problemValue === 3) {
       Marking.testProblem({
         userId: this.userId,
         testId: this.state.currentPaper.testId,
         problemType: this.state.problemValue,
         problemMessage: this.state.inpValu,
       })
-        .then((res) => {
+        .then(() => {
           this.setState({
             selectId: [],
             selectScore: [],
@@ -332,7 +330,7 @@ export default class index extends Component {
         testId: this.state.currentPaper.testId,
         problemType: this.state.problemValue,
       })
-        .then((res) => {
+        .then(() => {
           this.setState({
             selectId: [],
             selectScore: [],
