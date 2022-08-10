@@ -1,11 +1,9 @@
-package models
+package model
 
-import (
-	"log"
-)
+import "log"
 
 type Subject struct {
-	SubjectId   int64  `json:"subjectId" xorm:"pk autoincr"`
+	SubjectId   int64  `json:"subject_id" xorm:"pk autoincr"`
 	SubjectName string `json:"subject_name"`
 }
 
@@ -25,10 +23,21 @@ func InsertSubject(subject *Subject) (err1 error, questionId int64) {
 
 	return err, subject.SubjectId
 }
+
 func GetSubjectBySubjectName(subject *Subject, subjectName string) (bool, error) {
 	get, err := adapter.engine.Where("subject_name=?", subjectName).Get(subject)
 	if err != nil {
 		log.Println("FindSubjectList err ")
 	}
 	return get, err
+}
+
+func GetSubjectById(id int64) (string, error) {
+	subject := &Subject{}
+	ok, err := adapter.engine.Where("subject_id = ?", id).Get(subject)
+	if err != nil || !ok {
+		log.Println("GetSubjectById err")
+	}
+
+	return subject.SubjectName, err
 }

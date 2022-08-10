@@ -16,9 +16,11 @@ package controllers
 
 import (
 	_ "embed"
+	"encoding/json"
 
 	"github.com/astaxie/beego"
-	"github.com/casdoor/casdoor-go-sdk/auth"
+	auth "github.com/casdoor/casdoor-go-sdk/casdoorsdk"
+	"github.com/open-ct/openscore/service/user"
 )
 
 //go:embed token_jwt_key.pem
@@ -38,18 +40,53 @@ func InitAuthConfig() {
 	auth.InitConfig(casdoorEndpoint, clientId, clientSecret, JwtPublicKey, casdoorOrganization, casdoorApplication)
 }
 
-func (c *ApiController) Signin() {
+// UserLogin 用户登录
+func (c *ApiController) UserLogin() {
+	var req LoginRequest
+
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &req); err != nil {
+		c.ResponseError("cannot unmarshal", err.Error())
+		return
+	}
+
+	id, userType, err := user.Login(req.Account, req.Password)
+	if err != nil {
+		c.ResponseError("cannot login", err.Error())
+		return
+	}
+
+	c.SetSession("userId", id)
+	c.SetSession("userType", userType)
+
+	resp := struct {
+		UserType int64 `json:"user_type"`
+	}{userType}
+
+	c.ResponseOk(resp)
+}
+
+/*
+// @Title Signin
+// @Description sign in as a member
+// @Param   code     QueryString    string  true        "The code to sign in"
+// @Param   state     QueryString    string  true        "The state"
+// @Success 200 {object} controllers.api_controller.Response The Response object
+// @router /signin [post]
+// @Tag Account API*/
+func (c *ApiController) SignIn() {
 	code := c.Input().Get("code")
 	state := c.Input().Get("state")
 
 	token, err := auth.GetOAuthToken(code, state)
 	if err != nil {
-		panic(err)
+		c.ResponseError(err.Error())
+		return
 	}
 
 	claims, err := auth.ParseJwtToken(token.AccessToken)
 	if err != nil {
-		panic(err)
+		c.ResponseError(err.Error())
+		return
 	}
 
 	claims.AccessToken = token.AccessToken
@@ -58,12 +95,24 @@ func (c *ApiController) Signin() {
 	c.ResponseOk(claims)
 }
 
-func (c *ApiController) Signout() {
+/*
+// @Title Signout
+// @Description sign out the current member
+// @Success 200 {object} controllers.api_controller.Response The Response object
+// @router /signout [post]
+// @Tag Account API*/
+func (c *ApiController) SignOut() {
 	c.SetSessionClaims(nil)
 
 	c.ResponseOk()
 }
 
+/*
+// @Title GetAccount
+// @Description Get current account
+// @Success 200 {object} controllers.api_controller.Response The Response object
+// @router /get-account [get]
+// @Tag Account API*/
 func (c *ApiController) GetAccount() {
 	if c.RequireSignedIn() {
 		return

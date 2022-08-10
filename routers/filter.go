@@ -28,6 +28,10 @@ func TransparentStatic(ctx *context.Context) {
 		return
 	}
 
+	if strings.HasPrefix(urlPath, "/openct/") {
+		return
+	}
+
 	path := "web/build"
 	if urlPath == "/" {
 		path += "/index.html"

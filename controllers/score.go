@@ -10,14 +10,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/open-ct/openscore/models"
-	"github.com/open-ct/openscore/requests"
-	"github.com/open-ct/openscore/responses"
+	"github.com/open-ct/openscore/model"
+	"github.com/open-ct/openscore/service/paper"
 )
 
 func (c *ApiController) Display() {
 	defer c.ServeJSON()
-	var requestBody requests.TestDisplay
+	var requestBody TestRequest
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
 	if err != nil {
 		resp := Response{"10001", "cannot unmarshal", err}
@@ -26,10 +25,10 @@ func (c *ApiController) Display() {
 	}
 	testId := requestBody.TestId
 
-	var testPaper models.TestPaper
-	var topic models.Topic
-	var subTopic []models.SubTopic
-	var response responses.TestDisplay
+	var testPaper model.TestPaper
+	var topic model.Topic
+	var subTopic []model.SubTopic
+	var response TestDisplayResponse
 
 	_, err = testPaper.GetTestPaper(testId)
 	if err != nil {
@@ -37,13 +36,13 @@ func (c *ApiController) Display() {
 		c.Data["json"] = resp
 		return
 	}
-	err = topic.GetTopic(testPaper.Question_id)
+	err = topic.GetTopic(testPaper.QuestionId)
 	if err != nil {
 		resp := Response{"10003", "get topic fail", err}
 		c.Data["json"] = resp
 		return
 	}
-	err = models.GetSubTopicsByTestId(testPaper.Question_id, &subTopic)
+	err = model.GetSubTopicsByTestId(testPaper.QuestionId, &subTopic)
 	if err != nil {
 		resp := Response{"10004", "get subtopic fail", err}
 		c.Data["json"] = resp
@@ -51,20 +50,21 @@ func (c *ApiController) Display() {
 	}
 
 	for i := 0; i < len(subTopic); i++ {
-		var testPaperInfo models.TestPaperInfo
-		err = testPaperInfo.GetTestPaperInfoByTestIdAndQuestionDetailId(testId, subTopic[i].Question_detail_id)
+		var testPaperInfo model.TestPaperInfo
+		err = testPaperInfo.GetTestPaperInfoByTestIdAndQuestionDetailId(testId, subTopic[i].QuestionDetailId)
 		if err != nil {
 			resp := Response{"10005", "get testPaperInfo fail", err}
 			c.Data["json"] = resp
 			return
 		}
-		tempSubTopic := responses.SubTopicPlus{SubTopic: subTopic[i], Test_detail_id: testPaperInfo.Test_detail_id}
+		tempSubTopic := SubTopicPlus{SubTopic: subTopic[i], TestDetailId: testPaperInfo.TestDetailId}
 
 		response.SubTopics = append(response.SubTopics, tempSubTopic)
-		picName := testPaperInfo.Pic_src
-		//图片地址拼接 ，按服务器
+		picName := testPaperInfo.PicSrc
+		// 图片地址拼接 ，按服务器
 		// src := "C:\\Users\\yang\\Desktop\\阅卷系统\\img\\" + picName
 		src := "./img/" + picName
+
 		bytes, err := os.ReadFile(src)
 		if err != nil {
 			log.Println(err)
@@ -73,51 +73,102 @@ func (c *ApiController) Display() {
 			return
 		}
 		encoding := base64.StdEncoding.EncodeToString(bytes)
-		tempTestPaperInfo := responses.TestPaperInfoPlus{TestPaperInfo: testPaperInfo, PicCode: encoding}
+		tempTestPaperInfo := TestPaperInfoPlus{TestPaperInfo: testPaperInfo, PicCode: encoding}
 		response.TestInfos = append(response.TestInfos, tempTestPaperInfo)
 	}
-	response.QuestionId = topic.Question_id
-	response.QuestionName = topic.Question_name
+	response.QuestionId = topic.QuestionId
+	response.QuestionName = topic.QuestionName
 	response.TestId = testId
 	resp := Response{"10000", "OK", response}
 	c.Data["json"] = resp
 }
 
 func (c *ApiController) List() {
-	defer c.ServeJSON()
-	var requestBody requests.TestList
-	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	var response TestListResponse
+
+	userId, err := c.GetSessionUserId()
+
 	if err != nil {
-		resp := Response{"10001", "cannot unmarshal", err}
+		resp := Response{Status: "10001", Msg: "get user info fail", Data: err}
 		c.Data["json"] = resp
 		return
 	}
-	log.Println(requestBody)
-	userId := requestBody.UserId
-	var response responses.TestList
-	//----------------------------------------------------
 
-	err = models.GetDistributedTestIdPaperByUserId(userId, &response.TestId)
+	if err := model.GetDistributedTestIdPaperByUserId(userId, &response.TestIds); err != nil {
+		c.ResponseError("get distribution fail", err)
+		return
+	}
+	if len(response.TestIds) != 0 {
+		c.ResponseOk(response)
+		return
+	}
+
+	u := model.User{}
+	if err := u.GetUser(userId); err != nil {
+		c.ResponseError("get user info fail", err)
+		return
+	}
+
+	// 查询相应试卷
+	papers, err := paper.FindUnDistributeTest(u.QuestionId)
 	if err != nil {
-		resp := Response{"10002", "get distribution fail", err}
-		c.Data["json"] = resp
+		c.ResponseError("试卷分配异常，无法获取未分配试卷 ", err)
 		return
 	}
-	if len(response.TestId) == 0 {
-		resp := Response{"10003", "there is no paper to correct", err}
-		c.Data["json"] = resp
+	if len(papers) == 0 {
+		c.ResponseOk("there is no paper to correct")
 		return
-
 	}
-	log.Println(response)
-	resp := Response{"10000", "OK", response}
-	c.Data["json"] = resp
 
+	if len(papers) > 10 {
+		papers = papers[:10]
+	}
+
+	response.TestIds = make([]int64, len(papers))
+	for i, p := range papers {
+		response.TestIds[i] = p.TestId
+		p.CorrectingNumber++
+		if err := p.Update(); err != nil {
+			c.ResponseError("无法更改试卷状态 ", err)
+			return
+		}
+
+		// 添加试卷未批改记录
+		underCorrectedPaper := model.UnderCorrectedPaper{
+			TestId:           p.TestId,
+			QuestionId:       p.QuestionId,
+			TestQuestionType: 1,
+			UserId:           userId,
+		}
+		if err := underCorrectedPaper.Save(); err != nil {
+			c.ResponseError("无法生成待批改试卷 ", err)
+			return
+		}
+	}
+
+	go func() {
+		time.Sleep(30 * time.Minute)
+		for _, p := range papers {
+			p.GetTestPaper(p.TestId)
+			p.CorrectingNumber--
+			if err := p.UpdateCols("correcting_number"); err != nil {
+				c.ResponseError("无法更改试卷状态 ", err)
+				return
+			}
+		}
+
+		if err := model.DeleteUnderCorrectedPaperByUserId(userId); err != nil {
+			c.ResponseError("delete underCorrectedPaper fail after 30 min", err)
+			return
+		}
+	}()
+
+	c.ResponseOk(response)
 }
 
 func (c *ApiController) Point() {
 	defer c.ServeJSON()
-	var requestBody requests.TestPoint
+	var requestBody TestPoint
 	var resp Response
 	var err error
 	err = json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
@@ -126,64 +177,69 @@ func (c *ApiController) Point() {
 		c.Data["json"] = resp
 		return
 	}
-	log.Println(requestBody)
-	userId := requestBody.UserId
+
+	userId, err := c.GetSessionUserId()
+	if err != nil {
+		resp := Response{Status: "10001", Msg: "get user info fail", Data: err}
+		c.Data["json"] = resp
+		return
+	}
 	scoresStr := requestBody.Scores
 	testId := requestBody.TestId
 	testDetailIdStr := requestBody.TestDetailId
 	scores := strings.Split(scoresStr, "-")
 	testDetailIds := strings.Split(testDetailIdStr, "-")
-	//-------------------------------------------------------
+	// -------------------------------------------------------
 
-	//获取该试卷大题 和抽象大题信息
-	var test models.TestPaper
-	var topic models.Topic
+	// 获取该试卷大题 和抽象大题信息
+	var test model.TestPaper
+	var topic model.Topic
 	_, err = test.GetTestPaper(testId)
-	if err != nil || test.Test_id == 0 {
+	if err != nil || test.TestId == 0 {
 		resp := Response{"10002", "get test paper fail", err}
 		c.Data["json"] = resp
 		return
 	}
-	err = topic.GetTopic(test.Question_id)
-	if err != nil || topic.Question_id == 0 {
+	err = topic.GetTopic(test.QuestionId)
+	if err != nil || topic.QuestionId == 0 {
 		resp := Response{"10003", "get topic fail", err}
 		c.Data["json"] = resp
 		return
 	}
-	//获取试卷未批改表信息（试卷批改状态类型）
-	var underTest models.UnderCorrectedPaper
+	// 获取试卷未批改表信息（试卷批改状态类型）
+	var underTest model.UnderCorrectedPaper
 	err = underTest.GetUnderCorrectedPaper(userId, testId)
-	if err != nil || underTest.Question_id == 0 {
+	if err != nil || underTest.QuestionId == 0 {
 		resp := Response{"10004", "get underCorrected fail", err}
 		c.Data["json"] = resp
 		return
 	}
-	if underTest.Test_question_type == 0 {
-		standardError := topic.Standard_error
+	if underTest.TestQuestionType == 0 {
+		standardError := topic.StandardError
 
-		//分三种情况
-		if userId == test.Examiner_first_id {
+		// 分三种情况
+		if userId == test.ExaminerFirstId {
 			var sum int64
-			//给试卷详情表打分
+			// 给试卷详情表打分
 			for i := 0; i < len(testDetailIds); i++ {
-				//取出小题试卷id,和小题分数
-				var testInfo models.TestPaperInfo
+				// 取出小题试卷id,和小题分数
+				var testInfo model.TestPaperInfo
 				testDetailIdString := testDetailIds[i]
 				testDetailId, _ := strconv.ParseInt(testDetailIdString, 10, 64)
 				scoreString := scores[i]
 				score, _ := strconv.ParseInt(scoreString, 10, 64)
-				//------------------------------------------------
+				// ------------------------------------------------
 
-				//查试卷小题
+				// 查试卷小题
 				err := testInfo.GetTestPaperInfo(testDetailId)
 				if err != nil {
 					resp := Response{"10008", "get testPaper fail", err}
 					c.Data["json"] = resp
 					return
 				}
-				//修改试卷详情表
+				// 修改试卷详情表
 
-				testInfo.Examiner_first_self_score = score
+				testInfo.ExaminerFirstSelfScore = score
 
 				err = testInfo.Update()
 				if err != nil {
@@ -193,9 +249,9 @@ func (c *ApiController) Point() {
 				}
 				sum += score
 			}
-			//给试卷表打分
+			// 给试卷表打分
 
-			test.Examiner_first_self_score = sum
+			test.ExaminerFirstSelfScore = sum
 			err = test.Update()
 			if err != nil {
 				resp := Response{"10007", "update test fail", err}
@@ -203,21 +259,21 @@ func (c *ApiController) Point() {
 				return
 			}
 
-			//删除试卷待批改表 ，增加试卷记录表
-			var record models.ScoreRecord
-			var underTest models.UnderCorrectedPaper
+			// 删除试卷待批改表 ，增加试卷记录表
+			var record model.ScoreRecord
+			var underTest model.UnderCorrectedPaper
 
-			err = models.GetSelfScorePaperByTestQuestionTypeAndTestId(&underTest, testId, userId)
+			err = model.GetSelfScorePaperByTestQuestionTypeAndTestId(&underTest, testId, userId)
 			if err != nil {
 				resp = Response{"20012", "GetUnderCorrectedPaperByUserIdAndTestId  fail", err}
 				c.Data["json"] = resp
 				return
 			}
 			record.Score = sum
-			record.Test_id = testId
-			record.Test_record_type = underTest.Test_question_type
-			record.User_id = userId
-			record.Question_id = underTest.Question_id
+			record.TestId = testId
+			record.TestRecordType = underTest.TestQuestionType
+			record.UserId = userId
+			record.QuestionId = underTest.QuestionId
 
 			err = record.Save()
 			if err != nil {
@@ -232,38 +288,38 @@ func (c *ApiController) Point() {
 				return
 			}
 
-			if math.Abs(float64(sum-test.Examiner_first_score)) > float64(standardError) {
-				var newUnderTest models.UnderCorrectedPaper
-				newUnderTest.User_id = "10000"
-				newUnderTest.Self_score_id = userId
-				newUnderTest.Test_id = testId
-				newUnderTest.Question_id = test.Question_id
-				newUnderTest.Test_question_type = 7
+			if math.Abs(float64(sum-test.ExaminerFirstScore)) > float64(standardError) {
+				var newUnderTest model.UnderCorrectedPaper
+				newUnderTest.UserId = 10000
+				newUnderTest.SelfScoreId = userId
+				newUnderTest.TestId = testId
+				newUnderTest.QuestionId = test.QuestionId
+				newUnderTest.TestQuestionType = 7
 				newUnderTest.Save()
 			}
 
-		} else if userId == test.Examiner_second_id {
+		} else if userId == test.ExaminerSecondId {
 			var sum int64
-			//给试卷详情表打分
+			// 给试卷详情表打分
 			for i := 0; i < len(testDetailIds); i++ {
-				//取出小题试卷id,和小题分数
-				var testInfo models.TestPaperInfo
+				// 取出小题试卷id,和小题分数
+				var testInfo model.TestPaperInfo
 				testDetailIdString := testDetailIds[i]
 				testDetailId, _ := strconv.ParseInt(testDetailIdString, 10, 64)
 				scoreString := scores[i]
 				score, _ := strconv.ParseInt(scoreString, 10, 64)
-				//------------------------------------------------
+				// ------------------------------------------------
 
-				//查试卷小题
+				// 查试卷小题
 				err := testInfo.GetTestPaperInfo(testDetailId)
 				if err != nil {
 					resp := Response{"10008", "get testPaper fail", err}
 					c.Data["json"] = resp
 					return
 				}
-				//修改试卷详情表
+				// 修改试卷详情表
 
-				testInfo.Examiner_second_self_score = score
+				testInfo.ExaminerSecondSelfScore = score
 
 				err = testInfo.Update()
 				if err != nil {
@@ -273,9 +329,9 @@ func (c *ApiController) Point() {
 				}
 				sum += score
 			}
-			//给试卷表打分
+			// 给试卷表打分
 
-			test.Examiner_second_self_score = sum
+			test.ExaminerSecondSelfScore = sum
 
 			err = test.Update()
 			if err != nil {
@@ -283,21 +339,21 @@ func (c *ApiController) Point() {
 				c.Data["json"] = resp
 				return
 			}
-			//删除试卷待批改表 ，增加试卷记录表
-			var record models.ScoreRecord
-			var underTest models.UnderCorrectedPaper
+			// 删除试卷待批改表 ，增加试卷记录表
+			var record model.ScoreRecord
+			var underTest model.UnderCorrectedPaper
 
-			err = models.GetSelfScorePaperByTestQuestionTypeAndTestId(&underTest, testId, userId)
+			err = model.GetSelfScorePaperByTestQuestionTypeAndTestId(&underTest, testId, userId)
 			if err != nil {
 				resp = Response{"20012", "GetUnderCorrectedPaperByUserIdAndTestId  fail", err}
 				c.Data["json"] = resp
 				return
 			}
 			record.Score = sum
-			record.Test_id = testId
-			record.Test_record_type = underTest.Test_question_type
-			record.User_id = userId
-			record.Question_id = underTest.Question_id
+			record.TestId = testId
+			record.TestRecordType = underTest.TestQuestionType
+			record.UserId = userId
+			record.QuestionId = underTest.QuestionId
 			err = record.Save()
 			if err != nil {
 				resp = Response{"20013", "Save  fail", err}
@@ -310,38 +366,38 @@ func (c *ApiController) Point() {
 				c.Data["json"] = resp
 				return
 			}
-			if math.Abs(float64(sum-test.Examiner_second_score)) > float64(standardError) {
-				var newUnderTest models.UnderCorrectedPaper
-				newUnderTest.User_id = "10000"
-				newUnderTest.Test_id = testId
-				newUnderTest.Self_score_id = userId
-				newUnderTest.Question_id = test.Question_id
-				newUnderTest.Test_question_type = 7
+			if math.Abs(float64(sum-test.ExaminerSecondScore)) > float64(standardError) {
+				var newUnderTest model.UnderCorrectedPaper
+				newUnderTest.UserId = 10000
+				newUnderTest.TestId = testId
+				newUnderTest.SelfScoreId = userId
+				newUnderTest.QuestionId = test.QuestionId
+				newUnderTest.TestQuestionType = 7
 				newUnderTest.Save()
 			}
 
-		} else if userId == test.Examiner_third_id {
+		} else if userId == test.ExaminerThirdId {
 			var sum int64
-			//给试卷详情表打分
+			// 给试卷详情表打分
 			for i := 0; i < len(testDetailIds); i++ {
-				//取出小题试卷id,和小题分数
-				var testInfo models.TestPaperInfo
+				// 取出小题试卷id,和小题分数
+				var testInfo model.TestPaperInfo
 				testDetailIdString := testDetailIds[i]
 				testDetailId, _ := strconv.ParseInt(testDetailIdString, 10, 64)
 				scoreString := scores[i]
 				score, _ := strconv.ParseInt(scoreString, 10, 64)
-				//------------------------------------------------
+				// ------------------------------------------------
 
-				//查试卷小题
+				// 查试卷小题
 				err := testInfo.GetTestPaperInfo(testDetailId)
 				if err != nil {
 					resp := Response{"10008", "get testPaper fail", err}
 					c.Data["json"] = resp
 					return
 				}
-				//修改试卷详情表
+				// 修改试卷详情表
 
-				testInfo.Examiner_third_self_score = score
+				testInfo.ExaminerThirdSelfScore = score
 
 				err = testInfo.Update()
 				if err != nil {
@@ -351,9 +407,9 @@ func (c *ApiController) Point() {
 				}
 				sum += score
 			}
-			//给试卷表打分
+			// 给试卷表打分
 
-			test.Examiner_third_self_score = sum
+			test.ExaminerThirdSelfScore = sum
 
 			err = test.Update()
 			if err != nil {
@@ -361,21 +417,21 @@ func (c *ApiController) Point() {
 				c.Data["json"] = resp
 				return
 			}
-			//删除试卷待批改表 ，增加试卷记录表
-			var record models.ScoreRecord
-			var underTest models.UnderCorrectedPaper
+			// 删除试卷待批改表 ，增加试卷记录表
+			var record model.ScoreRecord
+			var underTest model.UnderCorrectedPaper
 
-			err = models.GetSelfScorePaperByTestQuestionTypeAndTestId(&underTest, testId, userId)
+			err = model.GetSelfScorePaperByTestQuestionTypeAndTestId(&underTest, testId, userId)
 			if err != nil {
 				resp = Response{"20012", "GetUnderCorrectedPaperByUserIdAndTestId  fail", err}
 				c.Data["json"] = resp
 				return
 			}
 			record.Score = sum
-			record.Test_id = testId
-			record.Test_record_type = underTest.Test_question_type
-			record.User_id = userId
-			record.Question_id = underTest.Question_id
+			record.TestId = testId
+			record.TestRecordType = underTest.TestQuestionType
+			record.UserId = userId
+			record.QuestionId = underTest.QuestionId
 
 			err = record.Save()
 			if err != nil {
@@ -389,22 +445,22 @@ func (c *ApiController) Point() {
 				c.Data["json"] = resp
 				return
 			}
-			if math.Abs(float64(sum-test.Examiner_third_score)) > float64(standardError) {
-				var newUnderTest models.UnderCorrectedPaper
-				newUnderTest.User_id = "10000"
-				newUnderTest.Test_id = testId
-				newUnderTest.Question_id = test.Question_id
-				newUnderTest.Self_score_id = userId
-				newUnderTest.Test_question_type = 7
+			if math.Abs(float64(sum-test.ExaminerThirdScore)) > float64(standardError) {
+				var newUnderTest model.UnderCorrectedPaper
+				newUnderTest.UserId = 10000
+				newUnderTest.TestId = testId
+				newUnderTest.QuestionId = test.QuestionId
+				newUnderTest.SelfScoreId = userId
+				newUnderTest.TestQuestionType = 7
 				newUnderTest.Save()
 			}
 
 		}
 
-	} else { //score数组string转int
+	} else { // score数组string转int
 		var scoreArr []int64
 		var sum int64 = 0
-		var record models.ScoreRecord
+		var record model.ScoreRecord
 		for _, i := range scores {
 			j, err := strconv.ParseInt(i, 10, 64)
 			sum += j
@@ -416,28 +472,28 @@ func (c *ApiController) Point() {
 
 		final := false
 
-		if topic.Score_type == 1 {
-			test.Examiner_first_id = userId
-			test.Examiner_first_score = sum
+		if topic.ScoreType == 1 {
+			test.ExaminerFirstId = userId
+			test.ExaminerFirstScore = sum
 			final = true
-		} else if underTest.Test_question_type == 2 && test.Examiner_first_id == "-1" {
-			test.Examiner_first_id = userId
-			test.Examiner_first_score = sum
-		} else if underTest.Test_question_type == 2 && test.Examiner_second_id == "-1" {
-			test.Examiner_second_id = userId
-			test.Examiner_second_score = sum
-			if math.Abs(float64(test.Examiner_second_score)-float64(test.Examiner_first_score)) <= float64(topic.Standard_error) {
-				log.Println(math.Abs(float64(test.Examiner_second_score) - float64(test.Examiner_first_score)))
-				sum = int64(math.Abs(float64(test.Examiner_second_score+test.Examiner_first_score)) / 2)
+		} else if underTest.TestQuestionType == 2 && test.ExaminerFirstId == -1 {
+			test.ExaminerFirstId = userId
+			test.ExaminerFirstScore = sum
+		} else if underTest.TestQuestionType == 2 && test.ExaminerSecondId == -1 {
+			test.ExaminerSecondId = userId
+			test.ExaminerSecondScore = sum
+			if math.Abs(float64(test.ExaminerSecondScore)-float64(test.ExaminerFirstScore)) <= float64(topic.StandardError) {
+				log.Println(math.Abs(float64(test.ExaminerSecondScore) - float64(test.ExaminerFirstScore)))
+				sum = int64(math.Abs(float64(test.ExaminerSecondScore+test.ExaminerFirstScore)) / 2)
 				final = true
 			} else {
-				newUnderTest := models.UnderCorrectedPaper{}
-				//随机 抽一个 人
+				newUnderTest := model.UnderCorrectedPaper{}
+				// 随机 抽一个 人
 
-				newUnderTest.User_id = models.FindNewUserId(test.Examiner_first_id, test.Examiner_second_id, test.Question_id)
-				newUnderTest.Test_question_type = 3
-				newUnderTest.Test_id = underTest.Test_id
-				newUnderTest.Question_id = underTest.Question_id
+				newUnderTest.UserId = model.FindNewUserId(test.ExaminerFirstId, test.ExaminerSecondId, test.QuestionId)
+				newUnderTest.TestQuestionType = 3
+				newUnderTest.TestId = underTest.TestId
+				newUnderTest.QuestionId = underTest.QuestionId
 				err = newUnderTest.Save()
 				if err != nil {
 					resp := Response{"10005", "insert undertest fail", err}
@@ -446,37 +502,37 @@ func (c *ApiController) Point() {
 				}
 			}
 		}
-		if underTest.Test_question_type == 0 {
+		if underTest.TestQuestionType == 0 {
 
-			test.Leader_id = userId
-			test.Leader_score = sum
+			test.LeaderId = userId
+			test.LeaderScore = sum
 			final = true
 		}
-		if underTest.Test_question_type == 3 {
-			test.Examiner_third_id = userId
-			test.Examiner_third_score = sum
-			first := math.Abs(float64(test.Examiner_third_score - test.Examiner_first_score))
-			second := math.Abs(float64(test.Examiner_third_score - test.Examiner_second_score))
+		if underTest.TestQuestionType == 3 {
+			test.ExaminerThirdId = userId
+			test.ExaminerThirdScore = sum
+			first := math.Abs(float64(test.ExaminerThirdScore - test.ExaminerFirstScore))
+			second := math.Abs(float64(test.ExaminerThirdScore - test.ExaminerSecondScore))
 			var small float64
 			if first <= second {
 				small = first
-				sum = (test.Examiner_third_score + test.Examiner_first_score) / 2
+				sum = (test.ExaminerThirdScore + test.ExaminerFirstScore) / 2
 			} else {
 				small = second
-				sum = (test.Examiner_third_score + test.Examiner_second_score) / 2
+				sum = (test.ExaminerThirdScore + test.ExaminerSecondScore) / 2
 			}
-			if small <= float64(topic.Standard_error) {
+			if small <= float64(topic.StandardError) {
 				final = true
 			} else {
 
-				test.Question_status = 2
+				test.QuestionStatus = 2
 
-				newUnderTest := models.UnderCorrectedPaper{}
-				//阅卷组长类型默认 id 10000
-				newUnderTest.User_id = "10000"
-				newUnderTest.Test_question_type = 4
-				newUnderTest.Test_id = underTest.Test_id
-				newUnderTest.Question_id = underTest.Question_id
+				newUnderTest := model.UnderCorrectedPaper{}
+				// 阅卷组长类型默认 id 10000
+				newUnderTest.UserId = 10000
+				newUnderTest.TestQuestionType = 4
+				newUnderTest.TestId = underTest.TestId
+				newUnderTest.QuestionId = underTest.QuestionId
 				err = newUnderTest.Save()
 				if err != nil {
 					resp := Response{"10006", "insert undertest fail", err}
@@ -486,8 +542,8 @@ func (c *ApiController) Point() {
 			}
 		}
 		if final {
-			test.Final_score = sum
-			record.Test_finish = 1
+			test.FinalScore = sum
+			record.TestFinish = 1
 		}
 
 		err = underTest.Delete()
@@ -504,7 +560,7 @@ func (c *ApiController) Point() {
 		}
 		for i := 0; i < len(scores); i++ {
 			score := scoreArr[i]
-			var tempTest models.TestPaperInfo
+			var tempTest model.TestPaperInfo
 			id, _ := strconv.ParseInt(testDetailIds[i], 10, 64)
 			log.Println(id)
 			err = tempTest.GetTestPaperInfo(id)
@@ -513,25 +569,25 @@ func (c *ApiController) Point() {
 				c.Data["json"] = resp
 				return
 			}
-			if topic.Score_type == 1 {
-				tempTest.Examiner_first_id = userId
-				tempTest.Examiner_first_score = score
-			} else if topic.Score_type == 2 && tempTest.Examiner_first_id == "-1" {
-				tempTest.Examiner_first_id = userId
-				tempTest.Examiner_first_score = score
-			} else if topic.Score_type == 2 && tempTest.Examiner_second_id == "-1" {
-				tempTest.Examiner_second_id = userId
-				tempTest.Examiner_second_score = score
+			if topic.ScoreType == 1 {
+				tempTest.ExaminerFirstId = userId
+				tempTest.ExaminerFirstScore = score
+			} else if topic.ScoreType == 2 && tempTest.ExaminerFirstId == -1 {
+				tempTest.ExaminerFirstId = userId
+				tempTest.ExaminerFirstScore = score
+			} else if topic.ScoreType == 2 && tempTest.ExaminerSecondId == -1 {
+				tempTest.ExaminerSecondId = userId
+				tempTest.ExaminerSecondScore = score
 			}
-			if underTest.Test_question_type == 4 || underTest.Test_question_type == 5 {
-				tempTest.Leader_id = userId
-				tempTest.Leader_score = score
-			} else if underTest.Test_question_type == 3 {
-				tempTest.Examiner_third_id = userId
-				tempTest.Examiner_third_score = score
+			if underTest.TestQuestionType == 4 || underTest.TestQuestionType == 5 {
+				tempTest.LeaderId = userId
+				tempTest.LeaderScore = score
+			} else if underTest.TestQuestionType == 3 {
+				tempTest.ExaminerThirdId = userId
+				tempTest.ExaminerThirdScore = score
 			}
 			if final {
-				tempTest.Final_score = score
+				tempTest.FinalScore = score
 
 			}
 			err = tempTest.Update()
@@ -543,11 +599,11 @@ func (c *ApiController) Point() {
 		}
 
 		record.Score = sum
-		record.Question_id = topic.Question_id
-		record.Test_id = testId
-		record.Test_record_type = underTest.Test_question_type
-		record.User_id = userId
-		record.Score_time = time.Now()
+		record.QuestionId = topic.QuestionId
+		record.TestId = testId
+		record.TestRecordType = underTest.TestQuestionType
+		record.UserId = userId
+		record.ScoreTime = time.Now()
 		err = record.Save()
 		if err != nil {
 			resp := Response{"10010", "insert record fail", err}
@@ -563,8 +619,7 @@ func (c *ApiController) Point() {
 
 func (c *ApiController) Problem() {
 	defer c.ServeJSON()
-	// var requestBody map[string]interface{}
-	var requestBody requests.TestProblem
+	var requestBody TestProblem
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
 	if err != nil {
 		resp := Response{"10001", "cannot unmarshal", err}
@@ -572,14 +627,19 @@ func (c *ApiController) Problem() {
 		return
 	}
 
-	userId := requestBody.UserId
+	userId, err := c.GetSessionUserId()
+	if err != nil {
+		resp := Response{Status: "10001", Msg: "get user info fail", Data: err}
+		c.Data["json"] = resp
+		return
+	}
 	problemType := requestBody.ProblemType
 	testId := requestBody.TestId
 	problemMessage := requestBody.ProblemMessage
 
-	var underTest models.UnderCorrectedPaper
-	var record models.ScoreRecord
-	var test models.TestPaper
+	var underTest model.UnderCorrectedPaper
+	var record model.ScoreRecord
+	var test model.TestPaper
 
 	err = underTest.GetUnderCorrectedPaper(userId, testId)
 	if err != nil {
@@ -595,10 +655,10 @@ func (c *ApiController) Problem() {
 		return
 	}
 
-	newUnderTest.User_id = userId
-	newUnderTest.Test_question_type = 6
-	newUnderTest.Problem_type = problemType
-	newUnderTest.Problem_message = problemMessage
+	newUnderTest.UserId = userId
+	newUnderTest.TestQuestionType = 6
+	newUnderTest.ProblemType = problemType
+	newUnderTest.ProblemMessage = problemMessage
 	has, _ := newUnderTest.IsDuplicate()
 	if !has {
 		err = newUnderTest.Save()
@@ -614,7 +674,7 @@ func (c *ApiController) Problem() {
 			return
 		}
 
-		test.Question_status = 3
+		test.QuestionStatus = 3
 		err = test.Update()
 		if err != nil {
 			resp := Response{"10005", "update testPaper fail", err}
@@ -623,12 +683,12 @@ func (c *ApiController) Problem() {
 		}
 	}
 
-	record.Test_record_type = 5
-	record.Test_id = testId
-	record.User_id = userId
-	record.Question_id = test.Question_id
-	record.Test_record_type = 5
-	record.Problem_type = problemType
+	record.TestRecordType = 5
+	record.TestId = testId
+	record.UserId = userId
+	record.QuestionId = test.QuestionId
+	record.TestRecordType = 5
+	record.ProblemType = problemType
 	err = record.Save()
 	if err != nil {
 		resp := Response{"10006", "insert record fail", err}
@@ -641,7 +701,7 @@ func (c *ApiController) Problem() {
 
 func (c *ApiController) Answer() {
 	defer c.ServeJSON()
-	var requestBody requests.TestAnswer
+	var requestBody TestRequest
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
 	if err != nil {
 		resp := Response{"10001", "cannot unmarshal", err}
@@ -649,33 +709,33 @@ func (c *ApiController) Answer() {
 		return
 	}
 	testId := requestBody.TestId
-	var test models.TestPaper
+	var test model.TestPaper
 	_, err = test.GetTestPaper(testId)
 	if err != nil {
 		resp := Response{"10002", "get testPaper fail", err}
 		c.Data["json"] = resp
 		return
 	}
-	var answerTest models.TestPaper
-	err = answerTest.GetTestPaperByQuestionIdAndQuestionStatus(test.Question_id, 5)
+	var answerTest model.TestPaper
+	err = answerTest.GetTestPaperByQuestionIdAndQuestionStatus(test.QuestionId, 5)
 	if err != nil {
 		resp := Response{"10003", "get testPaper fail", err}
 		c.Data["json"] = resp
 		return
 	}
 
-	var as responses.TestAnswer
+	var as TestAnswerResponse
 	var tempString []string
-	err = models.GetTestInfoPicListByTestId(answerTest.Test_id, &tempString)
+	err = model.GetTestInfoPicListByTestId(answerTest.TestId, &tempString)
 	if err != nil {
 		resp := Response{"10004", "get testPaperInfo fail", err}
 		c.Data["json"] = resp
 		return
 	}
-	//改成base64编码
+	// 改成base64编码
 	for i := 0; i < len(tempString); i++ {
 		picName := tempString[i]
-		//图片地址拼接 ，按服务器
+		// 图片地址拼接 ，按服务器
 		// src:="C:\\Users\\yang\\Desktop\\阅卷系统\\img\\"+picName
 		src := "./img/" + picName
 		bytes, err := os.ReadFile(src)
@@ -693,8 +753,9 @@ func (c *ApiController) Answer() {
 }
 
 func (c *ApiController) ExampleDetail() {
+	c.GetSessionUserId()
 	defer c.ServeJSON()
-	var requestBody requests.ExampleDetail
+	var requestBody ExampleDetail
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
 	if err != nil {
 		resp := Response{"10001", "cannot unmarshal", err}
@@ -703,17 +764,17 @@ func (c *ApiController) ExampleDetail() {
 	}
 	testId := requestBody.ExampleTestId
 	log.Println(testId)
-	//____________________________________________________________
-	var test models.TestPaper
+	// ____________________________________________________________
+	var test model.TestPaper
 	_, err = test.GetTestPaper(testId)
 	if err != nil {
 		resp := Response{"10002", "get testPaper fail", err}
 		c.Data["json"] = resp
 		return
 	}
-	var exampleTest []models.TestPaper
-	//??
-	err = models.GetTestPaperListByQuestionIdAndQuestionStatus(test.Question_id, 6, &exampleTest)
+	var exampleTest []model.TestPaper
+	// ??
+	err = model.GetTestPaperListByQuestionIdAndQuestionStatus(test.QuestionId, 6, &exampleTest)
 	if err != nil {
 		resp := Response{"10003", "get testPaper fail", err}
 		c.Data["json"] = resp
@@ -726,26 +787,26 @@ func (c *ApiController) ExampleDetail() {
 
 	}
 
-	var topic models.Topic
-	err = topic.GetTopic(exampleTest[0].Question_id)
+	var topic model.Topic
+	err = topic.GetTopic(exampleTest[0].QuestionId)
 	if err != nil {
 		resp := Response{"10005", "get topic fail", err}
 		c.Data["json"] = resp
 		return
 	}
-	var response responses.ExampleDetail
-	response.QuestionName = topic.Question_name
+	var response ExampleDetailResponse
+	response.QuestionName = topic.QuestionName
 	for i := 0; i < len(exampleTest); i++ {
-		var temp []models.TestPaperInfo
-		err = models.GetTestInfoListByTestId(exampleTest[i].Test_id, &temp)
+		var temp []model.TestPaperInfo
+		err = model.GetTestInfoListByTestId(exampleTest[i].TestId, &temp)
 		if err != nil {
 			resp := Response{"10006", "get testPaperInfo fail", err}
 			c.Data["json"] = resp
 			return
 		}
-		//转64编码
+		// 转64编码
 		for j := 0; j < len(temp); j++ {
-			picName := temp[j].Pic_src
+			picName := temp[j].PicSrc
 			// src:="C:\\Users\\yang\\Desktop\\阅卷系统\\img\\"+picName
 			src := "./img/" + picName
 			bytes, err := os.ReadFile(src)
@@ -756,7 +817,7 @@ func (c *ApiController) ExampleDetail() {
 				return
 			}
 			encoding := base64.StdEncoding.EncodeToString(bytes)
-			temp[j].Pic_src = encoding
+			temp[j].PicSrc = encoding
 		}
 		response.Test = append(response.Test, temp)
 	}
@@ -767,7 +828,7 @@ func (c *ApiController) ExampleDetail() {
 
 func (c *ApiController) ExampleList() {
 	defer c.ServeJSON()
-	var requestBody requests.ExampleList
+	var requestBody TestRequest
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
 	if err != nil {
 		resp := Response{"10001", "cannot unmarshal", err}
@@ -775,16 +836,16 @@ func (c *ApiController) ExampleList() {
 		return
 	}
 	testId := requestBody.TestId
-	//----------------------------------------------------------------------
-	var testPaper models.TestPaper
+	// ----------------------------------------------------------------------
+	var testPaper model.TestPaper
 	_, err = testPaper.GetTestPaper(testId)
 	if err != nil {
 		resp := Response{"10002", "get testPaper fail", err}
 		c.Data["json"] = resp
 		return
 	}
-	var response responses.ExampleList
-	err = models.GetTestPaperListByQuestionIdAndQuestionStatus(testPaper.Question_id, 6, &response.TestPapers)
+	var response ExampleListResponse
+	err = model.GetTestPaperListByQuestionIdAndQuestionStatus(testPaper.QuestionId, 6, &response.TestPapers)
 	if err != nil {
 		resp := Response{"10003", "get testPaper fail", err}
 		c.Data["json"] = resp
@@ -797,41 +858,47 @@ func (c *ApiController) ExampleList() {
 
 func (c *ApiController) Review() {
 	defer c.ServeJSON()
-	var requestBody requests.TestReview
-	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	var response TestReviewResponse
+
+	userId, err := c.GetSessionUserId()
 	if err != nil {
-		resp := Response{"10001", "cannot unmarshal", err}
+		resp := Response{Status: "10001", Msg: "get user info fail", Data: err}
 		c.Data["json"] = resp
 		return
 	}
-	userId := requestBody.UserId
-	var records []models.ScoreRecord
-	var response responses.TestReview
-	err = models.GetLatestRecords(userId, &records)
+
+	var records []model.ScoreRecord
+	err = model.GetLatestRecords(userId, &records)
 	if err != nil {
 		resp := Response{"10002", "get record fail", err}
 		c.Data["json"] = resp
 		return
 	}
 	for i := 0; i < len(records); i++ {
-		response.TestId = append(response.TestId, records[i].Test_id)
+		response.TestId = append(response.TestId, records[i].TestId)
 		response.Score = append(response.Score, records[i].Score)
-		response.ScoreTime = append(response.ScoreTime, records[i].Score_time)
+		response.ScoreTime = append(response.ScoreTime, records[i].ScoreTime)
 	}
 	resp := Response{"10000", "ok", response}
 	c.Data["json"] = resp
 }
+
 func (c *ApiController) ReviewPoint() {
 	defer c.ServeJSON()
-	var requestBody requests.TestPoint
+	var requestBody TestPoint
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
 	if err != nil {
 		resp := Response{"10001", "cannot unmarshal", err}
 		c.Data["json"] = resp
 		return
 	}
-	log.Println(requestBody)
-	userId := requestBody.UserId
+
+	userId, err := c.GetSessionUserId()
+	if err != nil {
+		resp := Response{Status: "10001", Msg: "get user info fail", Data: err}
+		c.Data["json"] = resp
+		return
+	}
 	scoresstr := requestBody.Scores
 	testId := requestBody.TestId
 	testDetailIdstr := requestBody.TestDetailId
@@ -839,7 +906,7 @@ func (c *ApiController) ReviewPoint() {
 	testDetailIds := strings.Split(testDetailIdstr, "-")
 	var scoreArr []int64
 	var sum int64 = 0
-	var record models.ScoreRecord
+	var record model.ScoreRecord
 	for _, i := range scores {
 		j, err := strconv.ParseInt(i, 10, 64)
 		sum += j
@@ -849,69 +916,69 @@ func (c *ApiController) ReviewPoint() {
 		scoreArr = append(scoreArr, j)
 	}
 
-	var test models.TestPaper
+	var test model.TestPaper
 	_, err = test.GetTestPaper(testId)
-	if err != nil || test.Test_id == 0 {
+	if err != nil || test.TestId == 0 {
 		resp := Response{"10002", "get test paper fail", err}
 		c.Data["json"] = resp
 		return
 	}
-	//判断是否二次阅卷
-	var topic models.Topic
-	topic.GetTopic(test.Question_id)
-	scoreType := topic.Score_type
+	// 判断是否二次阅卷
+	var topic model.Topic
+	topic.GetTopic(test.QuestionId)
+	scoreType := topic.ScoreType
 
 	num := 0
-	if test.Examiner_first_id == userId {
+	if test.ExaminerFirstId == userId {
 		num = 0
-		test.Examiner_first_score = sum
+		test.ExaminerFirstScore = sum
 		if scoreType == 1 {
-			test.Final_score = sum
-			record.Test_finish = 1
+			test.FinalScore = sum
+			record.TestFinish = 1
 		}
-		var record models.ScoreRecord
+		var record model.ScoreRecord
 		record.GetRecordByTestId(testId, userId)
 		record.Score = sum
 		record.Update()
 
-	} else if test.Examiner_second_id == userId {
+	} else if test.ExaminerSecondId == userId {
 		num = 1
-		test.Examiner_second_score = sum
-		var record models.ScoreRecord
+		test.ExaminerSecondScore = sum
+		var record model.ScoreRecord
 		record.GetRecordByTestId(testId, userId)
 		record.Score = sum
 		record.Update()
 	} else {
 		num = 2
-		test.Examiner_third_score = sum
-		var record models.ScoreRecord
+		test.ExaminerThirdScore = sum
+		var record model.ScoreRecord
 		record.GetRecordByTestId(testId, userId)
 		record.Score = sum
 		record.Update()
 	}
 	err = test.Update()
-	if err != nil || test.Test_id == 0 {
+	if err != nil || test.TestId == 0 {
 		resp := Response{"10003", "update test paper fail", err}
 		c.Data["json"] = resp
 		return
 	}
 
 	for i := 0; i < len(testDetailIds); i++ {
-		var testInfo models.TestPaperInfo
+		var testInfo model.TestPaperInfo
 		testInfoId, _ := strconv.ParseInt(testDetailIds[i], 10, 64)
 		testInfo.GetTestPaperInfo(testInfoId)
 		if num == 0 {
-			testInfo.Examiner_first_score = scoreArr[i]
+			testInfo.ExaminerFirstScore = scoreArr[i]
 			if scoreType == 1 {
-				testInfo.Final_score = scoreArr[i]
+				testInfo.FinalScore = scoreArr[i]
 			}
 		} else if num == 1 {
-			testInfo.Examiner_second_score = scoreArr[i]
+			testInfo.ExaminerSecondScore = scoreArr[i]
 		} else {
-			testInfo.Examiner_third_score = scoreArr[i]
+			testInfo.ExaminerThirdScore = scoreArr[i]
 		}
 		err = testInfo.Update()
-		if err != nil || test.Test_id == 0 {
+		if err != nil || test.TestId == 0 {
 			resp := Response{"10004", "update testinfo paper fail", err}
 			c.Data["json"] = resp
 			return
@@ -920,28 +987,25 @@ func (c *ApiController) ReviewPoint() {
 	c.Data["json"] = Response{"10000", "ok", nil}
 }
 
-//自评列表 chen
+// 自评列表 chen
 func (c *ApiController) SelfScoreList() {
 	defer c.ServeJSON()
-	var requestBody requests.TestList
-	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	var response TestListResponse
+
+	userId, err := c.GetSessionUserId()
 	if err != nil {
-		resp := Response{"10001", "cannot unmarshal", err}
+		resp := Response{Status: "10001", Msg: "get user info fail", Data: err}
 		c.Data["json"] = resp
 		return
 	}
-	log.Println(requestBody)
-	userId := requestBody.UserId
-	var response responses.TestList
-	//----------------------------------------------------
 
-	err = models.GetUnMarkSelfTestIdPaperByUserId(userId, &response.TestId)
+	err = model.GetUnMarkSelfTestIdPaperByUserId(userId, &response.TestIds)
 	if err != nil {
 		resp := Response{"10002", "get distribution fail", err}
 		c.Data["json"] = resp
 		return
 	}
-	if len(response.TestId) == 0 {
+	if len(response.TestIds) == 0 {
 		resp := Response{"10003", "there is no paper to correct", err}
 		c.Data["json"] = resp
 		return
@@ -953,44 +1017,43 @@ func (c *ApiController) SelfScoreList() {
 
 }
 
-///**
-//20.自评卷打分
-//*/
-//func (c *ApiController) SelfMarkPoint() {
-//	defer c.ServeJSON()
-//	var requestBody requests.TestPoint
+// /**
+// 20.自评卷打分
+// */
+// func (c *ApiController) SelfMarkPoint() {
+// 	defer c.ServeJSON()
+// 	var requestBody TestPoint
 //
+// 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+// 	if err != nil {
+// 		c.Data["json"] = Response{"10001", "cannot unmarshal", err}
+// 		return
+// 	}
+// 	userId, err := c.GetSessionUserId()
+// 	if err != nil {
+// 		resp := Response{Status: "10001", Msg: "get user info fail", Data: err}
+// 		c.Data["json"] = resp
+// 		return
+// 	}
+// 	testId := requestBody.TestIds
+// 	scoreStr := requestBody.Scores
+// 	testDetailIdStr := requestBody.TestDetailId
+// 	testDetailIds := strings.Split(testDetailIdStr, "-")
+// 	scores := strings.Split(scoreStr, "-")
 //
-//	err=json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
-//	if err!=nil {
-//		resp = Response{"10001","cannot unmarshal",err}
-//		c.Data["json"] = resp
-//		return
-//	}
-//	userId := requestBody.UserId
-//	testId := requestBody.TestId
-//	scoreStr:= requestBody.Scores
-//	testDetailIdStr:=requestBody.TestDetailId
-//	testDetailIds := strings.Split(testDetailIdStr, "-")
-//	scores := strings.Split(scoreStr, "-")
+// 	// ---------------------------------------------------------------------------------------
 //
-//	//---------------------------------------------------------------------------------------
+// 	// 查找大题
+// 	var test model.TestPaper
+// 	_, err = test.GetTestPaper(testId)
+// 	if err != nil || test.TestIds == 0 {
+// 		resp := Response{"10002", "get test paper fail", err}
+// 		c.Data["json"] = resp
+// 		return
+// 	}
+// 	var topic model.Topic
+// 	topic.GetTopic(test.QuestionId)
 //
-//
-//   //查找大题
-//	var test models.TestPaper
-//	_,err = test.GetTestPaper(testId)
-//	if err != nil || test.Test_id == 0 {
-//		resp := Response{"10002", "get test paper fail", err}
-//		c.Data["json"] = resp
-//		return
-//	}
-//	var topic models.Topic
-//	topic.GetTopic(test.Question_id)
-//
-//
-//
-//	//----------------------------------------
-//	resp = Response{"10000", "OK", nil}
-//	c.Data["json"] = resp
-//}
+// 	// ----------------------------------------
+// 	c.Data["json"] = Response{"10000", "OK", nil}
+// }

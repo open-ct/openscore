@@ -16,9 +16,10 @@ package controllers
 
 import (
 	"encoding/gob"
+	"errors"
 
 	"github.com/astaxie/beego"
-	"github.com/casdoor/casdoor-go-sdk/auth"
+	auth "github.com/casdoor/casdoor-go-sdk/casdoorsdk"
 )
 
 type ApiController struct {
@@ -85,4 +86,12 @@ func (c *ApiController) GetSessionUsername() string {
 	}
 
 	return GetUserName(user)
+}
+
+func (c *ApiController) GetSessionUserId() (int64, error) {
+	id, ok := c.Controller.GetSession("userId").(int64)
+	if !ok {
+		return 0, errors.New("not login")
+	}
+	return id, nil
 }
