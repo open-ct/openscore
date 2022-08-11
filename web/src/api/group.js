@@ -11,6 +11,10 @@ axios.defaults.baseURL = getServerUrl();
 axios.defaults.headers["Content-Type"] = "application/x-www-form-urlencoded;charset=UTF-8";
 const group = {
 
+  UserLogin(data) {
+    return axios.post("/login", data);
+  },
+
   userInfo(data) {
     return axios.post("/marking/supervisor/user/info", data);
   },

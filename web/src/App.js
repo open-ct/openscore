@@ -1,32 +1,21 @@
-import React from "react";
 import {BrowserRouter, Route} from "react-router-dom";
 import "./App.less";
-import AuthCallback from "./AuthCallback";
+import AuthCallback from "./auth/AuthCallback";
 import Home from "./views/Home";
-import * as Setting from "./Setting";
-import * as Conf from "./Conf";
+import Login from "./views/Login/chooserole";
+import normalLogin from "./views/Login/normaluser";
 
-class App extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      classes: props,
-    };
-
-    Setting.initServerUrl();
-    Setting.initCasdoorSdk(Conf.AuthConfig);
-  }
-
-  render() {
-    return (
-      <div className="App">
-        <BrowserRouter>
-          <Route path="/" component={Home} />
-          <Route exact path="/callback" component={AuthCallback} />
-        </BrowserRouter>
-      </div>
-    );
-  }
+function App() {
+  return (
+    <div className="App">
+      <BrowserRouter>
+        <Route path="/" exact component={Login} />
+        <Route path="/login" component={normalLogin} />
+        <Route path="/callback" component={AuthCallback} />
+        <Route path="/home" component={Home} />
+      </BrowserRouter>
+    </div>
+  );
 }
 
 export default App;
