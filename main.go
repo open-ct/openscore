@@ -18,12 +18,12 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/plugins/cors"
 	_ "github.com/astaxie/beego/session/redis"
-	"github.com/open-ct/openscore/models"
-	routers "github.com/open-ct/openscore/routers"
+	"github.com/open-ct/openscore/model"
+	"github.com/open-ct/openscore/routers"
 )
 
 func main() {
-	models.InitAdapter()
+	model.InitAdapter()
 
 	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
 		AllowOrigins:     []string{"*"},

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package models
+package model
 
 import (
 	"fmt"
@@ -128,14 +128,6 @@ func (a *Adapter) createTable() {
 	}
 
 	err = a.engine.Sync2(new(UnderCorrectedPaper))
-	if err != nil {
-		panic(err)
-	}
-
-	err = a.engine.Sync2(new(PaperDistribution))
-	if err != nil {
-		panic(err)
-	}
 	if err != nil {
 		panic(err)
 	}
