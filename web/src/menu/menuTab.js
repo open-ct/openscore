@@ -36,15 +36,15 @@ export default [
     chidPermissions: [
     ],
   },
-  // {
-  //     key: "selfMark",
-  //     userPermission: "阅卷员",
-  //     menu_name: "自评",
-  //     menu_url: "/home/selfMark",
-  //     icon: "SolutionOutlined",
-  //     chidPermissions: [
-  //     ]
-  // },
+  {
+    key: "selfMark",
+    userPermission: "阅卷员",
+    menu_name: "自评",
+    menu_url: "/home/selfMark",
+    icon: "SolutionOutlined",
+    chidPermissions: [
+    ],
+  },
   {
     key: "mark_monitor",
     userPermission: "组长",
@@ -144,16 +144,15 @@ export default [
       },
     ],
   },
-  {
-    key: "group_user_management",
-    userPermission: "组长",
-    menu_name: "用户管理",
-    menu_url: "/home/group/userMonitor",
-    icon: "UserOutlined",
-    chidPermissions: [
-    ],
-  },
-
+  // {
+  //     key: "group_user_management",
+  //     userPermission: "组长",
+  //     menu_name: "用户管理",
+  //     menu_url: "/home/group/userMonitor",
+  //     icon: "UserOutlined",
+  //     chidPermissions: [
+  //     ]
+  // },
   {
     key: "paper_management",
     userPermission: "管理员",
@@ -188,15 +187,6 @@ export default [
         chidPermissions: [
         ],
       },
-      {
-        key: "paper_manage",
-        userPermission: "管理员",
-        menu_name: "试卷管理",
-        menu_url: "/home/management/paper_manage",
-        icon: "",
-        chidPermissions: [
-        ],
-      },
     ],
   },
   {
@@ -206,15 +196,6 @@ export default [
     menu_url: "/home/management/user",
     icon: "UserOutlined",
     chidPermissions: [
-      {
-        key: "user_export",
-        userPermission: "管理员",
-        menu_name: "导入导出用户",
-        menu_url: "/home/management/user/user_export",
-        icon: "",
-        chidPermissions: [
-        ],
-      },
       {
         key: "user_manage",
         userPermission: "管理员",
@@ -226,6 +207,70 @@ export default [
       },
     ],
   },
+  {
+    key: "all_mark_monitor",
+    userPermission: "管理员",
+    menu_name: "评卷监控",
+    menu_url: "/home/markMonitor",
+    icon: "FormOutlined",
+    chidPermissions: [
+      {
+        key: "teacher",
+        userPermission: "管理员",
+        menu_name: "教师监控",
+        menu_url: "/home/markMonitor/teacher",
+        icon: "",
+        chidPermissions: [
+        ],
+      },
+      {
+        key: "score",
+        userPermission: "管理员",
+        menu_name: "分值分布",
+        menu_url: "/home/markMonitor/score",
+        icon: "",
+        chidPermissions: [
+        ],
+      },
+      {
+        key: "self",
+        userPermission: "管理员",
+        menu_name: "自评监控",
+        menu_url: "/home/markMonitor/self",
+        icon: "",
+        chidPermissions: [
+        ],
+      },
+      {
+        key: "average",
+        userPermission: "管理员",
+        menu_name: "平均分监控",
+        menu_url: "/home/markMonitor/average",
+        icon: "",
+        chidPermissions: [
+        ],
+      },
+      {
+        key: "standard",
+        userPermission: "管理员",
+        menu_name: "标准差监控",
+        menu_url: "/home/markMonitor/standard",
+        icon: "",
+        chidPermissions: [
+        ],
+      },
+      {
+        key: "all",
+        userPermission: "管理员",
+        menu_name: "总进度监控",
+        menu_url: "/home/markMonitor/all",
+        icon: "",
+        chidPermissions: [
+        ],
+      },
+    ],
+  },
+
 ];
 // 生成左边菜单
 // export function bindMenu(menulist) {

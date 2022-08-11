@@ -1,25 +1,22 @@
 import React, {Component} from "react";
 import DocumentTitle from "react-document-title";
-import {Button, Input, Modal, Select, message} from "antd";
-import {ExclamationCircleOutlined} from "@ant-design/icons";
+import {Button, Input, Select, message} from "antd";
 import "./index.less";
 import Manage from "../../../../api/manage";
+import manage from "../../../../api/manage";
 const {Option} = Select;
+
 export default class index extends Component {
 
     adminId = "1"
 
     state = {
-      subjectList: [],
-      questionList: [],
-      ImportTestNumber: undefined,
-      OnlineNumber: undefined,
-      testNumber: undefined,
-      userNumber: undefined,
+      subjectList: [],  // 获取学科列表
+      questionList: [], // 获取对应学科的大题列表
+      allotNum: [],      // 记录对应大题的人数
+      headmanNum: 0, // 组长数量
       subjectValue: undefined,
-      questionValue: undefined,
       loading: false,
-      ScoreType: undefined,
     }
 
     componentDidMount() {
@@ -50,21 +47,17 @@ export default class index extends Component {
       }
       return subjectOption;
     }
+
     subjectSelect = (e) => {
       this.setState({
         subjectValue: e,
-        questionValue: undefined,
       });
       Manage.questionList({adminId: this.adminId, subjectName: e})
         .then((res) => {
           if (res.data.status === "10000") {
             this.setState({
               questionList: res.data.data.questionsList,
-              ImportTestNumber: undefined,
-              OnlineNumber: undefined,
-              ScoreType: undefined,
-              testNumber: undefined,
-              userNumber: undefined,
+              allotNum: new Array(res.data.data.questionsList.length).fill(0),
             });
           }
         })
@@ -72,73 +65,32 @@ export default class index extends Component {
           console.log(e);
         });
     }
-    getQuestionOption = () => {
-      let questionOption;
+
+    getQuestionAllot = () => {
+      let subjectOption;
+
       if (this.state.questionList.length) {
-        questionOption = this.state.questionList.map(item => {
-          return <Option key={item.QuestionId} value={item.QuestionId}>{item.QuestionName}</Option>;
+        subjectOption = this.state.questionList.map((item, index) => {
+          return <div className="setting-box" key={index}>
+            {item.QuestionName} ：
+            <Input style={{width: 200}} placeholder="请输入本题需要的人数"
+              onChange={e => {
+                let nowAllot = this.state.allotNum;
+                nowAllot[index] = e.target.value;
+                this.setState({
+                  allotNum: nowAllot,
+                });
+                console.log(this.state.allotNum);
+              }}
+            />
+          </div>;
         });
       } else {
         return null;
       }
-      return questionOption;
+      return subjectOption;
     }
-    questionSelect = (e) => {
-      this.setState({
-        questionValue: e,
-      });
-      Manage.distributeInfo({adminId: this.adminId, questionId: e})
-        .then((res) => {
-          if (res.data.status === "10000") {
-            this.setState({
-              ImportTestNumber: res.data.data.distributionInfoVO.ImportTestNumber,
-              OnlineNumber: res.data.data.distributionInfoVO.OnlineNumber,
-              ScoreType: res.data.data.distributionInfoVO.ScoreType,
-            });
-          }
-        })
-        .catch((e) => {
-          console.log(e);
-        });
-    }
-    distributePaper = () => {
-      console.log(this.state.questionValue, this.state.testNumber, this.state.userNumber);
-      if (this.state.questionValue !== undefined && this.state.testNumber && this.state.userNumber) {
-        Modal.confirm({
-          title: "确认分配",
-          icon: <ExclamationCircleOutlined />,
-          content: "",
-          okText: "确认",
-          cancelText: "取消",
-          onOk: () => {
-            this.setState({
-              loading: true,
-            });
-            Manage.distributePaper({adminId: this.adminId, questionId: this.state.questionValue, testNumber: Number(this.state.testNumber), userNumber: Number(this.state.userNumber)})
-              .then((res) => {
-                if (res.data.status === "10000") {
-                  this.setState({
-                    loading: false,
-                    questionList: [],
-                    ImportTestNumber: undefined,
-                    OnlineNumber: undefined,
-                    testNumber: undefined,
-                    userNumber: undefined,
-                    questionValue: undefined,
-                    ScoreType: undefined,
-                  });
-                  message.success("试卷分配成功！");
-                }
-              })
-              .catch((e) => {
-                console.log(e);
-              });
-          },
-        });
-      } else {
-        message.warning("请将试卷分配信息填写完整！");
-      }
-    }
+
     goToDetail = () => {
       if (this.state.subjectValue) {
         this.props.history.push({pathname: "/home/management/detailTable", query: {subjectName: this.state.subjectValue}});
@@ -146,22 +98,33 @@ export default class index extends Component {
         message.warning("请先选择科目！");
       }
     }
-    ScoreType = () => {
-      console.log("111111");
-      if (this.state.ScoreType === 1) {
-        return "否";
-      } else if (this.state.ScoreType !== 1) {
-        return "是";
-      }else {
-        return null;
+
+    sendForm = () => {
+      let listNum = this.state.questionList.length;
+      let list = [];
+      for(let i = 0;i < listNum;i++) {
+        let item = {
+          id: this.state.questionList[i].QuestionId,
+          num: Number(this.state.allotNum[i]),
+        };
+        list.push(item);
       }
+
+      let subjectName = this.state.subjectValue;
+      const data = {
+        subject_name: subjectName,
+        supervisor_number: Number(this.state.headmanNum),
+        list: list,
+      };
+      manage.subjectAllot(data);
     }
+
     render() {
       return (
         <DocumentTitle title="试卷管理-试卷分配">
           <div className="allot-page" data-component="allot-page">
             <div className="subject-setting">
-              <div className="setting-header">试卷设置</div>
+              <div className="setting-header">学科设置</div>
               <div className="setting-box">
                 <div className="setting-input">
                   <div className="setting-item">
@@ -171,61 +134,31 @@ export default class index extends Component {
                       onSelect={(e) => {this.subjectSelect(e);}}
                       value={this.state.subjectValue}
                     >
-                      {
-                        this.getSubjectOption()
-                      }
+                      {this.getSubjectOption()}
                     </Select>
                   </div>
                   <div className="setting-item">
-                                    题号选择：<Select
-                      style={{width: 120}}
-                      placeholder="请选择题号"
-                      onSelect={(e) => {this.questionSelect(e);}}
-                      value={this.state.questionValue}
-                    >
-                      {
-                        this.getQuestionOption()
-                      }
-                    </Select>
+                                    组长人数：
+                    <Input style={{width: 200}}
+                      placeholder="请输入本学科需要的组长数"
+                      onChange={e => {
+                        this.setState({
+                          headmanNum: e.target.value,
+                        });
+                      }}
+                    />
                   </div>
                 </div>
               </div>
             </div>
             <div className="question-setting">
               <div className="setting-header">人数分配</div>
-              <div className="setting-box">
-                <div className="setting-input">
-                  <div className="setting-item">
-                                    目前可分配人数：{this.state.OnlineNumber}
-                  </div>
-                  <div className="setting-item">
-                                    未分配试卷数：{this.state.ImportTestNumber}
-                  </div>
-                  <div className="setting-item">
-                                    是否需要二次阅卷：{this.ScoreType()}
-                  </div>
-                </div>
-                <div className="setting-input" style={{marginTop: 24}}>
-                  <div className="setting-item">
-                                    设置分配人数：<Input placeholder="小于分配人数" value={this.state.userNumber} style={{width: 120}} onChange={e => {
-                      this.setState({
-                        userNumber: e.target.value,
-                      });
-                    }} />
-                  </div>
-                  <div className="setting-item">
-                                    设置分配试卷数：<Input placeholder="小于未分配试卷数" value={this.state.testNumber} style={{width: 120}} onChange={e => {
-                      this.setState({
-                        testNumber: e.target.value,
-                      });
-                    }} />
-                  </div>
-                </div>
-              </div>
+              {this.getQuestionAllot()}
             </div>
-            <Button type="primary" onClick={() => {this.distributePaper();}} loading={this.state.loading}>确认</Button>
+            <Button type="primary" onClick={() => {this.sendForm();}} loading={this.state.loading}>确认</Button>
             <Button type="default" style={{marginLeft: "20px"}} onClick={() => {this.goToDetail();}}>查看详情</Button>
           </div>
+
         </DocumentTitle>
       );
     }
