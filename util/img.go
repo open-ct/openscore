@@ -2,7 +2,6 @@ package util
 
 import (
 	"bufio"
-	"bytes"
 	"flag"
 	"fmt"
 	auth "github.com/casdoor/casdoor-go-sdk/casdoorsdk"
@@ -10,7 +9,6 @@ import (
 	"image/color"
 	"image/draw"
 	"image/png"
-	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -111,22 +109,16 @@ func UploadPic(name string, text string) (src string) {
 		log.Println(err)
 		os.Exit(1)
 	}
-	fileBytes := getFileBytes(outFile)
+	fileBytes, err := ioutil.ReadFile(newPath)
+	if err != nil {
+		panic(err)
+	}
 
 	fileUrl := UploadFileToStorage(name, fileBytes)
 
 	os.Remove(newPath)
 	fmt.Println("Wrote out.png OK.")
 	return fileUrl
-}
-
-func getFileBytes(file *os.File) []byte {
-	buf := bytes.NewBuffer(nil)
-	if _, err := io.Copy(buf, file); err != nil {
-		panic(err)
-	}
-
-	return buf.Bytes()
 }
 
 func UploadFileToStorage(name string, fileBytes []byte) string {
