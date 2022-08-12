@@ -93,7 +93,6 @@ func init() {
 		beego.NSRouter("/subjectList", api, "post:SubjectList"),
 		beego.NSRouter("/topicList", api, "post:TopicList"),
 		// beego.NSRouter("/distributionRecord", api, "post:DistributionRecord"), // Deprecated
-		beego.NSRouter("/img", api, "post:Pic"),
 		beego.NSRouter("/createUser", api, "post:CreateUser"),
 		beego.NSRouter("/deleteUser", api, "post:DeleteUser"),
 		beego.NSRouter("/updateUser", api, "post:UpdateUser"),

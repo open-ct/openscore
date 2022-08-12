@@ -12,6 +12,7 @@ import (
 	"log"
 	"os"
 
+	auth "github.com/casdoor/casdoor-go-sdk/casdoorsdk"
 	"github.com/golang/freetype"
 	"github.com/golang/freetype/truetype"
 	"golang.org/x/image/font"
@@ -20,7 +21,7 @@ import (
 
 var (
 	dpi      = flag.Float64("dpi", 200, "screen resolution in Dots Per Inch")
-	fontfile = flag.String("fontfile", "./simhei.ttf", "filename of the ttf font")
+	fontfile = flag.String("fontfile", "./font/simhei.ttf", "filename of the ttf font")
 	size     = flag.Float64("size", 20, "font size in points")
 	spacing  = flag.Float64("spacing", 1.5, "line spacing (e.g. 2 means double spaced)")
 	width    = 1024
@@ -87,8 +88,8 @@ func UploadPic(name string, text string) (src string) {
 	}
 
 	// Save that RGBA image to disk.
-	name = name + ".png"
-	newPath := "./img/" + name
+	name += ".png"
+	newPath := "./" + name
 
 	outFile, err := os.Create(newPath)
 	if err != nil {
@@ -108,6 +109,24 @@ func UploadPic(name string, text string) (src string) {
 		log.Println(err)
 		os.Exit(1)
 	}
+	fileBytes, err := ioutil.ReadFile(newPath)
+	if err != nil {
+		panic(err)
+	}
+
+	fileUrl := UploadFileToStorage(name, fileBytes)
+
+	os.Remove(newPath)
 	fmt.Println("Wrote out.png OK.")
-	return name
+	return fileUrl
+}
+
+func UploadFileToStorage(name string, fileBytes []byte) string {
+	fullFilePath := fmt.Sprintf("openscore/img/%s", name)
+	fileUrl, _, err := auth.UploadResource("admin", "", "", fullFilePath, fileBytes)
+	if err != nil {
+		panic(err)
+	}
+
+	return fileUrl
 }

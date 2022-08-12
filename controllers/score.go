@@ -1,11 +1,9 @@
 package controllers
 
 import (
-	"encoding/base64"
 	"encoding/json"
 	"log"
 	"math"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -60,20 +58,7 @@ func (c *ApiController) Display() {
 		tempSubTopic := SubTopicPlus{SubTopic: subTopic[i], TestDetailId: testPaperInfo.TestDetailId}
 
 		response.SubTopics = append(response.SubTopics, tempSubTopic)
-		picName := testPaperInfo.PicSrc
-		// 图片地址拼接 ，按服务器
-		// src := "C:\\Users\\yang\\Desktop\\阅卷系统\\img\\" + picName
-		src := "./img/" + picName
-
-		bytes, err := os.ReadFile(src)
-		if err != nil {
-			log.Println(err)
-			resp := Response{"30020", "get 图片显示异常 ", err}
-			c.Data["json"] = resp
-			return
-		}
-		encoding := base64.StdEncoding.EncodeToString(bytes)
-		tempTestPaperInfo := TestPaperInfoPlus{TestPaperInfo: testPaperInfo, PicCode: encoding}
+		tempTestPaperInfo := TestPaperInfoPlus{TestPaperInfo: testPaperInfo, PicCode: testPaperInfo.PicSrc}
 		response.TestInfos = append(response.TestInfos, tempTestPaperInfo)
 	}
 	response.QuestionId = topic.QuestionId
@@ -732,22 +717,9 @@ func (c *ApiController) Answer() {
 		c.Data["json"] = resp
 		return
 	}
-	// 改成base64编码
-	for i := 0; i < len(tempString); i++ {
-		picName := tempString[i]
-		// 图片地址拼接 ，按服务器
-		// src:="C:\\Users\\yang\\Desktop\\阅卷系统\\img\\"+picName
-		src := "./img/" + picName
-		bytes, err := os.ReadFile(src)
-		if err != nil {
-			log.Println(err)
-			resp := Response{"30020", "get 图片显示异常 ", err}
-			c.Data["json"] = resp
-			return
-		}
-		encoding := base64.StdEncoding.EncodeToString(bytes)
-		as.Pics = append(as.Pics, encoding)
-	}
+
+	as.Pics = tempString
+
 	resp := Response{"10000", "ok", as}
 	c.Data["json"] = resp
 }
@@ -804,21 +776,7 @@ func (c *ApiController) ExampleDetail() {
 			c.Data["json"] = resp
 			return
 		}
-		// 转64编码
-		for j := 0; j < len(temp); j++ {
-			picName := temp[j].PicSrc
-			// src:="C:\\Users\\yang\\Desktop\\阅卷系统\\img\\"+picName
-			src := "./img/" + picName
-			bytes, err := os.ReadFile(src)
-			if err != nil {
-				log.Println(err)
-				resp := Response{"30020", "get 图片显示异常 ", err}
-				c.Data["json"] = resp
-				return
-			}
-			encoding := base64.StdEncoding.EncodeToString(bytes)
-			temp[j].PicSrc = encoding
-		}
+
 		response.Test = append(response.Test, temp)
 	}
 	resp := Response{"10000", "ok", response}
