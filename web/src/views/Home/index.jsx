@@ -170,9 +170,14 @@ export default class index extends Component {
     renderAccount() {
       if (this.state.account === undefined || this.state.account === null) {
         return (
-          <a href={Setting.getSigninUrl()} style={{color: "#ffffff", marginLeft: "50px"}}>
-                    登录
-          </a>
+          <>
+            <a href={Setting.getSigninUrl()} style={{color: "#ffffff", marginLeft: "50px"}}>
+              管理员登录
+            </a>
+            <a onClick={() => {Setting.goToLink("/normalLogin");}} style={{color: "#ffffff", marginLeft: "50px"}}>
+              组长/阅卷老师登录
+            </a>
+          </>
         );
       } else {
         return (

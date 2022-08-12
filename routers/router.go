@@ -23,8 +23,8 @@ func init() {
 
 	api := new(controllers.ApiController)
 	beego.Router("/", api)
-	beego.Router("/api/login", api, "post:SignIn")
-	beego.Router("/api/logout", api, "post:SignOut")
+	beego.Router("/api/signin", api, "post:SignIn")
+	beego.Router("/api/signout", api, "post:SignOut")
 	beego.Router("/api/get-account", api, "get:GetAccount")
 
 	beego.Router("/openct/login", api, "post:UserLogin")
