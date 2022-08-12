@@ -27,3 +27,4 @@ logs/
 files/
 lastupdate.tmp
 commentsRouter*.go
+app.conf

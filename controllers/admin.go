@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -400,6 +399,7 @@ func (c *ApiController) WriteUserExcel() {
 */
 func (c *ApiController) ReadExcel() {
 	c.Ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin", c.Ctx.Request.Header.Get("Origin"))
+	defer c.ServeJSON()
 	var resp Response
 
 	file, header, err := c.GetFile("excel")
@@ -490,9 +490,6 @@ func (c *ApiController) ReadExcel() {
 			smallIndex++
 		}
 	}
-
-	fmt.Println("----- 1: ", bigQuestions, " -----")
-	fmt.Println("----- 1: ", smallQuestions, " -----")
 
 	for _, r := range rows[1:] {
 		row := make([]string, len(rows[0]))
@@ -1240,73 +1237,6 @@ func (c *ApiController) SubjectList() {
 //
 // }
 
-/**
-8.图片显示
-*/
-func (c *ApiController) Pic() {
-	defer c.ServeJSON()
-	var requestBody ReadFile
-	var resp Response
-	var err error
-	err = json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
-	if err != nil {
-		log.Println(err)
-		resp = Response{"10001", "cannot unmarshal", err}
-		c.Data["json"] = resp
-		return
-	}
-	// supervisorId := requestBody.SupervisorId
-	// 获取图片名
-	picName := requestBody.PicName
-	// 获取图片地址（win版）
-	src := "C:\\Users\\chen\\go\\src\\open-ct\\img\\" + picName
-	// linux版（）
-	// var src := "/usr/workspace/src/open-ct/"+name
-
-	// -------------------------------------
-	bytes, err := os.ReadFile(src)
-	encoding := base64.StdEncoding.EncodeToString(bytes)
-	if err != nil {
-		log.Println(err)
-		resp = Response{"30020", "图片显示异常 ", err}
-		c.Data["json"] = resp
-		return
-	}
-	// c.Ctx.Output.Header("Content-Type", "image/jpeg")
-	// c.Ctx.Output.Header("Content-Length", strconv.Itoa(len(data)))
-	// c.Ctx.WriteString(string(data))
-	// c.Ctx.ResponseWriter.WriteHeader(200)
-	// ----------------------------
-	data := make(map[string]interface{})
-	data["encoding"] = encoding
-	resp = Response{"10000", "OK", data}
-	c.Data["json"] = resp
-}
-
-/**
-数组转置函数
-*/
-func revers(users []model.User) {
-	for i := 0; i < len(users)/2; i++ {
-		var temp model.User
-		temp = users[i]
-		users[i] = users[len(users)-i-1]
-		users[len(users)-i-1] = temp
-	}
-}
-
-func cutUser(oldData []model.User, n int) (newData []model.User) {
-	newData1 := make([]model.User, n)
-	for i := 0; i < n; i++ {
-		newData1[i] = oldData[i]
-	}
-	return newData1
-}
-
-/**
-9.大题展示列表
-*/
-
 func (c *ApiController) TopicList() {
 	defer c.ServeJSON()
 	var resp Response
@@ -1449,9 +1379,9 @@ func (c *ApiController) DeleteTest() {
 			testPaperInfos := make([]model.TestPaperInfo, 0)
 			model.FindTestPaperInfoByQuestionDetailId(subTopic.QuestionDetailId, &testPaperInfos)
 			for k := 0; k < len(testPaperInfos); k++ {
-				picName := testPaperInfos[k].PicSrc
-				src := "./img/" + picName
-				os.Remove(src)
+				// picName := testPaperInfos[k].PicSrc
+				// src := "./img/" + picName
+				// os.Remove(src)
 				testPaperInfos[k].Delete()
 			}
 		}
