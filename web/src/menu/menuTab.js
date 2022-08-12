@@ -206,20 +206,20 @@ export default [
     menu_url: "/home/management/user",
     icon: "UserOutlined",
     chidPermissions: [
-      {
-        key: "user_export",
-        userPermission: "管理员",
-        menu_name: "导入导出用户",
-        menu_url: "/home/management/user/user_export",
-        icon: "",
-        chidPermissions: [
-        ],
-      },
+      // {
+      //   key: "user_export",
+      //   userPermission: "管理员",
+      //   menu_name: "导入导出用户",
+      //   menu_url: "/home/management/user/user_export",
+      //   icon: "",
+      //   chidPermissions: [
+      //   ],
+      // },
       {
         key: "user_manage",
         userPermission: "管理员",
         menu_name: "用户管理",
-        menu_url: "/home/management/user/user_manage",
+        menu_url: "/home/management/user_manage/user_manage",
         icon: "",
         chidPermissions: [
         ],
