@@ -14,7 +14,7 @@ export async function login(account, password) {
     }).then(res => {
       resolve(res.data);
     }).catch(error => {
-      console.log(error);
+      Settings.showMessage("error", error);
     });
   });
 }

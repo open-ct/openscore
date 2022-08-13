@@ -5,7 +5,6 @@ import AuthCallback from "./AuthCallback";
 import Home from "./views/Home";
 import * as Setting from "./Setting";
 import * as Conf from "./Conf";
-import normalLogin from "./views/Login/normaluser";
 
 class App extends React.Component {
   constructor(props) {
@@ -24,8 +23,6 @@ class App extends React.Component {
         <BrowserRouter>
           <Route path="/" component={Home} />
           <Route exact path="/callback" component={AuthCallback} />
-          <Route path="/normalLogin" component={normalLogin} />
-          <Route path="/home" component={Home} />
         </BrowserRouter>
       </div>
     );

@@ -76,6 +76,7 @@ func (c *ApiController) List() {
 	if err != nil {
 		resp := Response{Status: "10001", Msg: "get user info fail", Data: err}
 		c.Data["json"] = resp
+		c.ServeJSON()
 		return
 	}
 

@@ -31,7 +31,7 @@ import paperManage from "../Manage/paper_manage/manage";
 import detail from "../Manage/paper_manage/detail";
 
 import menuList from "../../menu/menuTab.js";
-
+import normalLogin from "../Login/normaluser";
 import logoUrl from "../../asset/images/OpenCT_Logo.png";
 import group from "../../api/group";
 import "./index.less";
@@ -40,7 +40,6 @@ const {Header, Sider, Content} = Layout;
 const {SubMenu} = Menu;
 
 export default class index extends Component {
-
     state = {
       account: null,
       current: "home",
@@ -174,9 +173,10 @@ export default class index extends Component {
             <a href={Setting.getSigninUrl()} style={{color: "#ffffff", marginLeft: "50px"}}>
               管理员登录
             </a>
-            <a onClick={() => {Setting.goToLink("/normalLogin");}} style={{color: "#ffffff", marginLeft: "50px"}}>
+            <Link
+              to={"/home/normaluser"} style={{color: "#ffffff", marginLeft: "50px"}}>
               组长/阅卷老师登录
-            </a>
+            </Link>
           </>
         );
       } else {
@@ -294,6 +294,7 @@ export default class index extends Component {
                     <Route path="/home/management/paper_manage" component={paperManage} exact></Route>
                     <Route path="/home/management/detailTable" component={detail} exact></Route>
 
+                    <Route path="/home/normaluser" component={normalLogin} exact></Route>
                   </>
 
                     : null
