@@ -1,5 +1,6 @@
 import {message} from "antd";
 import Sdk from "casdoor-js-sdk";
+import axios from "axios";
 // import {isMobile as isMobileDevice} from "react-device-detect";
 
 export let ServerUrl = "";
@@ -11,6 +12,7 @@ export function initServerUrl() {
     ServerUrl = `http://${hostname}:8080`;
   }
 }
+axios.defaults.withCredentials = true;
 
 export function initCasdoorSdk(config) {
   CasdoorSdk = new Sdk(config);
