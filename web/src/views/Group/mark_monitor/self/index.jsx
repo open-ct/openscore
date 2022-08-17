@@ -1,6 +1,7 @@
 import React, {Component} from "react";
 import DocumentTitle from "react-document-title";
 import {Select, Table} from "antd";
+import * as Settings from "../../../../Setting";
 import "./index.less";
 import group from "../../../../api/group";
 import ReactEcharts from "echarts-for-react";
@@ -99,14 +100,13 @@ export default class index extends Component {
           }
         })
         .catch((e) => {
-          console.log(e);
+          Settings.showMessage("error", e);
         });
     }
     teacherList = (questionId) => {
       group.selfTeacher({supervisorId: "2", questionId})
         .then((res) => {
           if (res.data.status === "10000") {
-            console.log(res.data);
             this.setState({
               teacherList: res.data.data.teacherVOList,
             });
@@ -114,7 +114,7 @@ export default class index extends Component {
           }
         })
         .catch((e) => {
-          console.log(e);
+          Settings.showMessage("error", e);
         });
     }
     // 题目选择区
@@ -141,7 +141,7 @@ export default class index extends Component {
       return selectList;
     }
     selectTeacher = (e) => {
-      console.log(e);
+      Settings.showMessage("error", e);
       let index;
       for (let i = 0; i < this.state.teacherList.length; i++) {
         if (this.state.teacherList[i].UserName === e) {
@@ -151,7 +151,7 @@ export default class index extends Component {
       this.tableData(this.state.teacherList[index].UserId);
     }
     selectQuestion = (e) => {
-      console.log(e);
+      Settings.showMessage("error", e);
       let index;
       for (let i = 0; i < this.state.questionList.length; i++) {
         if (this.state.questionList[i].QuestionName === e) {
@@ -187,7 +187,7 @@ export default class index extends Component {
           }
         })
         .catch((e) => {
-          console.log(e);
+          Settings.showMessage("error", e);
         });
     }
 

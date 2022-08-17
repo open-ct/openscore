@@ -1,4 +1,5 @@
 import axios from "axios";
+import * as Settings from "../Setting";
 function getServerUrl() {
   const hostname = window.location.hostname;
   if (hostname === "localhost") {
@@ -84,7 +85,7 @@ const Manage = {
       link.download = "用户导出.xlsx";// 重要--决定下载文件名
       link.click();
       link.remove();
-    }).catch(function(e) {console.log(e);});
+    }).catch(function(e) {Settings.showMessage("error", e);});
   },
 
 };

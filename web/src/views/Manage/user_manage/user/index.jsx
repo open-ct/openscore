@@ -1,6 +1,7 @@
 import React, {Component} from "react";
 import "./index.less";
 import {Button, Col, Form, Input, Modal, Popconfirm, Row, Table} from "antd";
+import * as Settings from "../../../../Setting";
 import Manage from "../../../../api/manage";
 export default class index extends Component {
     state = {
@@ -50,7 +51,7 @@ export default class index extends Component {
           }
         })
         .catch((e) => {
-          console.log(e);
+          Settings.showMessage("error", e);
         });
     }
 
@@ -69,7 +70,7 @@ export default class index extends Component {
             }
           })
           .catch((e) => {
-            console.log(e);
+            Settings.showMessage("error", e);
           });
       } else if (this.state.form_status === "edit") {
         Manage.updateUser(data)
@@ -84,7 +85,7 @@ export default class index extends Component {
             }
           })
           .catch((e) => {
-            console.log(e);
+            Settings.showMessage("error", e);
           });
       }
     }
@@ -101,7 +102,7 @@ export default class index extends Component {
           }
         })
         .catch((e) => {
-          console.log(e);
+          Settings.showMessage("error", e);
         });
     }
     editUser(data) {
@@ -110,7 +111,6 @@ export default class index extends Component {
         form_status: "edit",
       });
       setTimeout(() => {
-        console.log(data);
         this.formRef.current.setFieldsValue({
           account: data.account,
           password: data.password,

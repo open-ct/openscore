@@ -1,6 +1,7 @@
 import React, {Component} from "react";
 import DocumentTitle from "react-document-title";
 import {Select, Table} from "antd";
+import * as Settings from "../../../../Setting";
 import "./index.less";
 import group from "../../../../api/group";
 
@@ -61,12 +62,11 @@ export default class index extends Component {
             this.setState({
               questionList: res.data.data.questionsList,
             });
-            console.log(res.data.data.questionsList);
             this.tableData(res.data.data.questionsList[0].QuestionId);
           }
         })
         .catch((e) => {
-          console.log(e);
+          Settings.showMessage("error", e);
         });
     }
 
@@ -74,7 +74,6 @@ export default class index extends Component {
       group.scoreMonitor({supervisorId: "1", questionId: questionId})
         .then((res) => {
           if (res.data.status === "10000") {
-            console.log(res.data);
             let columns = [{
               title: "分数",
               width: 120,
@@ -95,14 +94,13 @@ export default class index extends Component {
                 }
               );
             }
-            console.log(tableData, columns);
             this.setState({
               tableData, columns,
             });
           }
         })
         .catch((e) => {
-          console.log(e);
+          Settings.showMessage("error", e);
         });
     }
 

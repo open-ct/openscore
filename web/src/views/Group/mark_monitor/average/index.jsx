@@ -1,6 +1,7 @@
 import React, {Component} from "react";
 import DocumentTitle from "react-document-title";
 import {Progress, Select, Table} from "antd";
+import * as Settings from "../../../../Setting";
 import "./index.less";
 import group from "../../../../api/group";
 const {Option} = Select;
@@ -25,12 +26,11 @@ export default class index extends Component {
           this.setState({
             questionList: res.data.data.questionsList,
           });
-          console.log(res.data.data.questionsList);
           this.tableData(res.data.data.questionsList[0].QuestionId);
         }
       })
       .catch((e) => {
-        console.log(e);
+        Settings.showMessage("error", e);
       });
   }
   // 题目选择区
@@ -74,7 +74,7 @@ export default class index extends Component {
         }
       })
       .catch((e) => {
-        console.log(e);
+        Settings.showMessage("error", e);
       });
   }
   columns = [

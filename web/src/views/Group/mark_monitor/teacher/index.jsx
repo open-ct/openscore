@@ -1,6 +1,7 @@
 import React, {Component} from "react";
 import DocumentTitle from "react-document-title";
 import {Select, Table} from "antd";
+import * as Settings from "../../../../Setting";
 import "./index.less";
 import group from "../../../../api/group";
 const {Option} = Select;
@@ -80,11 +81,10 @@ export default class index extends Component {
             this.setState({
               userInfo: res.data.data.userInfo,
             });
-            console.log(res.data.data.userInfo);
           }
         })
         .catch((e) => {
-          console.log(e);
+          Settings.showMessage("error", e);
         });
     }
 
@@ -95,12 +95,11 @@ export default class index extends Component {
             this.setState({
               questionList: res.data.data.questionsList,
             });
-            console.log(res.data.data.questionsList);
             this.tableData(res.data.data.questionsList[0].QuestionId);
           }
         })
         .catch((e) => {
-          console.log(e);
+          Settings.showMessage("error", e);
         });
     }
     tableData = (questionId) => {
@@ -130,7 +129,7 @@ export default class index extends Component {
           }
         })
         .catch((e) => {
-          console.log(e);
+          Settings.showMessage("error", e);
         });
     }
     componentDidMount() {

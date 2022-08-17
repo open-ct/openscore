@@ -2,8 +2,8 @@ import React, {Component} from "react";
 import DocumentTitle from "react-document-title";
 import {Button, Upload, message} from "antd";
 import {DownloadOutlined, UploadOutlined} from "@ant-design/icons";
+import * as Settings from "../../../../Setting";
 import "./index.less";
-import * as Setting from "../../../../Setting";
 import axios from "axios";
 
 export default class index extends Component {
@@ -35,14 +35,14 @@ export default class index extends Component {
       link.download = "试卷成绩.xlsx";// 重要--决定下载文件名
       link.click();
       link.remove();
-    }).catch(function(e) {console.log(e);});
+    }).catch(function(e) {Settings.showMessage("error", e);});
 
   }
 
   render() {
     const props_1 = {
       name: "excel",
-      action: Setting.ServerUrl + "/openct/marking/admin/readExcel",
+      action: Settings.ServerUrl + "/openct/marking/admin/readExcel",
       headers: {
         authorization: null,
       },
@@ -59,7 +59,7 @@ export default class index extends Component {
     };
     const props_2 = {
       name: "excel",
-      action: Setting.ServerUrl + "/openct/marking/admin/readExapmleExcel",
+      action: Settings.ServerUrl + "/openct/marking/admin/readExapmleExcel",
       headers: {
         authorization: "authorization-text",
       },
@@ -76,7 +76,7 @@ export default class index extends Component {
     };
     const props_3 = {
       name: "excel",
-      action: Setting.ServerUrl + "/openct/marking/admin/readAnswerExcel",
+      action: Settings.ServerUrl + "/openct/marking/admin/readAnswerExcel",
       headers: {
         authorization: "authorization-text",
       },

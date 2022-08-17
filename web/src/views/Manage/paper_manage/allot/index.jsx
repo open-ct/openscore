@@ -1,9 +1,9 @@
 import React, {Component} from "react";
 import DocumentTitle from "react-document-title";
 import {Button, Input, Select, message} from "antd";
+import * as Settings from "../../../../Setting";
 import "./index.less";
 import Manage from "../../../../api/manage";
-import manage from "../../../../api/manage";
 const {Option} = Select;
 
 export default class index extends Component {
@@ -33,7 +33,7 @@ export default class index extends Component {
           }
         })
         .catch((e) => {
-          console.log(e);
+          Settings.showMessage("error", e);
         });
     }
     getSubjectOption = () => {
@@ -62,7 +62,7 @@ export default class index extends Component {
           }
         })
         .catch((e) => {
-          console.log(e);
+          Settings.showMessage("error", e);
         });
     }
 
@@ -80,7 +80,6 @@ export default class index extends Component {
                 this.setState({
                   allotNum: nowAllot,
                 });
-                console.log(this.state.allotNum);
               }}
             />
           </div>;
@@ -116,7 +115,7 @@ export default class index extends Component {
         supervisor_number: Number(this.state.headmanNum),
         list: list,
       };
-      manage.subjectAllot(data);
+      Manage.subjectAllot(data);
     }
 
     render() {

@@ -2,6 +2,7 @@ import React, {Component} from "react";
 import DocumentTitle from "react-document-title";
 import {ArrowLeftOutlined} from "@ant-design/icons";
 import {Button, Form, Input, Modal, Popconfirm, Table} from "antd";
+import * as Settings from "../../../../Setting";
 import "./index.less";
 import Manage from "../../../../api/manage";
 export default class index extends Component {
@@ -17,7 +18,6 @@ export default class index extends Component {
   smallForm = React.createRef();
   formRef = React.createRef();
   componentDidMount() {
-    console.log(this.props.location.query);
     if (this.props.location.query) {
       this.setState({
         title: "试卷分配",
@@ -41,7 +41,7 @@ export default class index extends Component {
         }
       })
       .catch((e) => {
-        console.log(e);
+        Settings.showMessage("error", e);
       });
   }
 
@@ -55,7 +55,7 @@ export default class index extends Component {
         }
       })
       .catch((e) => {
-        console.log(e);
+        Settings.showMessage("error", e);
       });
   }
   addQuestionDetail(data) {
@@ -64,14 +64,12 @@ export default class index extends Component {
       smallForm_status: "add",
     });
     setTimeout(() => {
-      console.log(data);
       this.smallForm.current.setFieldsValue({
         question_detail_id: data.TopicId,
       });
     });
   }
   deleteQuestionDetail(data) {
-    console.log("data", data);
     Manage.deleteSmallQuestion({"question_detail_id": data})
       .then((res) => {
         if (res.data.status === "ok") {
@@ -83,7 +81,7 @@ export default class index extends Component {
         }
       })
       .catch((e) => {
-        console.log(e);
+        Settings.showMessage("error", e);
       });
   }
   editQuestionDetail(data) {
@@ -116,7 +114,7 @@ export default class index extends Component {
           }
         })
         .catch((e) => {
-          console.log(e);
+          Settings.showMessage("error", e);
         });
     } else if (this.state.smallForm_status === "edit") {
       Manage.updateSmallQuestion(data)
@@ -131,7 +129,7 @@ export default class index extends Component {
           }
         })
         .catch((e) => {
-          console.log(e);
+          Settings.showMessage("error", e);
         });
     }
   }
@@ -162,7 +160,7 @@ export default class index extends Component {
         }
       })
       .catch((e) => {
-        console.log(e);
+        Settings.showMessage("error", e);
       });
   }
   submit(data) {
@@ -181,7 +179,7 @@ export default class index extends Component {
         }
       })
       .catch((e) => {
-        console.log(e);
+        Settings.showMessage("error", e);
       });
   }
   //  取消按钮的点击事

@@ -2,7 +2,7 @@ import React, {Component} from "react";
 import DocumentTitle from "react-document-title";
 import {Button, Modal, Select, message} from "antd";
 import {ExclamationCircleOutlined} from "@ant-design/icons";
-
+import * as Settings from "../../../Setting";
 import "./index.less";
 
 import * as Util from "../../../util/Util";
@@ -44,7 +44,7 @@ export default class index extends Component {
         }
       })
       .catch((e) => {
-        console.log(e);
+        Settings.showMessage("error", e);
       });
   }
 
@@ -69,7 +69,7 @@ export default class index extends Component {
         }
       })
       .catch((e) => {
-        console.log(e);
+        Settings.showMessage("error", e);
       });
   }
 
@@ -81,7 +81,6 @@ export default class index extends Component {
         index = i;
       }
     }
-    console.log(this.state.selectScore[index]);
     return this.state.selectScore[index];
   }
 
@@ -165,7 +164,6 @@ export default class index extends Component {
     return scoreSelect;
   }
   select = (item, value) => {
-    console.log(item);
     if (this.state.selectId.length < this.state.testLength) {
       this.setState({
         selectId: [...this.state.selectId, item],
@@ -190,7 +188,6 @@ export default class index extends Component {
         selectScore: newSelectScore,
       });
     }
-    console.log(this.state.selectId, this.state.selectScore);
   }
   renderScoreDropDown() {
 
@@ -288,7 +285,7 @@ export default class index extends Component {
                 }
               })
               .catch((e) => {
-                console.log(e);
+                Settings.showMessage("error", e);
               });
           }
         } else if (value === 3) {
@@ -320,7 +317,7 @@ export default class index extends Component {
           this.getAllPaper();
         })
         .catch((e) => {
-          console.log(e);
+          Settings.showMessage("error", e);
         });
     } else {
       // Marking.testProblem({
