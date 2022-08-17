@@ -49,7 +49,7 @@ export default class index extends Component {
             title: "完成率",
             width: 90,
             dataIndex: "FinishRate",
-            render: (text, record) => {
+            render: (text) => {
               return (<Progress type="circle" percent={text * 100} width={40} />);
             },
           },
@@ -112,7 +112,7 @@ export default class index extends Component {
             title: "一评完成率",
             width: 90,
             dataIndex: "FirstFinishedRate",
-            render: (text, record) => {
+            render: (text) => {
               return (<Progress type="circle" percent={(text * 100).toFixed(1)} width={40} />);
             },
           },
@@ -145,7 +145,7 @@ export default class index extends Component {
             title: "二评完成率",
             width: 90,
             dataIndex: "SecondFinishedRate",
-            render: (text, record) => {
+            render: (text) => {
               return (<Progress type="circle" percent={(text * 100).toFixed(1)} width={40} />);
             },
           },
@@ -178,7 +178,7 @@ export default class index extends Component {
             title: "三评完成率",
             width: 90,
             dataIndex: "ThirdFinishedRate",
-            render: (text, record) => {
+            render: (text) => {
               return (<Progress type="circle" percent={(text * 100).toFixed(1)} width={40} />);
             },
           },
@@ -221,7 +221,7 @@ export default class index extends Component {
             title: "完成率",
             width: 90,
             dataIndex: "ArbitramentFinishedRate",
-            render: (text, record) => {
+            render: (text) => {
               return (<Progress type="circle" percent={(text * 100).toFixed(1)} width={40} />);
             },
           },
@@ -265,7 +265,7 @@ export default class index extends Component {
             title: "完成率",
             width: 90,
             dataIndex: "ProblemUnfinishedRate",
-            render: (text, record) => {
+            render: (text) => {
               return (<Progress type="circle" percent={(text * 100).toFixed(1)} width={40} />);
             },
           },
@@ -290,7 +290,7 @@ export default class index extends Component {
     questionList = () => {
       group.questionList({adminId: "1", subjectName: JSON.parse(localStorage.getItem("userInfo")).SubjectName})
         .then((res) => {
-          if (res.data.status == "10000") {
+          if (res.data.status === "10000") {
             this.setState({
               questionList: res.data.data.questionsList,
             });
@@ -306,7 +306,7 @@ export default class index extends Component {
     tableData = () => {
       group.allMonitor({supervisorId: "2", subject: JSON.parse(localStorage.getItem("userInfo")).SubjectName})
         .then((res) => {
-          if (res.data.status == "10000") {
+          if (res.data.status === "10000") {
             let tableData = [];
             for (let i = 0; i < res.data.data.scoreProgressVOList.length; i++) {
               let item = res.data.data.scoreProgressVOList[i];
@@ -329,7 +329,7 @@ export default class index extends Component {
     // 题目选择区
     selectBox = () => {
       let selectList;
-      if (this.state.questionList.length != 0) {
+      if (this.state.questionList.length !== 0) {
         selectList = this.state.questionList.map((item, i) => {
           return <Option key={i} value={item.QuestionName} label={item.QuestionName}>{item.QuestionName}</Option>;
         });

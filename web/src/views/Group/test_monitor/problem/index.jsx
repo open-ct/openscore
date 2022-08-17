@@ -43,7 +43,7 @@ export default class index extends Component {
     questionList = () => {
       group.questionList({adminId: "1", subjectName: JSON.parse(localStorage.getItem("userInfo")).SubjectName})
         .then((res) => {
-          if (res.data.status == "10000") {
+          if (res.data.status === "10000") {
             this.setState({
               questionList: res.data.data.questionsList,
             });
@@ -58,7 +58,7 @@ export default class index extends Component {
     tableData = (questionId) => {
       group.problemList({supervisorId: "2", questionId: questionId})
         .then((res) => {
-          if (res.data.status == "10000") {
+          if (res.data.status === "10000") {
             let tableData = [];
             for (let i = 0; i < res.data.data.ProblemUnderCorrectedPaperVOList.length; i++) {
               let item = res.data.data.ProblemUnderCorrectedPaperVOList[i];
@@ -90,7 +90,7 @@ export default class index extends Component {
     // 题目选择区
     selectBox = () => {
       let selectList;
-      if (this.state.questionList.length != 0) {
+      if (this.state.questionList.length !== 0) {
         selectList = this.state.questionList.map((item, i) => {
           return <Option key={i} value={item.QuestionName} label={item.QuestionName}>{item.QuestionName}</Option>;
         });
