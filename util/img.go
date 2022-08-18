@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	auth "github.com/casdoor/casdoor-go-sdk/casdoorsdk"
 	"image"
 	"image/color"
 	"image/draw"
@@ -12,7 +13,6 @@ import (
 	"log"
 	"os"
 
-	auth "github.com/casdoor/casdoor-go-sdk/casdoorsdk"
 	"github.com/golang/freetype"
 	"github.com/golang/freetype/truetype"
 	"golang.org/x/image/font"
@@ -89,7 +89,7 @@ func UploadPic(name string, text string) (src string) {
 
 	// Save that RGBA image to disk.
 	name += ".png"
-	newPath := "./" + name
+	newPath := "./tmp/" + name
 
 	outFile, err := os.Create(newPath)
 	if err != nil {

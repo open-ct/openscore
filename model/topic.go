@@ -2,8 +2,6 @@ package model
 
 import (
 	"log"
-	"time"
-
 	"xorm.io/builder"
 )
 
@@ -11,16 +9,16 @@ import (
 // struct : Topic(大题)
 // comment: must capitalize the first letter of the field in Topic
 type Topic struct {
-	QuestionId    int64     `json:"question_id" xorm:"pk autoincr"`
-	QuestionName  string    `json:"question_name" xorm:"varchar(50)"`
-	SubjectName   string    `json:"subject_name" xorm:"varchar(50)"`
-	StandardError int64     `json:"standard_error"`
-	QuestionScore int64     `json:"question_score"`
-	ScoreType     int64     `json:"score_type"`
-	ImportNumber  int64     `json:"import_number"`
-	ImportTime    time.Time `json:"import_time"`
-	SubjectId     int64     `json:"subject_id"`
-	SelfScoreRate int64     `json:"self_score_rate"`
+	QuestionId    int64  `json:"question_id" xorm:"pk autoincr"`
+	QuestionName  string `json:"question_name" xorm:"varchar(50)"`
+	SubjectName   string `json:"subject_name" xorm:"varchar(50)"`
+	StandardError int64  `json:"standard_error"`
+	QuestionScore int64  `json:"question_score"`
+	ScoreType     int64  `json:"score_type"`
+	ImportNumber  int64  `json:"import_number"`
+	ImportTime    string `json:"import_time"`
+	SubjectId     int64  `json:"subject_id"`
+	SelfScoreRate int64  `json:"self_score_rate"`
 }
 
 func (t *Topic) GetTopic(id int64) error {

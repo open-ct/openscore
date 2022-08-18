@@ -3,16 +3,14 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/open-ct/openscore/model"
+	"github.com/open-ct/openscore/util"
+	"github.com/xuri/excelize/v2"
 	"io"
 	"log"
 	"os"
 	"strconv"
 	"strings"
-	"time"
-
-	"github.com/open-ct/openscore/model"
-	"github.com/open-ct/openscore/util"
-	"github.com/xuri/excelize/v2"
 )
 
 func (c *ApiController) CreateSmallQuestion() {
@@ -820,18 +818,18 @@ func (c *ApiController) ReadAnswerExcel() {
 
 func (c *ApiController) QuestionBySubList() {
 	defer c.ServeJSON()
-	var requestBody QuestionBySubList
+	var req QuestionBySubList
 	var resp Response
 
-	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	err := json.Unmarshal(c.Ctx.Input.RequestBody, &req)
 	if err != nil {
 		log.Println(err)
 		resp = Response{"10001", "cannot unmarshal", err}
 		c.Data["json"] = resp
 		return
 	}
-	// supervisorId := requestBody.SupervisorId
-	subjectName := requestBody.SubjectName
+	// supervisorId := req.SupervisorId
+	subjectName := req.SubjectName
 	// ----------------------------------------------------
 	// 获取大题列表
 	topics := make([]model.Topic, 0)
@@ -865,23 +863,23 @@ func (c *ApiController) QuestionBySubList() {
 func (c *ApiController) InsertTopic() {
 
 	defer c.ServeJSON()
-	var requestBody AddTopic
+	var req AddTopic
 	var resp Response
 	var err error
 
-	err = json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	err = json.Unmarshal(c.Ctx.Input.RequestBody, &req)
 	if err != nil {
 		log.Println(err)
 		resp = Response{"10001", "cannot unmarshal", err}
 		c.Data["json"] = resp
 		return
 	}
-	// adminId := requestBody.AdminId
-	topicName := requestBody.TopicName
-	scoreType := requestBody.ScoreType
-	standardError := requestBody.Error
-	subjectName := requestBody.SubjectName
-	details := requestBody.TopicDetails
+	// adminId := req.AdminId
+	topicName := req.TopicName
+	scoreType := req.ScoreType
+	standardError := req.Error
+	subjectName := req.SubjectName
+	details := req.TopicDetails
 
 	// ----------------------------------------------------
 	// 添加subject
@@ -904,15 +902,16 @@ func (c *ApiController) InsertTopic() {
 
 	// 添加topic
 	var topic model.Topic
-	for _, detail := range requestBody.TopicDetails {
+	for _, detail := range req.TopicDetails {
 		topic.QuestionScore += detail.DetailScore
 	}
 	topic.QuestionName = topicName
 	topic.ScoreType = scoreType
 	topic.StandardError = standardError
 	topic.SubjectName = subjectName
-	topic.ImportTime = time.Now()
+	topic.ImportTime = util.GetCurrentTime()
 	topic.SubjectId = subjectId
+	topic.SelfScoreRate = req.SelfScoreRate
 
 	err, questionId := model.InsertTopic(&topic)
 	if err != nil {
@@ -961,7 +960,7 @@ func (c *ApiController) SubjectList() {
 	defer c.ServeJSON()
 	var resp Response
 
-	// supervisorId := requestBody.SupervisorId
+	// supervisorId := req.SupervisorId
 	// ----------------------------------------------------
 	// 获取科目列表
 	subjects := make([]model.Subject, 0)
@@ -995,19 +994,19 @@ func (c *ApiController) SubjectList() {
 // func (c *ApiController) DistributionInfo() {
 //
 // 	defer c.ServeJSON()
-// 	var requestBody DistributionInfo
+// 	var req DistributionInfo
 // 	var resp Response
 // 	var err error
 //
-// 	err = json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+// 	err = json.Unmarshal(c.Ctx.Input.RequestBody, &req)
 // 	if err != nil {
 // 		log.Println(err)
 // 		resp = Response{"10001", "cannot unmarshal", err}
 // 		c.Data["json"] = resp
 // 		return
 // 	}
-// 	// supervisorId := requestBody.SupervisorId
-// 	questionId := requestBody.QuestionId
+// 	// supervisorId := req.SupervisorId
+// 	questionId := req.QuestionId
 //
 // 	// ----------------------------------------------------
 // 	// 标注输出
@@ -1065,21 +1064,21 @@ func (c *ApiController) SubjectList() {
 // func (c *ApiController) Distribution() {
 //
 // 	defer c.ServeJSON()
-// 	var requestBody Distribution
+// 	var req Distribution
 // 	var resp Response
 // 	var err error
 //
-// 	err = json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+// 	err = json.Unmarshal(c.Ctx.Input.RequestBody, &req)
 // 	if err != nil {
 // 		log.Println(err)
 // 		resp = Response{"10001", "cannot unmarshal", err}
 // 		c.Data["json"] = resp
 // 		return
 // 	}
-// 	// supervisorId := requestBody.SupervisorId
-// 	questionId := requestBody.QuestionId
-// 	testNumber := requestBody.TestNumber
-// 	userNumber := requestBody.UserNumber
+// 	// supervisorId := req.SupervisorId
+// 	questionId := req.QuestionId
+// 	testNumber := req.TestNumber
+// 	userNumber := req.UserNumber
 // 	// ----------------------------------------------------
 //
 // 	// 是否需要二次阅卷
@@ -1240,7 +1239,7 @@ func (c *ApiController) SubjectList() {
 func (c *ApiController) TopicList() {
 	defer c.ServeJSON()
 	var resp Response
-	// supervisorId := requestBody.SupervisorId
+	// supervisorId := req.SupervisorId
 
 	// ----------------------------------------------------
 	// 获取大题列表
@@ -1262,7 +1261,7 @@ func (c *ApiController) TopicList() {
 		topicVOList[i].StandardError = topics[i].StandardError
 		topicVOList[i].ScoreType = topics[i].ScoreType
 		topicVOList[i].TopicId = topics[i].QuestionId
-		topicVOList[i].ImportTime = topics[i].ImportTime
+		topicVOList[i].ImportTime = util.FormatString(topics[i].ImportTime)
 
 		subTopics := make([]model.SubTopic, 0)
 		model.FindSubTopicsByQuestionId(topics[i].QuestionId, &subTopics)
@@ -1292,18 +1291,18 @@ func (c *ApiController) TopicList() {
 // // DistributionRecord ...
 // func (c *ApiController) DistributionRecord() {
 // 	defer c.ServeJSON()
-// 	var requestBody DistributionRecord
+// 	var req DistributionRecord
 // 	var resp Response
 //
-// 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+// 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &req)
 // 	if err != nil {
 // 		log.Println(err)
 // 		resp = Response{"10001", "cannot unmarshal", err}
 // 		c.Data["json"] = resp
 // 		return
 // 	}
-// 	// supervisorId := requestBody.SupervisorId
-// 	subjectName := requestBody.SubjectName
+// 	// supervisorId := req.SupervisorId
+// 	subjectName := req.SubjectName
 // 	// ----------------------------------------------------
 // 	// 获取大题列表
 // 	topics := make([]model.Topic, 0)
@@ -1354,19 +1353,19 @@ func (c *ApiController) TopicList() {
 func (c *ApiController) DeleteTest() {
 
 	defer c.ServeJSON()
-	var requestBody DeleteTest
+	var req DeleteTest
 	var resp Response
 	var err error
 
-	err = json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	err = json.Unmarshal(c.Ctx.Input.RequestBody, &req)
 	if err != nil {
 		log.Println(err)
 		resp = Response{"10001", "cannot unmarshal", err}
 		c.Data["json"] = resp
 		return
 	}
-	// adminId := requestBody.AdminId
-	questionId := requestBody.QuestionId
+	// adminId := req.AdminId
+	questionId := req.QuestionId
 
 	// ----------------------------------------------------
 	count, err := model.CountUnScoreTestNumberByQuestionId(questionId)

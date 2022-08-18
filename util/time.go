@@ -1,12 +1,25 @@
 package util
 
 import (
+	"fmt"
 	"strconv"
 	"time"
 )
 
 func String2Time(value string) (time.Time, error) {
 	return time.Parse(time.RFC3339, value)
+}
+
+func FormatString(s string) string {
+	if s == "" {
+		return ""
+	}
+
+	t, err := String2Time(s)
+	if err != nil {
+		fmt.Println(err)
+	}
+	return fmt.Sprintf("%s", t.Format("2006-01-02 15:04:05"))
 }
 
 func GetCurrentTime() string {

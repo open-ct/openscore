@@ -39,7 +39,7 @@ type TopicVO struct {
 	Score          int64
 	StandardError  int64
 	ScoreType      int64
-	ImportTime     time.Time
+	ImportTime     string
 	SubTopicVOList []SubTopicVO
 }
 

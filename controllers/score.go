@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"math"
+	"math/rand"
 	"strconv"
 	"strings"
 	"time"
@@ -14,14 +15,14 @@ import (
 
 func (c *ApiController) Display() {
 	defer c.ServeJSON()
-	var requestBody TestRequest
-	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	var req TestRequest
+	err := json.Unmarshal(c.Ctx.Input.RequestBody, &req)
 	if err != nil {
 		resp := Response{"10001", "cannot unmarshal", err}
 		c.Data["json"] = resp
 		return
 	}
-	testId := requestBody.TestId
+	testId := req.TestId
 
 	var testPaper model.TestPaper
 	var topic model.Topic
@@ -154,10 +155,9 @@ func (c *ApiController) List() {
 
 func (c *ApiController) Point() {
 	defer c.ServeJSON()
-	var requestBody TestPoint
+	var req TestPoint
 	var resp Response
-	var err error
-	err = json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	err := json.Unmarshal(c.Ctx.Input.RequestBody, &req)
 	if err != nil {
 		resp := Response{"10001", "cannot unmarshal", err}
 		c.Data["json"] = resp
@@ -170,9 +170,9 @@ func (c *ApiController) Point() {
 		c.Data["json"] = resp
 		return
 	}
-	scoresStr := requestBody.Scores
-	testId := requestBody.TestId
-	testDetailIdStr := requestBody.TestDetailId
+	scoresStr := req.Scores
+	testId := req.TestId
+	testDetailIdStr := req.TestDetailId
 	scores := strings.Split(scoresStr, "-")
 	testDetailIds := strings.Split(testDetailIdStr, "-")
 	// -------------------------------------------------------
@@ -200,6 +200,33 @@ func (c *ApiController) Point() {
 		c.Data["json"] = resp
 		return
 	}
+
+	// 如果是二次阅卷，检测是否超出 topic.StandardError
+	if topic.ScoreType == 2 {
+		record, err := model.GetRecordByTestId(testId)
+		if err != nil {
+			c.ResponseError(err.Error())
+			return
+		}
+		if record != nil {
+			// 比较分数
+			score, err := strconv.Atoi(scores[0])
+			if err != nil {
+				c.ResponseError(err.Error())
+				return
+			}
+			if math.Abs(float64(record.Score-int64(score))) > float64(topic.StandardError) {
+				var newUnderTest model.UnderCorrectedPaper
+				newUnderTest.UserId = 10000
+				newUnderTest.TestId = testId
+				newUnderTest.QuestionId = test.QuestionId
+				newUnderTest.SelfScoreId = userId
+				newUnderTest.TestQuestionType = 7
+				newUnderTest.Save()
+			}
+		}
+	}
+
 	if underTest.TestQuestionType == 0 {
 		standardError := topic.StandardError
 
@@ -514,14 +541,12 @@ func (c *ApiController) Point() {
 				test.QuestionStatus = 2
 
 				newUnderTest := model.UnderCorrectedPaper{}
-				// 阅卷组长类型默认 id 10000
-				newUnderTest.UserId = 10000
 				newUnderTest.TestQuestionType = 4
 				newUnderTest.TestId = underTest.TestId
 				newUnderTest.QuestionId = underTest.QuestionId
 				err = newUnderTest.Save()
 				if err != nil {
-					resp := Response{"10006", "insert undertest fail", err}
+					resp := Response{"10006", "insert underTest fail", err}
 					c.Data["json"] = resp
 					return
 				}
@@ -534,7 +559,7 @@ func (c *ApiController) Point() {
 
 		err = underTest.Delete()
 		if err != nil {
-			resp := Response{"10006", "delete undertest fail", err}
+			resp := Response{"10006", "delete underTest fail", err}
 			c.Data["json"] = resp
 			return
 		}
@@ -596,17 +621,48 @@ func (c *ApiController) Point() {
 			c.Data["json"] = resp
 			return
 		}
-
 	}
 
-	resp = Response{"10000", "ok", err}
-	c.Data["json"] = resp
+	records, err := model.ListUserScoreRecord(userId)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+	// 每阅100份，就把之前阅过的100份里随机抽取topic.SelfScoreRate份，重新阅一遍 作为自评分数
+
+	if len(records) > 0 && len(records)%100 == 0 {
+		t := model.Topic{}
+		if err := t.GetTopic(topic.QuestionId); err != nil {
+			c.ResponseError(err.Error())
+			return
+		}
+
+		rand.Seed(time.Now().UnixNano())
+
+		for i := 0; i < int(topic.SelfScoreRate); i++ {
+			randInt := rand.Intn(100)
+			index := randInt + (len(records)/100-1)*100
+			// 添加试卷未批改记录
+			underCorrectedPaper := model.UnderCorrectedPaper{
+				TestId:           records[index].TestId,
+				QuestionId:       records[index].QuestionId,
+				TestQuestionType: 0, // 自评价（阅卷员）
+				UserId:           userId,
+				SelfScoreId:      userId, // FIXME
+			}
+			if err := underCorrectedPaper.Save(); err != nil {
+				c.ResponseError("无法生成待批改试卷 ", err)
+				return
+			}
+		}
+	}
+	c.ResponseOk(resp)
 }
 
 func (c *ApiController) Problem() {
 	defer c.ServeJSON()
-	var requestBody TestProblem
-	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	var req TestProblem
+	err := json.Unmarshal(c.Ctx.Input.RequestBody, &req)
 	if err != nil {
 		resp := Response{"10001", "cannot unmarshal", err}
 		c.Data["json"] = resp
@@ -619,9 +675,9 @@ func (c *ApiController) Problem() {
 		c.Data["json"] = resp
 		return
 	}
-	problemType := requestBody.ProblemType
-	testId := requestBody.TestId
-	problemMessage := requestBody.ProblemMessage
+	problemType := req.ProblemType
+	testId := req.TestId
+	problemMessage := req.ProblemMessage
 
 	var underTest model.UnderCorrectedPaper
 	var record model.ScoreRecord
@@ -687,14 +743,14 @@ func (c *ApiController) Problem() {
 
 func (c *ApiController) Answer() {
 	defer c.ServeJSON()
-	var requestBody TestRequest
-	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	var req TestRequest
+	err := json.Unmarshal(c.Ctx.Input.RequestBody, &req)
 	if err != nil {
 		resp := Response{"10001", "cannot unmarshal", err}
 		c.Data["json"] = resp
 		return
 	}
-	testId := requestBody.TestId
+	testId := req.TestId
 	var test model.TestPaper
 	_, err = test.GetTestPaper(testId)
 	if err != nil {
@@ -728,14 +784,14 @@ func (c *ApiController) Answer() {
 func (c *ApiController) ExampleDetail() {
 	c.GetSessionUserId()
 	defer c.ServeJSON()
-	var requestBody ExampleDetail
-	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	var req ExampleDetail
+	err := json.Unmarshal(c.Ctx.Input.RequestBody, &req)
 	if err != nil {
 		resp := Response{"10001", "cannot unmarshal", err}
 		c.Data["json"] = resp
 		return
 	}
-	testId := requestBody.ExampleTestId
+	testId := req.ExampleTestId
 	log.Println(testId)
 	// ____________________________________________________________
 	var test model.TestPaper
@@ -787,14 +843,14 @@ func (c *ApiController) ExampleDetail() {
 
 func (c *ApiController) ExampleList() {
 	defer c.ServeJSON()
-	var requestBody TestRequest
-	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	var req TestRequest
+	err := json.Unmarshal(c.Ctx.Input.RequestBody, &req)
 	if err != nil {
 		resp := Response{"10001", "cannot unmarshal", err}
 		c.Data["json"] = resp
 		return
 	}
-	testId := requestBody.TestId
+	testId := req.TestId
 	// ----------------------------------------------------------------------
 	var testPaper model.TestPaper
 	_, err = testPaper.GetTestPaper(testId)
@@ -844,8 +900,8 @@ func (c *ApiController) Review() {
 
 func (c *ApiController) ReviewPoint() {
 	defer c.ServeJSON()
-	var requestBody TestPoint
-	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	var req TestPoint
+	err := json.Unmarshal(c.Ctx.Input.RequestBody, &req)
 	if err != nil {
 		resp := Response{"10001", "cannot unmarshal", err}
 		c.Data["json"] = resp
@@ -858,9 +914,9 @@ func (c *ApiController) ReviewPoint() {
 		c.Data["json"] = resp
 		return
 	}
-	scoresstr := requestBody.Scores
-	testId := requestBody.TestId
-	testDetailIdstr := requestBody.TestDetailId
+	scoresstr := req.Scores
+	testId := req.TestId
+	testDetailIdstr := req.TestDetailId
 	scores := strings.Split(scoresstr, "-")
 	testDetailIds := strings.Split(testDetailIdstr, "-")
 	var scoreArr []int64
@@ -981,9 +1037,9 @@ func (c *ApiController) SelfScoreList() {
 // */
 // func (c *ApiController) SelfMarkPoint() {
 // 	defer c.ServeJSON()
-// 	var requestBody TestPoint
+// 	var req TestPoint
 //
-// 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+// 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &req)
 // 	if err != nil {
 // 		c.Data["json"] = Response{"10001", "cannot unmarshal", err}
 // 		return
@@ -994,9 +1050,9 @@ func (c *ApiController) SelfScoreList() {
 // 		c.Data["json"] = resp
 // 		return
 // 	}
-// 	testId := requestBody.TestIds
-// 	scoreStr := requestBody.Scores
-// 	testDetailIdStr := requestBody.TestDetailId
+// 	testId := req.TestIds
+// 	scoreStr := req.Scores
+// 	testDetailIdStr := req.TestDetailId
 // 	testDetailIds := strings.Split(testDetailIdStr, "-")
 // 	scores := strings.Split(scoreStr, "-")
 //
