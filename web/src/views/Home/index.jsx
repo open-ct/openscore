@@ -1,16 +1,17 @@
 import React, {Component} from "react";
-import {Avatar, Dropdown, Layout, Menu} from "antd";
+import {Dropdown, Layout, Menu} from "antd";
 import DocumentTitle from "react-document-title";
 import {Link, Redirect, Route, Switch} from "react-router-dom";
 import * as Icon from "@ant-design/icons";
 import {LogoutOutlined, SettingOutlined} from "@ant-design/icons";
-import * as Setting from "../../Setting";
+import * as Settings from "../../Setting";
 import * as AccountBackend from "../../backend/AccountBackend";
 
 import MarkTasks from "../Mark/MarkTasks";
 import Answer from "../Mark/Answer";
 import Sample from "../Mark/Sample";
 import Review from "../Mark/Review";
+import SelfMark from "../Mark/SelfMark";
 
 import all from "../Group/mark_monitor/all";
 import average from "../Group/mark_monitor/average";
@@ -29,6 +30,9 @@ import paper from "../Manage/paper_manage/paper";
 import allot from "../Manage/paper_manage/allot";
 import paperManage from "../Manage/paper_manage/manage";
 import detail from "../Manage/paper_manage/detail";
+import userManage from "../Manage/user_manage/user";
+
+// import guide from "../Guide";
 
 import menuList from "../../menu/menuTab.js";
 import normalLogin from "../Login/normaluser";
@@ -43,21 +47,19 @@ export default class index extends Component {
     state = {
       account: null,
       current: "home",
-
+      userInfo: {},
     };
     permissionList = menuList
 
     componentDidMount() {
-      console.log(this.props);
       this.getAccount();
       this.userInfo();
       setTimeout(() => {
         console.log(this.state);
       }, 5000);
-      let moren = "/home/mark-tasks";
-      console.log(moren);
+      let defaultpage = "/home/mark-tasks";
       this.setState(
-        {current: moren.substring(moren.lastIndexOf("/") + 1, moren.length)}
+        {current: defaultpage.substring(defaultpage.lastIndexOf("/") + 1, defaultpage.length)}
       );
 
       this.props.history.listen((e) => {
@@ -70,28 +72,36 @@ export default class index extends Component {
     }
 
     userInfo = () => {
-      group.userInfo({supervisorId: "1"})
+      group.userInfo({supervisorId: 1})
         .then((res) => {
           if (res.data.status === "10000") {
             this.setState({
               userInfo: res.data.data.userInfo,
             });
-            console.log(res.data.data.userInfo);
             localStorage.setItem("userInfo", JSON.stringify(res.data.data.userInfo));
           }
         })
         .catch((e) => {
-          console.log(e);
+          Settings.showMessage("error", e);
         });
+      localStorage.setItem("userInfo", JSON.stringify(this.state.userInfo));
     }
     getAccount() {
-      AccountBackend.getAccount()
-        .then((res) => {
-          this.setState({
-            account: res.data,
+      if(this.state.account === null && localStorage.getItem("account") === null) {
+        AccountBackend.getAccount()
+          .then((res) => {
+            this.setState({
+              account: res.data,
+            });
+            console.log(this.state.account);
           });
-          localStorage.setItem("account", JSON.stringify(this.state.account));
+      } else if(localStorage.getItem("account") !== null) {
+        this.setState({
+          account: {
+            user_type: localStorage.getItem("account"),
+          },
         });
+      }
     }
 
     logout() {
@@ -102,44 +112,44 @@ export default class index extends Component {
 
       AccountBackend.signout()
         .then((res) => {
-          localStorage.setItem("account", "");
+          localStorage.removeItem("account");
+          localStorage.removeItem("userInfo");
           if (res.status === "ok") {
             this.setState({
               account: null,
+              userInfo: null,
             });
-
-            Setting.showMessage("success", "Successfully logged out, redirected to homepage");
-
-            Setting.goToLink("/");
+            Settings.showMessage("success", "成功登出");
+            Settings.goToLink("/");
           } else {
-            Setting.showMessage("error", `Logout failed: ${res.msg}`);
+            Settings.showMessage("error", `Logout failed: ${res.msg}`);
           }
         });
     }
 
     handleRightDropdownClick(e) {
       if (e.key === "0") {
-        Setting.openLink(Setting.getMyProfileUrl(this.state.account));
+        Settings.openLink(Settings.getMyProfileUrl(this.state.account));
       } else if (e.key === "1") {
         this.logout();
       }
     }
 
-    renderAvatar() {
-      if (this.state.account.avatar === "") {
-        return (
-          <Avatar style={{backgroundColor: Setting.getAvatarColor(this.state.account.name), verticalAlign: "middle"}} size="large">
-            {Setting.getShortName(this.state.account.name)}
-          </Avatar>
-        );
-      } else {
-        return (
-          <Avatar src={this.state.account.avatar} style={{verticalAlign: "middle"}} size="large">
-            {Setting.getShortName(this.state.account.name)}
-          </Avatar>
-        );
-      }
-    }
+    // renderAvatar() {
+    //   if (this.state.account.avatar === "") {
+    //     return (
+    //       <Avatar style={{backgroundColor: Settings.getAvatarColor(this.state.account.name), verticalAlign: "middle"}} size="large">
+    //         {Settings.getShortName(this.state.account.name)}
+    //       </Avatar>
+    //     );
+    //   } else {
+    //     return (
+    //       <Avatar src={this.state.account.avatar} style={{verticalAlign: "middle"}} size="large">
+    //         {Settings.getShortName(this.state.account.name)}
+    //       </Avatar>
+    //     );
+    //   }
+    // }
 
     renderRightDropdown() {
       const menu = (
@@ -158,19 +168,20 @@ export default class index extends Component {
       return (
         <Dropdown key="200" overlay={menu} >
           <a className="ant-dropdown-link" href="#" style={{float: "right", marginLeft: "50px"}}>
-            {
+            用户
+            {/* {
               this.renderAvatar()
-            }
+            } */}
           </a>
         </Dropdown>
       );
     }
 
     renderAccount() {
-      if (this.state.account === undefined || this.state.account === null) {
+      if (this.state.account === null) {
         return (
           <>
-            <a href={Setting.getSigninUrl()} style={{color: "#ffffff", marginLeft: "50px"}}>
+            <a href={Settings.getSigninUrl()} style={{color: "#ffffff", marginLeft: "50px"}}>
               管理员登录
             </a>
             <Link
@@ -187,21 +198,33 @@ export default class index extends Component {
     }
 
     bindMenu = (menulist) => {
-      return menulist.map((item) => {
-        if (item.chidPermissions.length === 0) {  // 没有子菜单
-          return <Menu.Item key={item.key} icon={item.icon ? React.createElement(Icon[item.icon]) : null}><Link
-            to={item.menu_url}>{item.menu_name}</Link></Menu.Item>;
-        } else {
-          return <SubMenu key={item.key} title={item.menu_name} icon={React.createElement(Icon[item.icon])}>
-            {this.bindMenu(item.chidPermissions)}
-          </SubMenu>;
+      if(this.state.account) {
+        let menu;
+        if(this.state.account.user_type === "2") {
+          menu = menulist.filter(item => item.userPermission === "阅卷员");
+        }else if(this.state.account.user_type === "1") {
+          menu = menulist.filter(item => item.userPermission === "组长");
+        }else if(this.state.account.owner === "openct") {
+          menu = menulist.filter(item => item.userPermission === "管理员");
+        }else{
+          menu = [];
         }
+        return menu.map((item) => {
+          if (item.chidPermissions.length === 0) {  // 没有子菜单
+            return <Menu.Item key={item.key}
+              icon={item.icon ? React.createElement(Icon[item.icon]) : null}><Link
+                to={item.menu_url}>{item.menu_name}</Link></Menu.Item>;
+          } else {
+            return <SubMenu key={item.key} title={item.menu_name} icon={React.createElement(Icon[item.icon])}>
+              {this.bindMenu(item.chidPermissions)}
+            </SubMenu>;
+          }
 
-      });
+        });
+      }
     }
 
     onOpenChange = (openKeys) => {
-      console.log(openKeys);
       if (openKeys.length === 1 || openKeys.length === 0) {
         this.setState({
           openKeys,
@@ -232,17 +255,23 @@ export default class index extends Component {
                   <span className="header-title">OpenCT在线阅卷系统</span>
                 </div>
 
-                <div className="header-info">
+                {/* <div className="header-info">
                   <span className="header-teacher">教师：小屋</span>
                   <span className="header-teacher">任务：正评卷</span>
                   <span className="header-teacher">题目：第一题</span>
                   <span className="header-teacher">评卷数量：201</span>
                   <span className="header-teacher">平均速度：6.5秒/份</span>
                   <span className="header-teacher">当前密号：2008886</span>
-                </div>
+                </div> */}
                 {
                   this.renderAccount()
                 }
+                <div className="header-right">
+                  <Link
+                    to={"/home/guide"} style={{color: "#ffffff", marginLeft: "50px"}}>
+                    阅卷系统使用指南
+                  </Link>
+                </div>
               </div>
 
             </Header>
@@ -274,7 +303,7 @@ export default class index extends Component {
                     <Route path="/home/answer" component={Answer} exact></Route>
                     <Route path="/home/sample" component={Sample} exact></Route>
                     <Route path="/home/review" component={Review} exact></Route>
-                    {/* <Route path="/home/selfMark" component={SelfMark} exact></Route> */}
+                    <Route path="/home/selfMark" component={SelfMark} exact></Route>
 
                     <Route path="/home/markMonitor/all" component={all} exact></Route>
                     <Route path="/home/markMonitor/average" component={average} exact></Route>
@@ -293,8 +322,10 @@ export default class index extends Component {
                     <Route path="/home/management/paper_allot" component={allot} exact></Route>
                     <Route path="/home/management/paper_manage" component={paperManage} exact></Route>
                     <Route path="/home/management/detailTable" component={detail} exact></Route>
+                    <Route path="/home/management/user/user_manage" component={userManage} exact></Route>
 
                     <Route path="/home/normaluser" component={normalLogin} exact></Route>
+
                   </>
 
                     : null

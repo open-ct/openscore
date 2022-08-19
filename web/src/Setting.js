@@ -11,6 +11,7 @@ export function initServerUrl() {
   if (hostname === "localhost") {
     ServerUrl = `http://${hostname}:8080`;
   }
+  return "/openct";
 }
 axios.defaults.withCredentials = true;
 
