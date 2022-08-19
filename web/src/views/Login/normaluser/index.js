@@ -5,7 +5,6 @@ import * as Setting from "../../../Setting";
 import axios from "axios";
 import * as Settings from "../../../Setting";
 import group from "../../../api/group";
-// const onFinish = (values: any) => {console.log('Received values of form: ', values);};
 export async function login(account, password) {
   return await new Promise((resolve) => {
     axios.post(`${Setting.ServerUrl}/login`, {

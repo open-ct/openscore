@@ -2,6 +2,7 @@ import React, {Component} from "react";
 import DocumentTitle from "react-document-title";
 import {Button, Input, Modal, Radio, Select, Space, Table, message} from "antd";
 import {ArrowLeftOutlined, ExclamationCircleOutlined} from "@ant-design/icons";
+import * as Settings from "../../../../Setting";
 import "./index.less";
 import group from "../../../../api/group";
 import Marking from "../../../../api/marking";
@@ -30,7 +31,6 @@ export default class index extends Component {
   }
 
   componentDidMount() {
-    console.log(this.props.match.params);
     this.setState({
       QuestionId: parseInt(this.props.match.params.QuestionId),
     });
@@ -66,7 +66,7 @@ export default class index extends Component {
         }
       })
       .catch((e) => {
-        console.log(e);
+        Settings.showMessage("error", e);
       });
   }
 
@@ -84,7 +84,7 @@ export default class index extends Component {
         }
       })
       .catch((e) => {
-        console.log(e);
+        Settings.showMessage("error", e);
       });
   }
 
@@ -102,7 +102,7 @@ export default class index extends Component {
         }
       })
       .catch((e) => {
-        console.log(e);
+        Settings.showMessage("error", e);
       });
   }
   // 当前试卷
@@ -126,7 +126,7 @@ export default class index extends Component {
         }
       })
       .catch((e) => {
-        console.log(e);
+        Settings.showMessage("error", e);
       });
   }
   // 选择评分区
@@ -161,7 +161,6 @@ export default class index extends Component {
     return scoreSelect;
   }
   select = (item, value) => {
-    console.log(item);
     if (this.state.selectId.length < this.state.testLength) {
       this.setState({
         selectId: [...this.state.selectId, item],
@@ -186,7 +185,6 @@ export default class index extends Component {
         selectScore: newSelectScore,
       });
     }
-    console.log(this.state.selectId, this.state.selectScore);
   }
   selectBox = (index) => {
     let selectList;
@@ -305,7 +303,7 @@ export default class index extends Component {
                 }
               })
               .catch((e) => {
-                console.log(e);
+                Settings.showMessage("error", e);
               });
           }
         } else if (value === 3) {
@@ -343,7 +341,7 @@ export default class index extends Component {
           }
         })
         .catch((e) => {
-          console.log(e);
+          Settings.showMessage("error", e);
         });
     } else {
       Marking.testProblem({
@@ -367,7 +365,7 @@ export default class index extends Component {
           }
         })
         .catch((e) => {
-          console.log(e);
+          Settings.showMessage("error", e);
         });
     }
 
@@ -377,7 +375,6 @@ export default class index extends Component {
   };
 
   handleCancel = () => {
-    console.log("Clicked cancel button");
     this.setState({
       problemVisible: false,
     });
@@ -388,7 +385,6 @@ export default class index extends Component {
     });
   }
   onRidioChange = e => {
-    console.log("radio checked", e.target.value);
     this.setState({
       problemValue: e.target.value,
     });
@@ -449,7 +445,6 @@ export default class index extends Component {
         index = i;
       }
     }
-    console.log(this.state.selectScore[index]);
     return this.state.selectScore[index];
   }
 
@@ -482,7 +477,7 @@ export default class index extends Component {
         }
       })
       .catch((e) => {
-        console.log(e);
+        Settings.showMessage("error", e);
       });
   }
   // 样卷
@@ -505,7 +500,7 @@ export default class index extends Component {
         }
       })
       .catch((e) => {
-        console.log(e);
+        Settings.showMessage("error", e);
       });
   }
 
@@ -547,18 +542,16 @@ export default class index extends Component {
     );
   }
   selectRow = (record) => {
-    console.log(record.order);
     Marking.testDetail({userId: "1", exampleTestId: record.question_id})
       .then((res) => {
         if (res.data.status === "10000") {
           this.setState({
             samplePaper: res.data.data.test[record.order],
           });
-          console.log(this.state.samplePaper);
         }
       })
       .catch((e) => {
-        console.log(e);
+        Settings.showMessage("error", e);
       });
   }
   render() {

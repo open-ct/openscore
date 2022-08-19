@@ -1,6 +1,7 @@
 import React, {Component} from "react";
 import DocumentTitle from "react-document-title";
 import {Table} from "antd";
+import * as Settings from "../../../Setting";
 import "./index.less";
 import Marking from "../../../api/marking";
 
@@ -32,7 +33,7 @@ export default class index extends Component {
         }
       })
       .catch((e) => {
-        console.log(e);
+        Settings.showMessage("error", e);
       });
   }
   getSampleList = () => {
@@ -54,7 +55,7 @@ export default class index extends Component {
         }
       })
       .catch((e) => {
-        console.log(e);
+        Settings.showMessage("error", e);
       });
   }
 
@@ -127,18 +128,16 @@ export default class index extends Component {
     );
   }
   selectRow = (record) => {
-    console.log(record.order);
     Marking.testDetail({userId: this.userId, exampleTestId: record.question_id})
       .then((res) => {
         if (res.data.status === "10000") {
           this.setState({
             samplePaper: res.data.data.test[record.order],
           });
-          console.log(this.state.samplePaper);
         }
       })
       .catch((e) => {
-        console.log(e);
+        Settings.showMessage("error", e);
       });
   }
 
