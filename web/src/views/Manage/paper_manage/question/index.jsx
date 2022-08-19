@@ -2,6 +2,7 @@ import React, {Component} from "react";
 import DocumentTitle from "react-document-title";
 import {Button, Input, Modal, Radio, message} from "antd";
 import {DeleteOutlined, ExclamationCircleOutlined} from "@ant-design/icons";
+import * as Settings from "../../../../Setting";
 import "./index.less";
 import Manage from "../../../../api/manage";
 export default class index extends Component {
@@ -101,7 +102,6 @@ export default class index extends Component {
                 }
               }
               topicDetails[addNo]["topicDetailName"] = e.target.value;
-              console.log(topicDetails);
               this.setState({
                 topicDetails,
               });
@@ -151,13 +151,11 @@ export default class index extends Component {
       let deleteNo;
       let topicDetails = [...this.state.topicDetails];
       for (let i = 0; i < this.state.questionList.length; i++) {
-        console.log(this.state.questionList[i].key);
         if (this.state.questionList[i].key === questionNo.toString()) {
           deleteNo = i;
           topicDetails.splice(i, 1);
         }
       }
-      console.log(topicDetails);
       this.setState({
         questionList: this.state.questionList.filter((item, i) => i !== deleteNo),
         topicDetails,
@@ -212,7 +210,7 @@ export default class index extends Component {
                 }
               })
               .catch((e) => {
-                console.log(e);
+                Settings.showMessage("error", e);
               });
           },
         });
@@ -273,7 +271,6 @@ export default class index extends Component {
     }
 
     goToDetail = () => {
-      console.log("123");
       this.props.history.push("/home/management/detailTable");
     }
 

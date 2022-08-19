@@ -29,6 +29,7 @@ import paper from "../Manage/paper_manage/paper";
 import allot from "../Manage/paper_manage/allot";
 import paperManage from "../Manage/paper_manage/manage";
 import detail from "../Manage/paper_manage/detail";
+import userManage from "../Manage/user_manage/user";
 
 import menuList from "../../menu/menuTab.js";
 import normalLogin from "../Login/normaluser";
@@ -48,14 +49,9 @@ export default class index extends Component {
     permissionList = menuList
 
     componentDidMount() {
-      console.log(this.props);
       this.getAccount();
       this.userInfo();
-      setTimeout(() => {
-        console.log(this.state);
-      }, 5000);
       let moren = "/home/mark-tasks";
-      console.log(moren);
       this.setState(
         {current: moren.substring(moren.lastIndexOf("/") + 1, moren.length)}
       );
@@ -187,21 +183,23 @@ export default class index extends Component {
     }
 
     bindMenu = (menulist) => {
-      return menulist.map((item) => {
-        if (item.chidPermissions.length === 0) {  // 没有子菜单
-          return <Menu.Item key={item.key} icon={item.icon ? React.createElement(Icon[item.icon]) : null}><Link
-            to={item.menu_url}>{item.menu_name}</Link></Menu.Item>;
-        } else {
-          return <SubMenu key={item.key} title={item.menu_name} icon={React.createElement(Icon[item.icon])}>
-            {this.bindMenu(item.chidPermissions)}
-          </SubMenu>;
-        }
+      if(this.state.account) {
+        return menulist.map((item) => {
+          if (item.chidPermissions.length === 0) {  // 没有子菜单
+            return <Menu.Item key={item.key}
+              icon={item.icon ? React.createElement(Icon[item.icon]) : null}><Link
+                to={item.menu_url}>{item.menu_name}</Link></Menu.Item>;
+          } else {
+            return <SubMenu key={item.key} title={item.menu_name} icon={React.createElement(Icon[item.icon])}>
+              {this.bindMenu(item.chidPermissions)}
+            </SubMenu>;
+          }
 
-      });
+        });
+      }
     }
 
     onOpenChange = (openKeys) => {
-      console.log(openKeys);
       if (openKeys.length === 1 || openKeys.length === 0) {
         this.setState({
           openKeys,
@@ -293,6 +291,7 @@ export default class index extends Component {
                     <Route path="/home/management/paper_allot" component={allot} exact></Route>
                     <Route path="/home/management/paper_manage" component={paperManage} exact></Route>
                     <Route path="/home/management/detailTable" component={detail} exact></Route>
+                    <Route path="/home/management/user/user_manage" component={userManage} exact></Route>
 
                     <Route path="/home/normaluser" component={normalLogin} exact></Route>
                   </>

@@ -1,5 +1,6 @@
 import React, {Component} from "react";
 import DocumentTitle from "react-document-title";
+import * as Settings from "../../../Setting";
 import "./index.less";
 import Marking from "../../../api/marking";
 
@@ -13,7 +14,6 @@ export default class index extends Component {
   getAllPaper = () => {
     Marking.testList({userId: this.userId})
       .then((res) => {
-        console.log(res);
         if (res.data.status === "10000") {
           let papers = [...res.data.data.TestIds];
           this.setState(
@@ -25,15 +25,13 @@ export default class index extends Component {
         }
       })
       .catch((e) => {
-        console.log(e);
+        Settings.showMessage("error", e);
       });
   }
 
   getAnswer = () => {
-    console.log("====");
     Marking.testAnswer({userId: this.userId, testId: this.state.papers[0]})
       .then((res) => {
-        console.log(res);
         if (res.data.status === "10000") {
           this.setState({
             keyTest: res.data.data.Pics,
@@ -41,7 +39,7 @@ export default class index extends Component {
         }
       })
       .catch((e) => {
-        console.log(e);
+        Settings.showMessage("error", e);
       });
   }
   componentDidMount() {

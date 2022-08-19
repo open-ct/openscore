@@ -2,13 +2,15 @@ import React, {Component} from "react";
 import DocumentTitle from "react-document-title";
 import {Button, Input, Modal, Radio, Select, Space, message} from "antd";
 import {ExclamationCircleOutlined} from "@ant-design/icons";
+import * as Settings from "../../../Setting";
 import "./index.less";
 import * as Util from "../../../util/Util";
 import Marking from "../../../api/marking";
 const {Option} = Select;
+
 export default class index extends Component {
 
-  userId = "1"
+  userId = 1
 
   state = {
     problemVisible: false,
@@ -24,14 +26,16 @@ export default class index extends Component {
   };
 
   componentDidMount() {
-    this.getAllPaper();
+    if(localStorage.getItem("account") === "1" || localStorage.getItem("account") === "2") {
+      this.getAllPaper();
+    }
   }
 
   // 总试卷获取 
   getAllPaper = () => {
     Marking.testList({userId: this.userId})
       .then((res) => {
-        if (res.data.status === "10000") {
+        if (res.data.status === "ok") {
           let papers = [...res.data.data.TestIds];
           this.setState(
             {
@@ -41,12 +45,14 @@ export default class index extends Component {
           this.getCurrentPaper();
         }else if(res.data.status === "10003") {
           if (res.data.msg === "there is no paper to correct") {
+            // let {user_type} = JSON.parse(this.state.account.tag)
+            // if(user_type==="2")
             message.warning("没有试卷待批改");
           }
         }
       })
       .catch((e) => {
-        console.log(e);
+        Settings.showMessage("error", e);
       });
   }
 
@@ -71,7 +77,7 @@ export default class index extends Component {
         }
       })
       .catch((e) => {
-        console.log(e);
+        Settings.showMessage("error", e);
       });
   }
 
@@ -83,7 +89,6 @@ export default class index extends Component {
         index = i;
       }
     }
-    console.log(this.state.selectScore[index]);
     return this.state.selectScore[index];
   }
 
@@ -92,12 +97,11 @@ export default class index extends Component {
     let testPaper = null;
     if (this.state.currentPaper.testInfos !== undefined) {
       testPaper = this.state.currentPaper.testInfos.map((item, index) => {
-        return <div key={index} className="test-question-img" data-content-before={this.imgScore(item.test_detail_id)}>
-          <img src={"data:image/jpg;base64," + item.picCode} alt="加载失败" />
+        return <div className="test-question-img" key={index} data-content-before={this.imgScore(item.test_detail_id)}>
+          <img src={item.pic_src} alt="加载失败" />
         </div>;
       });
     }
-
     return testPaper;
   }
 
@@ -154,6 +158,7 @@ export default class index extends Component {
             filterSort={(optionA, optionB) =>
               optionA.label.localeCompare(optionB.label)
             }
+            autoFocus={index === 0}
           >
             {
               this.selectBox(index)
@@ -167,7 +172,6 @@ export default class index extends Component {
     return scoreSelect;
   }
   select = (item, value) => {
-    console.log(item);
     if (this.state.selectId.length < this.state.testLength) {
       this.setState({
         selectId: [...this.state.selectId, item],
@@ -192,7 +196,6 @@ export default class index extends Component {
         selectScore: newSelectScore,
       });
     }
-    console.log(this.state.selectId, this.state.selectScore);
   }
   renderScoreDropDown() {
 
@@ -290,7 +293,7 @@ export default class index extends Component {
                 }
               })
               .catch((e) => {
-                console.log(e);
+                Settings.showMessage("error", e);
               });
           }
         } else if (value === 3) {
@@ -322,7 +325,7 @@ export default class index extends Component {
           this.getAllPaper();
         })
         .catch((e) => {
-          console.log(e);
+          Settings.showMessage("error", e);
         });
     } else {
       Marking.testProblem({
@@ -339,7 +342,7 @@ export default class index extends Component {
           this.getAllPaper();
         })
         .catch((e) => {
-          console.log(e);
+          Settings.showMessage("error", e);
         });
     }
     this.setState({
@@ -348,13 +351,11 @@ export default class index extends Component {
   };
 
   handleCancel = () => {
-    console.log("Clicked cancel button");
     this.setState({
       problemVisible: false,
     });
   };
   onRidioChange = e => {
-    console.log("radio checked", e.target.value);
     this.setState({
       problemValue: e.target.value,
     });
@@ -367,7 +368,7 @@ export default class index extends Component {
   problemModal() {
     const {problemValue} = this.state;
     return (
-      <Modal
+      <Modal autoFocus="true"
         title="请选择问题卷类型"
         visible={this.state.problemVisible}
         onOk={this.handleOk}

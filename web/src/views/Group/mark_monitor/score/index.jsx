@@ -1,10 +1,12 @@
 import React, {Component} from "react";
 import DocumentTitle from "react-document-title";
 import {Select, Table} from "antd";
+import * as Settings from "../../../../Setting";
 import "./index.less";
 import group from "../../../../api/group";
 
 import ReactEcharts from "echarts-for-react";
+
 const {Option} = Select;
 export default class index extends Component {
     supervisorId = "2"
@@ -34,11 +36,11 @@ export default class index extends Component {
         X_data.push(this.state.columns[i].title);
       }
       for (const key in this.state.tableData[0]) {
-        if (key != "Score") {
+        if (key !== "Score") {
           Y_data.push(this.state.tableData[0][key]);
         }
       }
-      let option = {
+      return {
         xAxis: {
           name: "分数",
           data: X_data,
@@ -52,29 +54,26 @@ export default class index extends Component {
           data: Y_data,
         }],
       };
-      return option;
     };
     questionList = () => {
       group.questionList({adminId: "1", subjectName: JSON.parse(localStorage.getItem("userInfo")).SubjectName})
         .then((res) => {
-          if (res.data.status == "10000") {
+          if (res.data.status === "10000") {
             this.setState({
               questionList: res.data.data.questionsList,
             });
-            console.log(res.data.data.questionsList);
             this.tableData(res.data.data.questionsList[0].QuestionId);
           }
         })
         .catch((e) => {
-          console.log(e);
+          Settings.showMessage("error", e);
         });
     }
 
     tableData = (questionId) => {
       group.scoreMonitor({supervisorId: "1", questionId: questionId})
         .then((res) => {
-          if (res.data.status == "10000") {
-            console.log(res.data);
+          if (res.data.status === "10000") {
             let columns = [{
               title: "分数",
               width: 120,
@@ -95,21 +94,20 @@ export default class index extends Component {
                 }
               );
             }
-            console.log(tableData, columns);
             this.setState({
               tableData, columns,
             });
           }
         })
         .catch((e) => {
-          console.log(e);
+          Settings.showMessage("error", e);
         });
     }
 
     // 题目选择区
     selectBox = () => {
       let selectList;
-      if (this.state.questionList.length != 0) {
+      if (this.state.questionList.length !== 0) {
         selectList = this.state.questionList.map((item, i) => {
           return <Option key={i} value={item.QuestionName} label={item.QuestionName}>{item.QuestionName}</Option>;
         });
