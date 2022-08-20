@@ -445,7 +445,7 @@ export default class index extends Component {
           this.setState({
             problemVisible: true,
           });
-        } 
+        }
       },
     });
   }
