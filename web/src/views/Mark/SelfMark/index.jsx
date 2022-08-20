@@ -288,10 +288,7 @@ export default class index extends Component {
                 Settings.showMessage("error", e);
               });
           }
-        } else if (value === 3) {
-          console.log("3");
-        } else {
-          console.log("2", this);
+        } else if (value === 2) {
           this.setState({
             problemVisible: true,
           });

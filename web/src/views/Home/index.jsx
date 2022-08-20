@@ -72,12 +72,11 @@ export default class index extends Component {
             this.setState({
               userInfo: res.data.data.userInfo,
             });
-            console.log(res.data.data.userInfo);
             localStorage.setItem("userInfo", JSON.stringify(res.data.data.userInfo));
           }
         })
         .catch((e) => {
-          console.log(e);
+          Setting.showMessage('error', e)
         });
     }
     getAccount() {
