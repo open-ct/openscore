@@ -441,7 +441,7 @@ export default class index extends Component {
             .catch((e) => {
               Settings.showMessage("error", e);
             });
-        }  else if (value === 2) {
+        } else if (value === 2) {
           this.setState({
             problemVisible: true,
           });
