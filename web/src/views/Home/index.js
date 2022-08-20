@@ -43,28 +43,32 @@ const {SubMenu} = Menu;
 export default class index extends Component {
     state = {
       account: null,
-      current: "home",
-
+      openKeys: [],
+      selectedKeys: [],
+      userInfo: {},
     };
     permissionList = menuList
 
     componentDidMount() {
       this.getAccount();
       this.userInfo();
-      let moren = "/home/mark-tasks";
-      this.setState(
-        {current: moren.substring(moren.lastIndexOf("/") + 1, moren.length)}
-      );
-
-      this.props.history.listen((e) => {
-        let test = e.pathname;
-        let text = test.substring(test.lastIndexOf("/") + 1, test.length);
+      const pathname = this.props.location.pathname;
+      const rank = pathname.split("/").slice(-2).reverse();
+      switch (rank.length) {
+      case 1:
         this.setState({
-          current: text,
+          openKeys: rank,
         });
-      });
-    }
+        break;
+      case 2:
+        this.setState({
+          selectedKeys: rank,
+          openKeys: rank[1],
+        });
+        break;
+      }
 
+    }
     userInfo = () => {
       group.userInfo({supervisorId: "1"})
         .then((res) => {
@@ -76,7 +80,7 @@ export default class index extends Component {
           }
         })
         .catch((e) => {
-          Setting.showMessage('error', e)
+          Setting.showMessage("error", e);
         });
     }
     getAccount() {
@@ -217,8 +221,14 @@ export default class index extends Component {
       }
     }
 
+    onClick = (selectedKeys) => {
+      this.setState({selectedKeys: selectedKeys.keyPath});
+      console.log(selectedKeys.keyPath);
+    }
+
     render() {
-      const {openKeys} = this.state;
+      const {openKeys, selectedKeys} = this.state;
+      console.log(openKeys, selectedKeys);
       return (
         <DocumentTitle title="阅卷系统">
           <Layout className="home-page" data-component="home-page">
@@ -249,15 +259,11 @@ export default class index extends Component {
                   onOpenChange={this.onOpenChange.bind(this)}
                   style={{width: 200, height: "100%"}}
                   openKeys={openKeys}
-                  defaultOpenKeys={this.state.openKeys}
-                  defaultSelectedKeys={["mark-tasks"]}
-                  selectedKeys={[this.state.current]}
+                  selectedKeys={selectedKeys}
+                  onClick={this.onClick}
                   mode="inline"
                 >
-                  {/* <Menu.Item key="mark-tasks" icon={<FormOutlined />}>评卷</Menu.Item>
-                                <Menu.Item key="answer" icon={<CheckCircleOutlined />}>答案</Menu.Item>
-                                <Menu.Item key="sample" icon={<ProfileOutlined />}>样卷</Menu.Item>
-                                <Menu.Item key="review" icon={<HighlightOutlined />}>回评</Menu.Item> */
+                  {
                     this.bindMenu(this.permissionList)
                   }
 
@@ -266,31 +272,31 @@ export default class index extends Component {
               <Content>
                 <Switch>
                   {this.permissionList[0].userPermission === "阅卷员" ? <>
-                    <Redirect from="/home" to="/home/mark-tasks" exact></Redirect>
+                    {this.openKeys === [] ? <Redirect from="/home" to="/home/mark-tasks" exact></Redirect> : null}
                     <Route path="/home/mark-tasks" component={MarkTasks} exact></Route>
                     <Route path="/home/answer" component={Answer} exact></Route>
                     <Route path="/home/sample" component={Sample} exact></Route>
                     <Route path="/home/review" component={Review} exact></Route>
                     {/* <Route path="/home/selfMark" component={SelfMark} exact></Route> */}
 
-                    <Route path="/home/markMonitor/all" component={all} exact></Route>
-                    <Route path="/home/markMonitor/average" component={average} exact></Route>
-                    <Route path="/home/markMonitor/score" component={score} exact></Route>
-                    <Route path="/home/markMonitor/self" component={self} exact></Route>
-                    <Route path="/home/markMonitor/standard" component={standard} exact></Route>
-                    <Route path="/home/markMonitor/teacher" component={teacher} exact></Route>
+                    <Route path="/home/allMarkMonitor/all" component={all} exact></Route>
+                    <Route path="/home/allMarkMonitor/average" component={average} exact></Route>
+                    <Route path="/home/allMarkMonitor/score" component={score} exact></Route>
+                    <Route path="/home/allMarkMonitor/self" component={self} exact></Route>
+                    <Route path="/home/allMarkMonitor/standard" component={standard} exact></Route>
+                    <Route path="/home/allMarkMonitor/teacher" component={teacher} exact></Route>
 
                     <Route path="/home/group/arbitration" component={arbitration} exact></Route>
                     <Route path="/home/group/marking" component={marking}></Route>
                     <Route path="/home/group/problem" component={problem} exact></Route>
                     <Route path="/home/group/markTasks/:type/:QuestionId" component={markTasks} exact></Route>
 
-                    <Route path="/home/management/question" component={question} exact></Route>
-                    <Route path="/home/management/paper" component={paper}></Route>
-                    <Route path="/home/management/paper_allot" component={allot} exact></Route>
-                    <Route path="/home/management/paper_manage" component={paperManage} exact></Route>
-                    <Route path="/home/management/detailTable" component={detail} exact></Route>
-                    <Route path="/home/management/user/user_manage" component={userManage} exact></Route>
+                    <Route path="/home/paperManagement/question" component={question} exact></Route>
+                    <Route path="/home/paperManagement/paper" component={paper}></Route>
+                    <Route path="/home/paperManagement/paper_allot" component={allot} exact></Route>
+                    <Route path="/home/userManagement/paper_manage" component={paperManage} exact></Route>
+                    <Route path="/home/userManagement/detailTable" component={detail} exact></Route>
+                    <Route path="/home/userManagement/user/user_manage" component={userManage} exact></Route>
 
                     <Route path="/home/normaluser" component={normalLogin} exact></Route>
                   </>
