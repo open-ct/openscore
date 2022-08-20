@@ -1,8 +1,11 @@
 import React, {Component} from "react";
 import DocumentTitle from "react-document-title";
 import {Button, Upload, message} from "antd";
-import {UploadOutlined} from "@ant-design/icons";
+import {DownloadOutlined, UploadOutlined} from "@ant-design/icons";
+import * as Settings from "../../../../Setting";
 import "./index.less";
+import axios from "axios";
+
 export default class index extends Component {
 
   state = {
@@ -13,12 +16,35 @@ export default class index extends Component {
 
   }
 
+  paperExport = () => {
+    axios.request({
+      url: "/marking/supervisor/writeScoreExcel",
+      headers: {
+        "Content-Type": "application/json", // 重要
+        "accept": "application/octet-stream", // 重要
+      },
+      method: "POST",
+      data: "",
+      params: "",
+      responseType: "blob", // 重要
+    }).then(function(response) {
+      var data = response.data;
+      var url = URL.createObjectURL(data);// 重要
+      let link = document.createElement("a");
+      link.href = url;
+      link.download = "试卷成绩.xlsx";// 重要--决定下载文件名
+      link.click();
+      link.remove();
+    }).catch(function(e) {Settings.showMessage("error", e);});
+
+  }
+
   render() {
     const props_1 = {
       name: "excel",
-      action: "http://localhost:8080/openct/marking/admin/readExcel",
+      action: Settings.ServerUrl + "/openct/marking/admin/readExcel",
       headers: {
-        authorization: "authorization-text",
+        authorization: null,
       },
       onChange(info) {
         if (info.file.status !== "uploading") {
@@ -33,7 +59,7 @@ export default class index extends Component {
     };
     const props_2 = {
       name: "excel",
-      action: "http://localhost:8080/openct/marking/admin/readExapmleExcel",
+      action: Settings.ServerUrl + "/openct/marking/admin/readExapmleExcel",
       headers: {
         authorization: "authorization-text",
       },
@@ -50,7 +76,7 @@ export default class index extends Component {
     };
     const props_3 = {
       name: "excel",
-      action: "http://localhost:8080/openct/marking/admin/readAnswerExcel",
+      action: Settings.ServerUrl + "/openct/marking/admin/readAnswerExcel",
       headers: {
         authorization: "authorization-text",
       },
@@ -66,17 +92,22 @@ export default class index extends Component {
       },
     };
     return (
-      <DocumentTitle title="试卷管理-导入导出试卷">
+      <DocumentTitle title="试卷管理-导入试卷">
         <div className="export-page" data-component="export-page">
-          <Upload {...props_1}>
-            <Button icon={<UploadOutlined />} style={{marginRight: 24}}>导入试卷</Button>
-          </Upload>
-          <Upload {...props_2}>
-            <Button icon={<UploadOutlined />} style={{marginRight: 24}}>导入样卷</Button>
-          </Upload>
-          <Upload {...props_3}>
-            <Button icon={<UploadOutlined />} style={{marginRight: 24}}>导入答案</Button>
-          </Upload>
+          <div className="export-page" data-component="export-page">
+            <Upload {...props_1}>
+              <Button icon={<UploadOutlined />} style={{marginRight: 24}}>导入试卷</Button>
+            </Upload>
+            <Upload {...props_2}>
+              <Button icon={<UploadOutlined />} style={{marginRight: 24}}>导入样卷</Button>
+            </Upload>
+            <Upload {...props_3}>
+              <Button icon={<UploadOutlined />} style={{marginRight: 24}}>导入答案</Button>
+            </Upload>
+          </div>
+          <div className="export-page" data-component="export-page">
+            <Button icon={<DownloadOutlined />} onClick={this.paperExport} style={{marginRight: 24}}>导出成绩</Button>
+          </div>
         </div>
       </DocumentTitle>
     );

@@ -1,9 +1,11 @@
 import React, {Component} from "react";
 import DocumentTitle from "react-document-title";
 import {Select, Table} from "antd";
+import * as Settings from "../../../../Setting";
 import "./index.less";
 import group from "../../../../api/group";
 import ReactEcharts from "echarts-for-react";
+
 const {Option} = Select;
 export default class index extends Component {
 
@@ -67,7 +69,7 @@ export default class index extends Component {
       for (let i = 0; i < this.state.tableData.length; i++) {
         Y2_data.push(this.state.tableData[i].SelfScore);
       }
-      let option = {
+      return {
         xAxis: {
           name: "序号",
           data: X_data,
@@ -86,12 +88,11 @@ export default class index extends Component {
           data: Y2_data,
         }],
       };
-      return option;
     };
     questionList = () => {
       group.questionList({adminId: "1", subjectName: JSON.parse(localStorage.getItem("userInfo")).SubjectName})
         .then((res) => {
-          if (res.data.status == "10000") {
+          if (res.data.status === "10000") {
             this.setState({
               questionList: res.data.data.questionsList,
             });
@@ -99,14 +100,13 @@ export default class index extends Component {
           }
         })
         .catch((e) => {
-          console.log(e);
+          Settings.showMessage("error", e);
         });
     }
     teacherList = (questionId) => {
       group.selfTeacher({supervisorId: "2", questionId})
         .then((res) => {
-          if (res.data.status == "10000") {
-            console.log(res.data);
+          if (res.data.status === "10000") {
             this.setState({
               teacherList: res.data.data.teacherVOList,
             });
@@ -114,13 +114,13 @@ export default class index extends Component {
           }
         })
         .catch((e) => {
-          console.log(e);
+          Settings.showMessage("error", e);
         });
     }
     // 题目选择区
     selectQuestionBox = () => {
       let selectList;
-      if (this.state.questionList.length != 0) {
+      if (this.state.questionList.length !== 0) {
         selectList = this.state.questionList.map((item, i) => {
           return <Option key={i} value={item.QuestionName} label={item.QuestionName}>{item.QuestionName}</Option>;
         });
@@ -131,8 +131,8 @@ export default class index extends Component {
     }
     selectTeacherBox = () => {
       let selectList;
-      if (this.state.teacherList.length != 0) {
-        selectList = this.state.teacherList.map((item, i) => {
+      if (this.state.teacherList.length !== 0) {
+        selectList = this.state.teacherList.map((item) => {
           return <Option key={item.UserName} value={item.UserName} label={item.UserName}>{item.UserName}</Option>;
         });
       } else {
@@ -141,7 +141,7 @@ export default class index extends Component {
       return selectList;
     }
     selectTeacher = (e) => {
-      console.log(e);
+      Settings.showMessage("error", e);
       let index;
       for (let i = 0; i < this.state.teacherList.length; i++) {
         if (this.state.teacherList[i].UserName === e) {
@@ -151,7 +151,7 @@ export default class index extends Component {
       this.tableData(this.state.teacherList[index].UserId);
     }
     selectQuestion = (e) => {
-      console.log(e);
+      Settings.showMessage("error", e);
       let index;
       for (let i = 0; i < this.state.questionList.length; i++) {
         if (this.state.questionList[i].QuestionName === e) {
@@ -167,7 +167,7 @@ export default class index extends Component {
     tableData = (examinerId) => {
       group.selfMonitor({supervisorId: "2", examinerId})
         .then((res) => {
-          if (res.data.status == "10000") {
+          if (res.data.status === "10000") {
             let tableData = [];
             let selfScoreRecordVOList = res.data.data.selfScoreRecordVOList;
             for (let i = 0; i < res.data.data.selfScoreRecordVOList.length; i++) {
@@ -187,7 +187,7 @@ export default class index extends Component {
           }
         })
         .catch((e) => {
-          console.log(e);
+          Settings.showMessage("error", e);
         });
     }
 
