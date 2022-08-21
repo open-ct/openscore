@@ -6,17 +6,17 @@ import (
 	"github.com/open-ct/openscore/model"
 )
 
-func Login(account string, pwd string) (int64, int64, error) {
+func Login(account string, pwd string) (int64, string, error) {
 	u, err := model.GetUserByAccount(account)
 	if err != nil {
-		return 0, 0, err
+		return 0, "", err
 	}
 	if u == nil {
-		return 0, 0, errors.New("user not found")
+		return 0, "", errors.New("user not found")
 	}
 
 	if u.Password != pwd {
-		return 0, 0, errors.New("pwd not correct")
+		return 0, "", errors.New("pwd not correct")
 	}
 
 	// if err := u.UpdateOnlineStatus(true, util.GetCurrentTime()); err != nil {

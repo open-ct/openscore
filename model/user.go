@@ -18,7 +18,7 @@ type User struct {
 	SubjectName    string `json:"subject_name"`
 	IsOnlineStatus bool   `json:"is_online_status"`
 	QuestionId     int64  `json:"question_id"`
-	UserType       int64  `json:"user_type"`
+	UserType       string `json:"user_type"`
 }
 
 func (u *User) Insert() error {
