@@ -210,6 +210,7 @@ func (c *ApiController) UserInfo() {
 	var userInfoVO UserInfoVO
 	userInfoVO.UserName = user.UserName
 	userInfoVO.SubjectName = user.SubjectName
+	userInfoVO.UserType = user.UserType
 
 	// --------------------------------------------------
 

@@ -106,6 +106,7 @@ type QuestionListVO struct {
 type UserInfoVO struct {
 	UserName    string
 	SubjectName string
+	UserType    string
 }
 
 type TeacherMonitoringVO struct {
