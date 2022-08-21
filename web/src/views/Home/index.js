@@ -223,12 +223,10 @@ export default class index extends Component {
 
     onClick = (selectedKeys) => {
       this.setState({selectedKeys: selectedKeys.keyPath});
-      console.log(selectedKeys.keyPath);
     }
 
     render() {
       const {openKeys, selectedKeys} = this.state;
-      console.log(openKeys, selectedKeys);
       return (
         <DocumentTitle title="阅卷系统">
           <Layout className="home-page" data-component="home-page">
