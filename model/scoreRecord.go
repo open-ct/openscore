@@ -30,9 +30,19 @@ func (s *ScoreRecord) GetTopic(id int64) error {
 func (s *ScoreRecord) GetRecordByTestId(testId int64, userId int64) error {
 	has, err := adapter.engine.Where(builder.Eq{"test_id": testId}).Where("user_id=?", userId).Where("test_record_type !=0").Get(s)
 	if !has || err != nil {
-		log.Println("could not find user")
+		log.Println("could not find ScoreRecord")
 	}
 	return err
+}
+
+func GetRecordByTestId(testId int64) (*ScoreRecord, error) {
+	s := &ScoreRecord{}
+	has, err := adapter.engine.Where(builder.Eq{"test_id": testId}).Where("test_record_type !=0").Get(s)
+	if !has || err != nil {
+		log.Println("could not find ScoreRecord")
+		return nil, err
+	}
+	return s, nil
 }
 
 func (s *ScoreRecord) Save() error {
@@ -41,6 +51,15 @@ func (s *ScoreRecord) Save() error {
 		log.Println("insert record fail")
 	}
 	return err
+}
+
+func ListUserScoreRecord(userId int64) ([]ScoreRecord, error) {
+	var records []ScoreRecord
+	err := adapter.engine.Where("test_record_type=1").Where("user_id=?", userId).Find(&records)
+	if err != nil {
+		log.Println("ListUserScoreRecord err ")
+	}
+	return records, err
 }
 
 func GetLatestRecords(userId int64, records *[]ScoreRecord) error {

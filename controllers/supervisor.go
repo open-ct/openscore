@@ -224,17 +224,17 @@ func (c *ApiController) UserInfo() {
 */
 func (c *ApiController) TeacherMonitoring() {
 	defer c.ServeJSON()
-	var requestBody Question
+	var req Question
 	var resp Response
 
-	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	err := json.Unmarshal(c.Ctx.Input.RequestBody, &req)
 	if err != nil {
 		resp = Response{"10001", "cannot unmarshal", err}
 		c.Data["json"] = resp
 		return
 	}
-	// supervisorId := requestBody.SupervisorId
-	questionId := requestBody.QuestionId
+	// supervisorId := req.SupervisorId
+	questionId := req.QuestionId
 
 	// ----------------------------------------------------
 	// paperDistributions := make([]model.PaperDistribution, 0)
@@ -404,18 +404,18 @@ func (c *ApiController) TeacherMonitoring() {
 */
 func (c *ApiController) ScoreDistribution() {
 	defer c.ServeJSON()
-	var requestBody Question
+	var req Question
 	var resp Response
 	var err error
 
-	err = json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	err = json.Unmarshal(c.Ctx.Input.RequestBody, &req)
 	if err != nil {
 		resp = Response{"10001", "cannot unmarshal", err}
 		c.Data["json"] = resp
 		return
 	}
-	// supervisorId := requestBody.SupervisorId
-	questionId := requestBody.QuestionId
+	// supervisorId := req.SupervisorId
+	questionId := req.QuestionId
 
 	// ----------------------------------------------------
 	// 求大题满分
@@ -477,18 +477,18 @@ func (c *ApiController) ScoreDistribution() {
 */
 func (c *ApiController) TeachersByQuestion() {
 	defer c.ServeJSON()
-	var requestBody Question
+	var req Question
 	var resp Response
 	var err error
 
-	err = json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	err = json.Unmarshal(c.Ctx.Input.RequestBody, &req)
 	if err != nil {
 		resp = Response{"10001", "cannot unmarshal", err}
 		c.Data["json"] = resp
 		return
 	}
-	// supervisorId := requestBody.SupervisorId
-	questionId := requestBody.QuestionId
+	// supervisorId := req.SupervisorId
+	questionId := req.QuestionId
 
 	// ----------------------------------------------------
 	// 根据大题求试卷分配表
@@ -537,18 +537,18 @@ func (c *ApiController) TeachersByQuestion() {
 */
 func (c *ApiController) SelfScore() {
 	defer c.ServeJSON()
-	var requestBody SelfScore
+	var req SelfScore
 	var resp Response
 	var err error
 
-	err = json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	err = json.Unmarshal(c.Ctx.Input.RequestBody, &req)
 	if err != nil {
 		resp = Response{"10001", "cannot unmarshal", err}
 		c.Data["json"] = resp
 		return
 	}
-	// supervisorId := requestBody.SupervisorId
-	examinerId := requestBody.ExaminerId
+	// supervisorId := req.SupervisorId
+	examinerId := req.ExaminerId
 	// ----------------------------------------------------
 
 	// 根据userId找到自评卷
@@ -626,17 +626,17 @@ func (c *ApiController) SelfScore() {
 */
 func (c *ApiController) AverageScore() {
 	defer c.ServeJSON()
-	var requestBody Question
+	var req Question
 	var resp Response
 
-	err := json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	err := json.Unmarshal(c.Ctx.Input.RequestBody, &req)
 	if err != nil {
 		resp = Response{"10001", "cannot unmarshal", err}
 		c.Data["json"] = resp
 		return
 	}
-	// supervisorId := requestBody.SupervisorId
-	questionId := requestBody.QuestionId
+	// supervisorId := req.SupervisorId
+	questionId := req.QuestionId
 	// --------------------------------------------
 	// 根据大题求试卷分配表
 	// paperDistributions := make([]model.PaperDistribution, 0)
@@ -725,18 +725,18 @@ func (c *ApiController) AverageScore() {
 */
 func (c *ApiController) ProblemTest() {
 	defer c.ServeJSON()
-	var requestBody Question
+	var req Question
 	var resp Response
 	var err error
 
-	err = json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	err = json.Unmarshal(c.Ctx.Input.RequestBody, &req)
 	if err != nil {
 		resp = Response{"10001", "cannot unmarshal", err}
 		c.Data["json"] = resp
 		return
 	}
-	// supervisorId := requestBody.SupervisorId
-	questionId := requestBody.QuestionId
+	// supervisorId := req.SupervisorId
+	questionId := req.QuestionId
 	// ------------------------------------------------
 
 	// 根据大题号找到问题卷
@@ -791,18 +791,18 @@ func (c *ApiController) ProblemTest() {
 */
 func (c *ApiController) ArbitramentTest() {
 	defer c.ServeJSON()
-	var requestBody Question
+	var req Question
 	var resp Response
 	var err error
 
-	err = json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	err = json.Unmarshal(c.Ctx.Input.RequestBody, &req)
 	if err != nil {
 		resp = Response{"10001", "cannot unmarshal", err}
 		c.Data["json"] = resp
 		return
 	}
-	// supervisorId := requestBody.SupervisorId
-	questionId := requestBody.QuestionId
+	// supervisorId := req.SupervisorId
+	questionId := req.QuestionId
 	// ------------------------------------------------
 
 	// 根据大题号找到仲裁卷
@@ -906,18 +906,18 @@ func (c *ApiController) ArbitramentTest() {
 */
 func (c *ApiController) ScoreProgress() {
 	defer c.ServeJSON()
-	var requestBody ScoreProgress
+	var req ScoreProgress
 	var resp Response
 	var err error
 
-	err = json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	err = json.Unmarshal(c.Ctx.Input.RequestBody, &req)
 	if err != nil {
 		resp = Response{"10001", "cannot unmarshal", err}
 		c.Data["json"] = resp
 		return
 	}
-	// supervisorId := requestBody.SupervisorId
-	subject := requestBody.Subject
+	// supervisorId := req.SupervisorId
+	subject := req.Subject
 
 	// ----------------------------------------------------
 	// 根据科目获取大题列表
@@ -1327,11 +1327,11 @@ func (c *ApiController) ScoreProgress() {
 */
 func (c *ApiController) SupervisorPoint() {
 	defer c.ServeJSON()
-	var requestBody SupervisorPoint
+	var req SupervisorPoint
 	var resp Response
 	var err error
 
-	err = json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	err = json.Unmarshal(c.Ctx.Input.RequestBody, &req)
 	if err != nil {
 		resp = Response{"10001", "cannot unmarshal", err}
 		c.Data["json"] = resp
@@ -1344,9 +1344,9 @@ func (c *ApiController) SupervisorPoint() {
 		c.Data["json"] = resp
 		return
 	}
-	testId := requestBody.TestId
-	scoreStr := requestBody.Scores
-	testDetailIdStr := requestBody.TestDetailIds
+	testId := req.TestId
+	scoreStr := req.Scores
+	testDetailIdStr := req.TestDetailIds
 	testDetailIds := strings.Split(testDetailIdStr, "-")
 	scores := strings.Split(scoreStr, "-")
 
@@ -1443,18 +1443,18 @@ func (c *ApiController) SupervisorPoint() {
 */
 func (c *ApiController) ProblemUnmarkList() {
 	defer c.ServeJSON()
-	var requestBody Question
+	var req Question
 	var resp Response
 	var err error
 
-	err = json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	err = json.Unmarshal(c.Ctx.Input.RequestBody, &req)
 	if err != nil {
 		resp = Response{"10001", "cannot unmarshal", err}
 		c.Data["json"] = resp
 		return
 	}
-	// supervisorId := requestBody.SupervisorId
-	questionId := requestBody.QuestionId
+	// supervisorId := req.SupervisorId
+	questionId := req.QuestionId
 	// ------------------------------------------------
 
 	// 根据大题号找到问题卷
@@ -1489,18 +1489,18 @@ func (c *ApiController) ProblemUnmarkList() {
 */
 func (c *ApiController) SelfUnmarkList() {
 	defer c.ServeJSON()
-	var requestBody Question
+	var req Question
 	var resp Response
 	var err error
 
-	err = json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	err = json.Unmarshal(c.Ctx.Input.RequestBody, &req)
 	if err != nil {
 		resp = Response{"10001", "cannot unmarshal", err}
 		c.Data["json"] = resp
 		return
 	}
-	// supervisorId := requestBody.SupervisorId
-	questionId := requestBody.QuestionId
+	// supervisorId := req.SupervisorId
+	questionId := req.QuestionId
 	// ------------------------------------------------
 
 	// 根据大题号找到自评卷
@@ -1535,18 +1535,18 @@ func (c *ApiController) SelfUnmarkList() {
 */
 func (c *ApiController) ArbitramentUnmarkList() {
 	defer c.ServeJSON()
-	var requestBody Question
+	var req Question
 	var resp Response
 	var err error
 
-	err = json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	err = json.Unmarshal(c.Ctx.Input.RequestBody, &req)
 	if err != nil {
 		resp = Response{"10001", "cannot unmarshal", err}
 		c.Data["json"] = resp
 		return
 	}
-	// supervisorId := requestBody.SupervisorId
-	questionId := requestBody.QuestionId
+	// supervisorId := req.SupervisorId
+	questionId := req.QuestionId
 
 	// ------------------------------------------------
 
@@ -1580,18 +1580,18 @@ func (c *ApiController) ArbitramentUnmarkList() {
 
 func (c *ApiController) ScoreDeviation() {
 	defer c.ServeJSON()
-	var requestBody Question
+	var req Question
 	var resp Response
 	var err error
 
-	err = json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	err = json.Unmarshal(c.Ctx.Input.RequestBody, &req)
 	if err != nil {
 		resp = Response{"10001", "cannot unmarshal", err}
 		c.Data["json"] = resp
 		return
 	}
-	// supervisorId := requestBody.SupervisorId
-	questionId := requestBody.QuestionId
+	// supervisorId := req.SupervisorId
+	questionId := req.QuestionId
 
 	// ------------------------------------------------
 
@@ -1686,18 +1686,18 @@ func (c *ApiController) ScoreDeviation() {
 */
 func (c *ApiController) SelfMarkList() {
 	defer c.ServeJSON()
-	var requestBody Question
+	var req Question
 	var resp Response
 	var err error
 
-	err = json.Unmarshal(c.Ctx.Input.RequestBody, &requestBody)
+	err = json.Unmarshal(c.Ctx.Input.RequestBody, &req)
 	if err != nil {
 		resp = Response{"10001", "cannot unmarshal", err}
 		c.Data["json"] = resp
 		return
 	}
-	// supervisorId := requestBody.SupervisorId
-	questionId := requestBody.QuestionId
+	// supervisorId := req.SupervisorId
+	questionId := req.QuestionId
 
 	// ------------------------------------------------
 	// 找到大题标准误差
