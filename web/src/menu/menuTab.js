@@ -46,7 +46,7 @@ export default [
     ],
   },
   {
-    key: "mark_monitor",
+    key: "markMonitor",
     userPermission: "组长",
     menu_name: "评卷监控",
     menu_url: "/home/markMonitor",
@@ -109,7 +109,7 @@ export default [
     ],
   },
   {
-    key: "test_management",
+    key: "testMonitor",
     userPermission: "组长",
     menu_name: "试卷管理",
     menu_url: "/home/testMonitor",
@@ -145,7 +145,7 @@ export default [
     ],
   },
   // {
-  //     key: "group_user_management",
+  //     key: "group_userManagement",
   //     userPermission: "组长",
   //     menu_name: "用户管理",
   //     menu_url: "/home/group/userMonitor",
@@ -154,17 +154,17 @@ export default [
   //     ]
   // },
   {
-    key: "paper_management",
+    key: "paperManagement",
     userPermission: "管理员",
     menu_name: "试卷管理",
-    menu_url: "/home/management/paper",
+    menu_url: "/home/paperManagement",
     icon: "FormOutlined",
     chidPermissions: [
       {
         key: "question",
         userPermission: "管理员",
         menu_name: "题目设置",
-        menu_url: "/home/management/question",
+        menu_url: "/home/paperManagement/question",
         icon: "",
         chidPermissions: [
         ],
@@ -173,7 +173,7 @@ export default [
         key: "paper",
         userPermission: "管理员",
         menu_name: "试卷导入",
-        menu_url: "/home/management/paper",
+        menu_url: "/home/paperManagement/paper",
         icon: "",
         chidPermissions: [
         ],
@@ -182,7 +182,7 @@ export default [
         key: "paper_allot",
         userPermission: "管理员",
         menu_name: "试卷分配",
-        menu_url: "/home/management/paper_allot",
+        menu_url: "/home/paperManagement/paper_allot",
         icon: "",
         chidPermissions: [
         ],
@@ -190,17 +190,17 @@ export default [
     ],
   },
   {
-    key: "user_management",
+    key: "userManagement",
     userPermission: "管理员",
     menu_name: "用户管理",
-    menu_url: "/home/management/user",
+    menu_url: "/home/userManagement",
     icon: "UserOutlined",
     chidPermissions: [
       {
-        key: "user_manage",
+        key: "userManage",
         userPermission: "管理员",
         menu_name: "用户管理",
-        menu_url: "/home/management/user/user_manage",
+        menu_url: "/home/userManagement/userManage",
         icon: "",
         chidPermissions: [
         ],
@@ -208,17 +208,17 @@ export default [
     ],
   },
   {
-    key: "all_mark_monitor",
+    key: "allMarkMonitor",
     userPermission: "管理员",
     menu_name: "评卷监控",
-    menu_url: "/home/markMonitor",
+    menu_url: "/home/allMarkMonitor",
     icon: "FormOutlined",
     chidPermissions: [
       {
         key: "teacher",
         userPermission: "管理员",
         menu_name: "教师监控",
-        menu_url: "/home/markMonitor/teacher",
+        menu_url: "/home/allMarkMonitor/teacher",
         icon: "",
         chidPermissions: [
         ],
@@ -227,7 +227,7 @@ export default [
         key: "score",
         userPermission: "管理员",
         menu_name: "分值分布",
-        menu_url: "/home/markMonitor/score",
+        menu_url: "/home/allMarkMonitor/score",
         icon: "",
         chidPermissions: [
         ],
@@ -236,7 +236,7 @@ export default [
         key: "self",
         userPermission: "管理员",
         menu_name: "自评监控",
-        menu_url: "/home/markMonitor/self",
+        menu_url: "/home/allMarkMonitor/self",
         icon: "",
         chidPermissions: [
         ],
@@ -245,7 +245,7 @@ export default [
         key: "average",
         userPermission: "管理员",
         menu_name: "平均分监控",
-        menu_url: "/home/markMonitor/average",
+        menu_url: "/home/allMarkMonitor/average",
         icon: "",
         chidPermissions: [
         ],
@@ -254,7 +254,7 @@ export default [
         key: "standard",
         userPermission: "管理员",
         menu_name: "标准差监控",
-        menu_url: "/home/markMonitor/standard",
+        menu_url: "/home/allMarkMonitor/standard",
         icon: "",
         chidPermissions: [
         ],
@@ -263,7 +263,7 @@ export default [
         key: "all",
         userPermission: "管理员",
         menu_name: "总进度监控",
-        menu_url: "/home/markMonitor/all",
+        menu_url: "/home/allMarkMonitor/all",
         icon: "",
         chidPermissions: [
         ],
