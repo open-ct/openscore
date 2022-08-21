@@ -89,7 +89,7 @@ func UploadPic(name string, text string) (src string) {
 
 	// Save that RGBA image to disk.
 	name += ".png"
-	newPath := "./" + name
+	newPath := "./tmp/" + name
 
 	outFile, err := os.Create(newPath)
 	if err != nil {
