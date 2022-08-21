@@ -286,7 +286,7 @@ func (c *ApiController) WriteUserExcel() {
 			SubjectName:    subjectName,
 			IsOnlineStatus: false,
 			QuestionId:     0,
-			UserType:       1,
+			UserType:       "supervisor",
 		}
 		if err := u.Insert(); err != nil {
 			c.ResponseError(err.Error())
@@ -309,7 +309,7 @@ func (c *ApiController) WriteUserExcel() {
 				SubjectName:    subjectName,
 				IsOnlineStatus: false,
 				QuestionId:     item.Id,
-				UserType:       2,
+				UserType:       "normal",
 			}
 			if err := u.Insert(); err != nil {
 				c.ResponseError(err.Error())

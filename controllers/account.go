@@ -59,7 +59,7 @@ func (c *ApiController) UserLogin() {
 	c.SetSession("userType", userType)
 
 	resp := struct {
-		UserType int64 `json:"user_type"`
+		UserType string `json:"user_type"`
 	}{userType}
 
 	c.ResponseOk(resp)

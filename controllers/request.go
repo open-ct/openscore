@@ -35,7 +35,7 @@ type UpdateUserRequest struct {
 	UserName    string `json:"user_name"`
 	Password    string `json:"password"`
 	SubjectName string `json:"subject_name"`
-	UserType    int64  `json:"user_type"`
+	UserType    string `json:"user_type"`
 }
 
 type DeleteUserRequest struct {
@@ -47,7 +47,7 @@ type CreateUserRequest struct {
 	Password    string `json:"password"`
 	SubjectName string `json:"subject_name"`
 	QuestionId  int64  `json:"question_id"`
-	UserType    int64  `json:"user_type"`
+	UserType    string `json:"user_type"`
 }
 
 type WriteUserRequest struct {
