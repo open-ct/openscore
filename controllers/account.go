@@ -49,18 +49,20 @@ func (c *ApiController) UserLogin() {
 		return
 	}
 
-	id, userType, err := user.Login(req.Account, req.Password)
+	u, err := user.Login(req.Account, req.Password)
 	if err != nil {
 		c.ResponseError("cannot login", err.Error())
 		return
 	}
 
-	c.SetSession("userId", id)
-	c.SetSession("userType", userType)
+	c.SetSession("userId", u.UserId)
+	c.SetSession("userType", u.UserType)
 
 	resp := struct {
-		UserType string `json:"user_type"`
-	}{userType}
+		UserType    string `json:"user_type"`
+		UserName    string `json:"user_name"`
+		SubjectName string `json:"subject_name"`
+	}{u.UserType, u.UserName, u.SubjectName}
 
 	c.ResponseOk(resp)
 }
