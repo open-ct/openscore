@@ -31,25 +31,25 @@ export default class index extends Component {
   }
 
   getReviewList = () => {
-    Marking.testReview({userId: this.userId})
-      .then((res) => {
-        if (res.data.status === "10000") {
-          let reviewList = [];
-          for (let i = 0; i < res.data.data.testId.length; i++) {
-            reviewList.push({
-              order: i + 1,
-              test_id: res.data.data.testId[i],
-              score: res.data.data.score[i],
-            });
-          }
-          this.setState({
-            reviewList,
-          });
-        }
-      })
-      .catch((e) => {
-        Settings.showMessage("error", e);
-      });
+    // Marking.testReview({userId: this.userId});
+    // .then((res) => {
+    //   if (res.data.status === "10000") {
+    //     let reviewList = [];
+    //     for (let i = 0; i < res.data.data.testId.length; i++) {
+    //       reviewList.push({
+    //         order: i + 1,
+    //         test_id: res.data.data.testId[i],
+    //         score: res.data.data.score[i],
+    //       });
+    //     }
+    //     this.setState({
+    //       reviewList,
+    //     });
+    //   }
+    // })
+    // .catch((e) => {
+    //   Settings.showMessage("error", e);
+    // });
   }
 
   columns = [

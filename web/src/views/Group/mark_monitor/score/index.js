@@ -6,6 +6,7 @@ import "./index.less";
 import group from "../../../../api/group";
 
 import ReactEcharts from "echarts-for-react";
+import Manage from "../../../../api/manage";
 
 const {Option} = Select;
 export default class index extends Component {
@@ -22,11 +23,11 @@ export default class index extends Component {
       tableData: [
         {Score: "教师"},
       ],
+      subjectList: [],
     }
 
     componentDidMount() {
       this.questionList();
-
     }
 
     getOption = () => {
@@ -55,16 +56,11 @@ export default class index extends Component {
         }],
       };
     };
+
     questionList = () => {
-      group.questionList({adminId: "1", subjectName: JSON.parse(localStorage.getItem("userInfo")).SubjectName})
-        .then((res) => {
-          if (res.data.status === "10000") {
-            this.setState({
-              questionList: res.data.data.questionsList,
-            });
-            this.tableData(res.data.data.questionsList[0].QuestionId);
-          }
-        })
+      Manage.subjectList().then((res) => {
+        this.setState({subjectList: res.data.data.subjectVOList});
+      })
         .catch((e) => {
           Settings.showMessage("error", e);
         });
@@ -116,6 +112,24 @@ export default class index extends Component {
       }
       return selectList;
     }
+    onSelectSub = (e) => {
+      group.questionList({subjectName: e})
+        .then((res) => {
+          if (res.data.status === "10000") {
+            this.setState({
+              questionList: res.data.data.questionsList,
+            });
+            if (res.data.data.questionsList.length > 0) {this.tableData(res.data.data.questionsList[0].QuestionId);}
+          }
+        });
+    }
+
+    selectSubject = () => {
+      return this.state.subjectList.map((item, i) => {
+        return <Option key={i} value={item.SubjectName} label={item.SubjectName}>{item.SubjectName}</Option>;
+      });
+    }
+
     select = (e) => {
       let index;
       for (let i = 0; i < this.state.questionList.length; i++) {
@@ -134,7 +148,7 @@ export default class index extends Component {
               <div className="question-select">
                             题目选择：<Select
                   showSearch
-                  style={{width: 120}}
+                  style={{width: 120, marginRight: 70}}
                   optionFilterProp="label"
                   onSelect={(e) => {this.select(e);}}
                   filterOption={(input, option) =>
@@ -148,6 +162,22 @@ export default class index extends Component {
                 >
                   {
                     this.selectBox()
+                  }
+
+                </Select>
+
+                科目选择：<Select
+                  style={{width: 120}}
+                  optionFilterProp="label"
+                  onSelect={(e) => {this.onSelectSub(e);}}
+                  filterOption={(input, option) =>
+                    option.label.indexOf(input) >= 0
+                  }
+                  filterSort={(optionA, optionB) =>
+                    optionA.label.localeCompare(optionB.label)
+                  }>
+                  {
+                    this.selectSubject()
                   }
 
                 </Select>

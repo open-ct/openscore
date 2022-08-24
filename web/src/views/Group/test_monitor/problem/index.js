@@ -42,7 +42,8 @@ export default class index extends Component {
     }
 
     questionList = () => {
-      group.questionList({adminId: "1", subjectName: JSON.parse(localStorage.getItem("userInfo")).SubjectName})
+      const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+      group.questionList({adminId: "1", subjectName: userInfo.subject_name})
         .then((res) => {
           if (res.data.status === "10000") {
             this.setState({
