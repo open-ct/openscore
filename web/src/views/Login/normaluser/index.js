@@ -22,8 +22,8 @@ export default class normalLogin extends Component {
     onFinish = values => {
       group.UserLogin(values
       ).then(res => {
-        localStorage.setItem("account", res.data.data.user_type);
         if (res.data.status === "ok") {
+          localStorage.setItem("userInfo", JSON.stringify(res.data.data));
           Settings.showMessage("success", "Logged in successfully");
           Settings.goToLink("/home");
         }

@@ -56,7 +56,6 @@ export default class index extends Component {
     }
 
     submit(data) {
-      data.user_type = parseInt(data.user_type);
       if (this.state.form_status === "add") {
         Manage.createUser(data)
           .then((res) => {
@@ -135,9 +134,9 @@ export default class index extends Component {
           width: "10px",
           sorter: (a, b) => a.user_type.localeCompare(b.user_type),
           render: (text) => {
-            if (text === 2) {
+            if (text === "normal") {
               return "阅卷员";
-            } else if (text === 1) {
+            } else if (text === "supervisor") {
               return "组长";
             } else {
               return "用户类型错误";

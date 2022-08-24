@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import DocumentTitle from "react-document-title";
-import {Button, Input, Modal, Radio, Select, Space, message} from "antd";
+import {Button, Input, Modal, Radio, Select, Slider, Space, message} from "antd";
 import {ExclamationCircleOutlined} from "@ant-design/icons";
 import * as Settings from "../../../Setting";
 import "./index.less";
@@ -23,12 +23,13 @@ export default class index extends Component {
     selectScore: [],
     subTopic: [],
     markScore: [],
+    currentStyle: "",
+    shape: 0,
   };
 
   componentDidMount() {
-    if(localStorage.getItem("account") === "1" || localStorage.getItem("account") === "2") {
-      this.getAllPaper();
-    }
+    this.getAllPaper();
+
   }
 
   // 总试卷获取 
@@ -92,12 +93,19 @@ export default class index extends Component {
     return this.state.selectScore[index];
   }
 
+  // 调整样式
+  adjustStyle = () => {
+    if(this.state.currentStyle === "adjustH") {return {width: "100%", height: `${this.state.shape}%`};}
+    if (this.state.currentStyle === "adjustW") {return {height: "100%", width: `${this.state.shape}%`};}
+    return {};
+  }
+
   // 阅卷区
   showTest = () => {
     let testPaper = null;
     if (this.state.currentPaper.testInfos !== undefined) {
       testPaper = this.state.currentPaper.testInfos.map((item, index) => {
-        return <div className="test-question-img" key={index} data-content-before={this.imgScore(item.test_detail_id)}>
+        return <div style={this.adjustStyle()} className="test-question-img" key={index} data-content-before={this.imgScore(item.test_detail_id)}>
           <img src={item.pic_src} alt="加载失败" />
         </div>;
       });
@@ -105,27 +113,49 @@ export default class index extends Component {
     return testPaper;
   }
 
-  render() {
-    return (
-      <DocumentTitle title="阅卷系统-评卷">
-        <div className="mark-tasks-page" data-component="mark-tasks-page">
-          <div className="mark-paper">
-            {
-              this.showTest()
-            }
+    onAfterChange = (value) => {
+      this.setState({shape: value});
+    };
+
+    render() {
+      const options = [{label: "宽度占满", value: "adjustH"}, {label: "高度占满", value: "adjustW"}];
+      return (
+        <DocumentTitle title="阅卷系统-评卷">
+          <div className="mark-tasks-page" data-component="mark-tasks-page">
+            <div className="mark-paper">
+              {
+                this.showTest()
+              }
+            </div>
+            <div className="mark-score">
+              {
+                this.renderScoreDropDown()
+              }
+              {
+                this.renderPush()
+              }
+              <div className="mark-seting">
+                <Slider
+                  step={20}
+                  onChange={this.onChange}
+                  onAfterChange={this.onAfterChange}
+                />
+                <div className="mark-seting-buttons">
+                  <Radio.Group
+                    options={options}
+                    onChange={(e) => {this.setState({currentStyle: e.target.value});}}
+                    value={this.state.currentStyle}
+                    optionType="button"
+                    buttonStyle="solid"
+                  />
+                </div>
+              </div>
+
+            </div>
           </div>
-          <div className="mark-score">
-            {
-              this.renderScoreDropDown()
-            }
-            {
-              this.renderPush()
-            }
-          </div>
-        </div>
-      </DocumentTitle>
-    );
-  }
+        </DocumentTitle>
+      );
+    }
 
   // 评分区
   selectBox = (index) => {

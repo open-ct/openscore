@@ -5,6 +5,7 @@ import * as Settings from "../../../../Setting";
 import "./index.less";
 import group from "../../../../api/group";
 import ReactEcharts from "echarts-for-react";
+import Manage from "../../../../api/manage";
 
 const {Option} = Select;
 export default class index extends Component {
@@ -17,6 +18,7 @@ export default class index extends Component {
       tableData: [],
       QuestionId: undefined,
       selfScoreRecordVOList: [],
+      subjectList: [],
     }
     columns = [
       {
@@ -52,9 +54,9 @@ export default class index extends Component {
 
     ]
 
-    componentDidMount() {
-      this.questionList();
-    }
+    // componentDidMount() {
+    //   this.questionList();
+    // }
 
     getOption = () => {
       let X_data = [];
@@ -90,15 +92,9 @@ export default class index extends Component {
       };
     };
     questionList = () => {
-      group.questionList({adminId: "1", subjectName: JSON.parse(localStorage.getItem("userInfo")).SubjectName})
-        .then((res) => {
-          if (res.data.status === "10000") {
-            this.setState({
-              questionList: res.data.data.questionsList,
-            });
-            this.teacherList(res.data.data.questionsList[0].QuestionId);
-          }
-        })
+      Manage.subjectList().then((res) => {
+        this.setState({subjectList: res.data.data.subjectVOList});
+      })
         .catch((e) => {
           Settings.showMessage("error", e);
         });
@@ -191,13 +187,31 @@ export default class index extends Component {
         });
     }
 
+    onSelectsub = (e) => {
+      group.questionList({subjectName: e})
+        .then((res) => {
+          if (res.data.status === "10000") {
+            this.setState({
+              questionList: res.data.data.questionsList,
+            });
+            if (res.data.data.questionsList.length > 0) {this.tableData(res.data.data.questionsList[0].QuestionId);}
+          }
+        });
+    }
+
+    selectSubject = () => {
+      return this.state.subjectList.map((item, i) => {
+        return <Option key={i} value={item.SubjectName} label={item.SubjectName}>{item.SubjectName}</Option>;
+      });
+    }
+
     render() {
       return (
         <DocumentTitle title="阅卷系统-自评监控">
           <div className="self-monitor-page" data-component="self-monitor-page">
             <div className="search-container">
               <div className="question-select">
-                            题目选择：<Select
+                  题目选择：<Select
                   key="question"
                   showSearch
                   style={{width: 120}}
@@ -218,10 +232,10 @@ export default class index extends Component {
                 </Select>
               </div>
               <div className="teacher-select">
-                            教师选择：<Select
+                  教师选择：<Select
                   key="teacher"
                   showSearch
-                  style={{width: 120}}
+                  style={{width: 120, marginRight: 70}}
                   optionFilterProp="label"
                   onSelect={(e) => {this.selectTeacher(e);}}
                   filterOption={(input, option) =>
@@ -235,6 +249,20 @@ export default class index extends Component {
                 >
                   {
                     this.selectTeacherBox()
+                  }
+                </Select>
+                科目选择：<Select
+                  style={{width: 120}}
+                  optionFilterProp="label"
+                  onSelect={(e) => {this.onSelectsub(e);}}
+                  filterOption={(input, option) =>
+                    option.label.indexOf(input) >= 0
+                  }
+                  filterSort={(optionA, optionB) =>
+                    optionA.label.localeCompare(optionB.label)
+                  }>
+                  {
+                    this.selectSubject()
                   }
                 </Select>
               </div>

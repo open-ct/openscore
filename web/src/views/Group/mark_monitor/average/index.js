@@ -4,6 +4,7 @@ import {Progress, Select, Table} from "antd";
 import * as Settings from "../../../../Setting";
 import "./index.less";
 import group from "../../../../api/group";
+import Manage from "../../../../api/manage";
 const {Option} = Select;
 export default class index extends Component {
 
@@ -17,18 +18,14 @@ export default class index extends Component {
     tableData: [],
     fullScore: undefined,
     averageScore: undefined,
+    subjectList: [],
+
   }
 
   questionList = () => {
-    group.questionList({adminId: "1", subjectName: JSON.parse(localStorage.getItem("userInfo")).SubjectName})
-      .then((res) => {
-        if (res.data.status === "10000") {
-          this.setState({
-            questionList: res.data.data.questionsList,
-          });
-          this.tableData(res.data.data.questionsList[0].QuestionId);
-        }
-      })
+    Manage.subjectList().then((res) => {
+      this.setState({subjectList: res.data.data.subjectVOList});
+    })
       .catch((e) => {
         Settings.showMessage("error", e);
       });
@@ -105,6 +102,23 @@ export default class index extends Component {
     return progressItem;
   }
 
+  onSelectsub = (e) => {
+    group.questionList({subjectName: e})
+      .then((res) => {
+        if (res.data.status === "10000") {
+          this.setState({
+            questionList: res.data.data.questionsList,
+          });
+          if (res.data.data.questionsList.length > 0) {this.tableData(res.data.data.questionsList[0].QuestionId);}
+        }
+      });
+  }
+
+  selectSubject = () => {
+    return this.state.subjectList.map((item, i) => {
+      return <Option key={i} value={item.SubjectName} label={item.SubjectName}>{item.SubjectName}</Option>;
+    });
+  }
   render() {
     return (
       <DocumentTitle title="阅卷系统-平均分监控">
@@ -113,7 +127,7 @@ export default class index extends Component {
             <div className="question-select">
                 题目选择：<Select
                 showSearch
-                style={{width: 120}}
+                style={{width: 120, marginRight: 70}}
                 optionFilterProp="label"
                 onSelect={(e) => {this.select(e);}}
                 filterOption={(input, option) =>
@@ -131,6 +145,20 @@ export default class index extends Component {
 
               </Select>
             </div>
+            科目选择：<Select
+              style={{width: 120}}
+              optionFilterProp="label"
+              onSelect={(e) => {this.onSelectsub(e);}}
+              filterOption={(input, option) =>
+                option.label.indexOf(input) >= 0
+              }
+              filterSort={(optionA, optionB) =>
+                optionA.label.localeCompare(optionB.label)
+              }>
+              {
+                this.selectSubject()
+              }
+            </Select>
             <div className="question-score">
                 满分：{this.state.fullScore}
             </div>
