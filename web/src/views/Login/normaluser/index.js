@@ -5,6 +5,7 @@ import * as Setting from "../../../Setting";
 import axios from "axios";
 import * as Settings from "../../../Setting";
 import group from "../../../api/group";
+
 export async function login(account, password) {
   return await new Promise((resolve) => {
     axios.post(`${Setting.ServerUrl}/login`, {
@@ -17,15 +18,15 @@ export async function login(account, password) {
     });
   });
 }
-export default class normalLogin extends Component {
 
-    onFinish = values => {
+export default class normalLogin extends Component {
+    loginUser = () => {}
+    onFinish = (values) => {
       group.UserLogin(values
       ).then(res => {
         if (res.data.status === "ok") {
-          localStorage.setItem("userInfo", JSON.stringify(res.data.data));
           Settings.showMessage("success", "Logged in successfully");
-          Settings.goToLink("/home");
+          this.props.history.push("/home", {userInfo: res.data.data});
         }
       });
     };

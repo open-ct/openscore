@@ -113,49 +113,49 @@ export default class index extends Component {
     return testPaper;
   }
 
-    onAfterChange = (value) => {
-      this.setState({shape: value});
-    };
+  onAfterChange = (value) => {
+    this.setState({shape: value});
+  };
 
-    render() {
-      const options = [{label: "宽度占满", value: "adjustH"}, {label: "高度占满", value: "adjustW"}];
-      return (
-        <DocumentTitle title="阅卷系统-评卷">
-          <div className="mark-tasks-page" data-component="mark-tasks-page">
-            <div className="mark-paper">
-              {
-                this.showTest()
-              }
-            </div>
-            <div className="mark-score">
-              {
-                this.renderScoreDropDown()
-              }
-              {
-                this.renderPush()
-              }
-              <div className="mark-seting">
-                <Slider
-                  step={20}
-                  onChange={this.onChange}
-                  onAfterChange={this.onAfterChange}
-                />
-                <div className="mark-seting-buttons">
-                  <Radio.Group
-                    options={options}
-                    onChange={(e) => {this.setState({currentStyle: e.target.value});}}
-                    value={this.state.currentStyle}
-                    optionType="button"
-                    buttonStyle="solid"
-                  />
-                </div>
-              </div>
-
-            </div>
+  render() {
+    const options = [{label: "宽度占满", value: "adjustH"}, {label: "高度占满", value: "adjustW"}];
+    return (
+      <DocumentTitle title="阅卷系统-评卷">
+        <div className="mark-tasks-page" data-component="mark-tasks-page">
+          <div className="mark-paper">
+            {
+              this.showTest()
+            }
           </div>
-        </DocumentTitle>
-      );
-    }
+          <div className="mark-score">
+            {
+              this.renderScoreDropDown()
+            }
+            {
+              this.renderPush()
+            }
+            <div className="mark-seting">
+              <Slider
+                step={20}
+                onChange={this.onChange}
+                onAfterChange={this.onAfterChange}
+              />
+              <div className="mark-seting-buttons">
+                <Radio.Group
+                  options={options}
+                  onChange={(e) => {this.setState({currentStyle: e.target.value});}}
+                  value={this.state.currentStyle}
+                  optionType="button"
+                  buttonStyle="solid"
+                />
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </DocumentTitle>
+    );
+  }
 
   // 评分区
   selectBox = (index) => {
