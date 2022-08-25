@@ -6,6 +6,7 @@ import * as Icon from "@ant-design/icons";
 import {LogoutOutlined, SettingOutlined} from "@ant-design/icons";
 import * as Setting from "../../Setting";
 import * as AccountBackend from "../../backend/AccountBackend";
+import Context from "../../util/Context";
 
 import MarkTasks from "../Mark/MarkTasks";
 import Answer from "../Mark/Answer";
@@ -44,7 +45,7 @@ export default class index extends Component {
       account: null,
       openKeys: [],
       selectedKeys: [],
-      userInfo: {},
+      userInfo: null,
       role: "",
     };
     permissionList = menuList
@@ -66,7 +67,12 @@ export default class index extends Component {
         });
         break;
       }
+    }
 
+    componentDidUpdate() {
+      if (typeof this.props.location.state !== "undefined" && this.state.userInfo === null) {
+        this.setState({userInfo: this.props.location.state.userInfo, role: "user"});
+      }
     }
     getAccount() {
       AccountBackend.getAccount()
@@ -76,13 +82,6 @@ export default class index extends Component {
               account: res.data,
               role: "admin",
             });
-            localStorage.setItem("account", JSON.stringify(this.state.account));
-          } else {
-            let userInfo = localStorage.getItem("userInfo");
-            if (userInfo !== "") {
-              userInfo = JSON.parse(userInfo);
-              this.setState({userInfo: userInfo, role: "user"});
-            }
           }
         });
     }
@@ -95,7 +94,6 @@ export default class index extends Component {
       if (this.state.role === "admin") {
         AccountBackend.signout()
           .then((res) => {
-            localStorage.setItem("account", "");
             if (res.status === "ok") {
               this.setState({
                 account: null,
@@ -111,7 +109,6 @@ export default class index extends Component {
           });
       } else {
         this.setState({userInfo: null, role: ""});
-        localStorage.setItem("userInfo", "");
       }
 
     }
@@ -266,82 +263,84 @@ export default class index extends Component {
     }
 
     render() {
-      const {openKeys, selectedKeys} = this.state;
+      const {openKeys, selectedKeys, role, account, userInfo} = this.state;
       return (
-        <DocumentTitle title="阅卷系统">
-          <Layout className="home-page" data-component="home-page">
-            <Header>
-              <div className="header-box">
-                <div className="header-logo">
-                  <img src={logoUrl} alt="" />
-                  <span className="header-title">OpenCT在线阅卷系统</span>
-                </div>
+        <Context.Provider value={role === "admin" ? account : userInfo}>
+          <DocumentTitle title="阅卷系统">
+            <Layout className="home-page" data-component="home-page">
+              <Header>
+                <div className="header-box">
+                  <div className="header-logo">
+                    <img src={logoUrl} alt="" />
+                    <span className="header-title">OpenCT在线阅卷系统</span>
+                  </div>
 
-                <div className="header-info">
-                  <span className="header-teacher">教师：小屋</span>
-                  <span className="header-teacher">任务：正评卷</span>
-                  <span className="header-teacher">题目：第一题</span>
-                  <span className="header-teacher">评卷数量：201</span>
-                  <span className="header-teacher">平均速度：6.5秒/份</span>
-                  <span className="header-teacher">当前密号：2008886</span>
-                </div>
-                {
-                  this.renderAccount()
-                }
-              </div>
-
-            </Header>
-            <Layout className="container">
-              <Sider>
-                <Menu
-                  onOpenChange={this.onOpenChange.bind(this)}
-                  style={{width: 200, height: "100%"}}
-                  selectedKeys={selectedKeys}
-                  openKeys={openKeys}
-                  onClick={this.onClick}
-                  mode="inline"
-                >
+                  <div className="header-info">
+                    <span className="header-teacher">教师：小屋</span>
+                    <span className="header-teacher">任务：正评卷</span>
+                    <span className="header-teacher">题目：第一题</span>
+                    <span className="header-teacher">评卷数量：201</span>
+                    <span className="header-teacher">平均速度：6.5秒/份</span>
+                    <span className="header-teacher">当前密号：2008886</span>
+                  </div>
                   {
-                    this.bindMenu(this.permissionList)
+                    this.renderAccount()
                   }
+                </div>
 
-                </Menu>
-              </Sider>
-              <Content>
-                <Switch>
-                  {this.openKeys === [] ? <Redirect from="/home" to="/home/mark-tasks" exact></Redirect> : null}
-                  <Route path="/home/mark-tasks" component={MarkTasks} exact></Route>
-                  <Route path="/home/answer" component={Answer} exact></Route>
-                  <Route path="/home/sample" component={Sample} exact></Route>
-                  <Route path="/home/review" component={Review} exact></Route>
-                  {/* <Route path="/home/selfMark" component={SelfMark} exact></Route> */}
+              </Header>
+              <Layout className="container">
+                <Sider>
+                  <Menu
+                    onOpenChange={this.onOpenChange.bind(this)}
+                    style={{width: 200, height: "100%"}}
+                    selectedKeys={selectedKeys}
+                    openKeys={openKeys}
+                    onClick={this.onClick}
+                    mode="inline"
+                  >
+                    {
+                      this.bindMenu(this.permissionList)
+                    }
 
-                  <Route path="/home/allMarkMonitor/all" component={all} exact></Route>
-                  <Route path="/home/allMarkMonitor/average" component={average} exact></Route>
-                  <Route path="/home/allMarkMonitor/score" component={score} exact></Route>
-                  <Route path="/home/allMarkMonitor/self" component={self} exact></Route>
-                  <Route path="/home/allMarkMonitor/standard" component={standard} exact></Route>
-                  <Route path="/home/allMarkMonitor/teacher" component={teacher} exact></Route>
+                  </Menu>
+                </Sider>
+                <Content>
+                  <Switch>
+                    {this.openKeys === [] ? <Redirect from="/home" to="/home/mark-tasks" exact></Redirect> : null}
+                    <Route path="/home/mark-tasks" component={MarkTasks} exact></Route>
+                    <Route path="/home/answer" component={Answer} exact></Route>
+                    <Route path="/home/sample" component={Sample} exact></Route>
+                    <Route path="/home/review" component={Review} exact></Route>
+                    {/* <Route path="/home/selfMark" component={SelfMark} exact></Route> */}
 
-                  <Route path="/home/group/arbitration" component={arbitration} exact></Route>
-                  <Route path="/home/group/marking" component={marking}></Route>
-                  <Route path="/home/group/problem" component={problem} exact></Route>
-                  <Route path="/home/group/markTasks/:type/:QuestionId" component={markTasks} exact></Route>
+                    <Route path="/home/allMarkMonitor/all" component={all} exact></Route>
+                    <Route path="/home/allMarkMonitor/average" component={average} exact></Route>
+                    <Route path="/home/allMarkMonitor/score" component={score} exact></Route>
+                    <Route path="/home/allMarkMonitor/self" component={self} exact></Route>
+                    <Route path="/home/allMarkMonitor/standard" component={standard} exact></Route>
+                    <Route path="/home/allMarkMonitor/teacher" component={teacher} exact></Route>
 
-                  <Route path="/home/paperManagement/question" component={question} exact></Route>
-                  <Route path="/home/paperManagement/paper" component={paper}></Route>
-                  <Route path="/home/paperManagement/paper_allot" component={allot} exact></Route>
-                  <Route path="/home/userManagement/paper_manage" component={paperManage} exact></Route>
-                  <Route path="/home/userManagement/detailTable" component={detail} exact></Route>
-                  <Route path="/home/userManagement/userManage" component={userManage} exact></Route>
+                    <Route path="/home/group/arbitration" component={arbitration} exact></Route>
+                    <Route path="/home/group/marking" component={marking}></Route>
+                    <Route path="/home/group/problem" component={problem} exact></Route>
+                    <Route path="/home/group/markTasks/:type/:QuestionId" component={markTasks} exact></Route>
 
-                  <Route path="/home/normaluser" component={normalLogin} exact></Route>
+                    <Route path="/home/paperManagement/question" component={question} exact></Route>
+                    <Route path="/home/paperManagement/paper" component={paper}></Route>
+                    <Route path="/home/paperManagement/paper_allot" component={allot} exact></Route>
+                    <Route path="/home/userManagement/paper_manage" component={paperManage} exact></Route>
+                    <Route path="/home/userManagement/detailTable" component={detail} exact></Route>
+                    <Route path="/home/userManagement/userManage" component={userManage} exact></Route>
 
-                </Switch>
-              </Content>
+                    <Route path="/home/normaluser" component={normalLogin} exact></Route>
+
+                  </Switch>
+                </Content>
+              </Layout>
             </Layout>
-          </Layout>
-        </DocumentTitle>
+          </DocumentTitle>
+        </Context.Provider>
       );
     }
 }

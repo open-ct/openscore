@@ -4,6 +4,7 @@ import {Select, Table} from "antd";
 import * as Settings from "../../../../Setting";
 import "./index.less";
 import group from "../../../../api/group";
+import Context from "../../../../util/Context";
 const {Option} = Select;
 export default class index extends Component {
 
@@ -39,10 +40,11 @@ export default class index extends Component {
       tableData: [],
       count: 0,
       questionIndex: 0,
+      userInfo: null,
     }
 
     questionList = () => {
-      const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+      const {userInfo} = this;
       group.questionList({adminId: "1", subjectName: userInfo.subject_name})
         .then((res) => {
           if (res.data.status === "10000") {
@@ -121,6 +123,11 @@ export default class index extends Component {
       return (
         <DocumentTitle title="阅卷系统-问题卷">
           <div className="group-problem-page" data-component="group-problem-page">
+            <Context.Consumer>
+              {(value) => {
+                this.userInfo = value;
+              }}
+            </Context.Consumer>
             <div className="search-container">
               <div className="question-select">
                             题目选择：<Select
