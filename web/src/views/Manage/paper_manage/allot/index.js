@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import DocumentTitle from "react-document-title";
-import {Button, Input, Select, message} from "antd";
+import {Button, Input, Select} from "antd";
 import * as Settings from "../../../../Setting";
 import "./index.less";
 import Manage from "../../../../api/manage";
@@ -90,13 +90,13 @@ export default class index extends Component {
       return subjectOption;
     }
 
-    goToDetail = () => {
-      if (this.state.subjectValue) {
-        this.props.history.push({pathname: "/home/management/detailTable", query: {subjectName: this.state.subjectValue}});
-      }else {
-        message.warning("请先选择科目！");
-      }
-    }
+    // goToDetail = () => {
+    //   if (this.state.subjectValue) {
+    //     this.props.history.push({pathname: "/home/userManagement/detailTable", query: {subjectName: this.state.subjectValue}});
+    //   }else {
+    //     message.warning("请先选择科目！");
+    //   }
+    // }
 
     sendForm = () => {
       let listNum = this.state.questionList.length;
@@ -155,7 +155,7 @@ export default class index extends Component {
               {this.getQuestionAllot()}
             </div>
             <Button type="primary" onClick={() => {this.sendForm();}} loading={this.state.loading}>确认</Button>
-            <Button type="default" style={{marginLeft: "20px"}} onClick={() => {this.goToDetail();}}>查看详情</Button>
+            {/* <Button type="default" style={{marginLeft: "20px"}} onClick={() => {this.goToDetail();}}>查看详情</Button> */}
           </div>
 
         </DocumentTitle>
