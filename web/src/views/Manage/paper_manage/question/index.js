@@ -271,7 +271,7 @@ export default class index extends Component {
     }
 
     goToDetail = () => {
-      this.props.history.push("/home/management/detailTable");
+      this.props.history.push("/home/userManagement/detailTable");
     }
 
     render() {
