@@ -9,7 +9,7 @@ import (
 
 type User struct {
 	UserId         int64  `json:"user_id" xorm:"pk autoincr"`
-	Account        string `json:"account" xorm:"unique"`
+	Account        string `json:"account"`
 	UserName       string `json:"user_name"`
 	Password       string `json:"password"`
 	LoginTime      string `json:"login_time"`

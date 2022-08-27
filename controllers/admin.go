@@ -458,6 +458,8 @@ func (c *ApiController) ReadExcel() {
 	}
 
 	if len(topics) != len(bigQuestions) {
+		fmt.Println("----- len(topics): ", len(topics), " -----")
+		fmt.Println("----- len(bigQuestions): ", len(bigQuestions), " -----")
 		c.ResponseError("len(topics) != len(bigQuestions)")
 		return
 	}
@@ -954,10 +956,6 @@ func (c *ApiController) InsertTopic() {
 */
 
 func (c *ApiController) SubjectList() {
-	fmt.Println("subject: ")
-	fmt.Println("subject: ")
-	fmt.Println("subject: ")
-	fmt.Println("subject: ")
 	defer c.ServeJSON()
 	var resp Response
 
@@ -972,11 +970,9 @@ func (c *ApiController) SubjectList() {
 		c.Data["json"] = resp
 		return
 	}
-	fmt.Println("subject: ", subjects)
 
 	var subjectVOList = make([]SubjectListVO, len(subjects))
 	for i := 0; i < len(subjects); i++ {
-
 		subjectVOList[i].SubjectName = subjects[i].SubjectName
 		subjectVOList[i].SubjectId = subjects[i].SubjectId
 	}
