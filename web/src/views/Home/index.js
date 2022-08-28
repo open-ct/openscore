@@ -35,6 +35,8 @@ import userManage from "../Manage/user_manage/user";
 import menuList from "../../menu/menuTab.js";
 import normalLogin from "../Login/normaluser";
 import logoUrl from "../../asset/images/OpenCT_Logo.png";
+import postUrl from "../../asset/images/OpenCT_Post.png";
+
 import "./index.less";
 
 const {Header, Sider, Content} = Layout;
@@ -276,12 +278,12 @@ export default class index extends Component {
                   </div>
 
                   <div className="header-info">
-                    <span className="header-teacher">教师：小屋</span>
+                    {/* <span className="header-teacher">教师：小屋</span>
                     <span className="header-teacher">任务：正评卷</span>
                     <span className="header-teacher">题目：第一题</span>
                     <span className="header-teacher">评卷数量：201</span>
                     <span className="header-teacher">平均速度：6.5秒/份</span>
-                    <span className="header-teacher">当前密号：2008886</span>
+                    <span className="header-teacher">当前密号：2008886</span> */}
                   </div>
                   {
                     this.renderAccount()
@@ -290,53 +292,64 @@ export default class index extends Component {
 
               </Header>
               <Layout className="container">
-                <Sider>
-                  <Menu
-                    onOpenChange={this.onOpenChange.bind(this)}
-                    style={{width: 200, height: "100%"}}
-                    selectedKeys={selectedKeys}
-                    openKeys={openKeys}
-                    onClick={this.onClick}
-                    mode="inline"
-                  >
-                    {
-                      this.bindMenu(this.permissionList)
-                    }
+                {
+                  this.state.role === "" ?
+                    <Content>
+                      <div className="content-notlogin">
+                        <img src={postUrl} alt="openCT_POST" />
+                        <p>OpenScore阅卷系统</p>
+                      </div>
+                    </Content>
+                    : <>
+                      <Sider>
+                        <Menu
+                          onOpenChange={this.onOpenChange.bind(this)}
+                          style={{width: 200, height: "100%"}}
+                          selectedKeys={selectedKeys}
+                          openKeys={openKeys}
+                          onClick={this.onClick}
+                          mode="inline"
+                        >
+                          {
+                            this.bindMenu(this.permissionList)
+                          }
 
-                  </Menu>
-                </Sider>
-                <Content>
-                  <Switch>
-                    {this.openKeys === [] ? <Redirect from="/home" to="/home/mark-tasks" exact></Redirect> : null}
-                    <Route path="/home/mark-tasks" component={MarkTasks} exact></Route>
-                    <Route path="/home/answer" component={Answer} exact></Route>
-                    <Route path="/home/sample" component={Sample} exact></Route>
-                    <Route path="/home/review" component={Review} exact></Route>
-                    {/* <Route path="/home/selfMark" component={SelfMark} exact></Route> */}
+                        </Menu>
+                      </Sider>
+                      <Content>
+                        <Switch>
+                          {this.openKeys === [] ? <Redirect from="/home" to="/home/mark-tasks" exact></Redirect> : null}
+                          <Route path="/home/mark-tasks" component={MarkTasks} exact></Route>
+                          <Route path="/home/answer" component={Answer} exact></Route>
+                          <Route path="/home/sample" component={Sample} exact></Route>
+                          <Route path="/home/review" component={Review} exact></Route>
+                          {/* <Route path="/home/selfMark" component={SelfMark} exact></Route> */}
 
-                    <Route path="/home/allMarkMonitor/all" component={all} exact></Route>
-                    <Route path="/home/allMarkMonitor/average" component={average} exact></Route>
-                    <Route path="/home/allMarkMonitor/score" component={score} exact></Route>
-                    <Route path="/home/allMarkMonitor/self" component={self} exact></Route>
-                    <Route path="/home/allMarkMonitor/standard" component={standard} exact></Route>
-                    <Route path="/home/allMarkMonitor/teacher" component={teacher} exact></Route>
+                          <Route path="/home/allMarkMonitor/all" component={all} exact></Route>
+                          <Route path="/home/allMarkMonitor/average" component={average} exact></Route>
+                          <Route path="/home/allMarkMonitor/score" component={score} exact></Route>
+                          <Route path="/home/allMarkMonitor/self" component={self} exact></Route>
+                          <Route path="/home/allMarkMonitor/standard" component={standard} exact></Route>
+                          <Route path="/home/allMarkMonitor/teacher" component={teacher} exact></Route>
 
-                    <Route path="/home/group/arbitration" component={arbitration} exact></Route>
-                    <Route path="/home/group/marking" component={marking}></Route>
-                    <Route path="/home/group/problem" component={problem} exact></Route>
-                    <Route path="/home/group/markTasks/:type/:QuestionId" component={markTasks} exact></Route>
+                          <Route path="/home/group/arbitration" component={arbitration} exact></Route>
+                          <Route path="/home/group/marking" component={marking}></Route>
+                          <Route path="/home/group/problem" component={problem} exact></Route>
+                          <Route path="/home/group/markTasks/:type/:QuestionId" component={markTasks} exact></Route>
 
-                    <Route path="/home/paperManagement/question" component={question} exact></Route>
-                    <Route path="/home/paperManagement/paper" component={paper}></Route>
-                    <Route path="/home/paperManagement/paper_allot" component={allot} exact></Route>
-                    <Route path="/home/userManagement/paper_manage" component={paperManage} exact></Route>
-                    <Route path="/home/userManagement/detailTable" component={detail} exact></Route>
-                    <Route path="/home/userManagement/userManage" component={userManage} exact></Route>
+                          <Route path="/home/paperManagement/question" component={question} exact></Route>
+                          <Route path="/home/paperManagement/paper" component={paper}></Route>
+                          <Route path="/home/paperManagement/paper_allot" component={allot} exact></Route>
+                          <Route path="/home/userManagement/paper_manage" component={paperManage} exact></Route>
+                          <Route path="/home/userManagement/detailTable" component={detail} exact></Route>
+                          <Route path="/home/userManagement/userManage" component={userManage} exact></Route>
 
-                    <Route path="/home/normaluser" component={normalLogin} exact></Route>
+                          <Route path="/home/normaluser" component={normalLogin} exact></Route>
 
-                  </Switch>
-                </Content>
+                        </Switch>
+                      </Content></>
+                }
+
               </Layout>
             </Layout>
           </DocumentTitle>
