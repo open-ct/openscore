@@ -34,7 +34,7 @@ import userManage from "../Manage/user_manage/user";
 
 import menuList from "../../menu/menuTab.js";
 import normalLogin from "../Login/normaluser";
-import logoUrl from "../../asset/images/OpenCT_Logo.png";
+
 import "./index.less";
 
 const {Header, Sider, Content} = Layout;
@@ -110,7 +110,7 @@ export default class index extends Component {
       } else {
         this.setState({userInfo: null, role: ""});
       }
-
+      this.props.history.push("/home");
     }
 
     handleRightDropdownClick(e) {
@@ -271,17 +271,17 @@ export default class index extends Component {
               <Header>
                 <div className="header-box">
                   <div className="header-logo">
-                    <img src={logoUrl} alt="" />
+                    <img src="https://score-cdn.open-ct.com/OpenCT_Logo.png" alt="" />
                     <span className="header-title">OpenCT在线阅卷系统</span>
                   </div>
 
                   <div className="header-info">
-                    <span className="header-teacher">教师：小屋</span>
+                    {/* <span className="header-teacher">教师：小屋</span>
                     <span className="header-teacher">任务：正评卷</span>
                     <span className="header-teacher">题目：第一题</span>
                     <span className="header-teacher">评卷数量：201</span>
                     <span className="header-teacher">平均速度：6.5秒/份</span>
-                    <span className="header-teacher">当前密号：2008886</span>
+                    <span className="header-teacher">当前密号：2008886</span> */}
                   </div>
                   {
                     this.renderAccount()
@@ -290,21 +290,32 @@ export default class index extends Component {
 
               </Header>
               <Layout className="container">
-                <Sider>
-                  <Menu
-                    onOpenChange={this.onOpenChange.bind(this)}
-                    style={{width: 200, height: "100%"}}
-                    selectedKeys={selectedKeys}
-                    openKeys={openKeys}
-                    onClick={this.onClick}
-                    mode="inline"
-                  >
-                    {
-                      this.bindMenu(this.permissionList)
-                    }
+                {
+                  this.state.role === "" && this.props.location.pathname === "/" ?
+                    <Content>
+                      <div className="content-notlogin">
+                        <img src="https://score-cdn.open-ct.com/openct.png" alt="openCT_POST" />
+                        <p>OpenScore阅卷系统</p>
+                      </div>
+                    </Content>
+                    : <>
+                      <Sider>
+                        <Menu
+                          onOpenChange={this.onOpenChange.bind(this)}
+                          style={{width: 200, height: "100%"}}
+                          selectedKeys={selectedKeys}
+                          openKeys={openKeys}
+                          onClick={this.onClick}
+                          mode="inline"
+                        >
+                          {
+                            this.bindMenu(this.permissionList)
+                          }
 
-                  </Menu>
-                </Sider>
+                        </Menu>
+                      </Sider>
+                    </>
+                }
                 <Content>
                   <Switch>
                     {this.openKeys === [] ? <Redirect from="/home" to="/home/mark-tasks" exact></Redirect> : null}

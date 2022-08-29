@@ -58,8 +58,8 @@ export default class index extends Component {
   }
 
   // 当前试卷
-  getCurrentPaper = () => {
-    Marking.testDisplay({userId: this.userId, testId: this.state.papers[0]})
+  getCurrentPaper = (testId = this.state.papers[0]) => {
+    Marking.testDisplay({userId: this.userId, testId})
       .then((res) => {
         if (res.data.status === "10000") {
           let currentPaper = res.data.data;
@@ -312,7 +312,7 @@ export default class index extends Component {
               testDetailId: Qustion_detail_id,
             })
               .then((res) => {
-                if (res.data.status === "10000") {
+                if (res.data.status === "ok") {
                   this.setState({
                     selectId: [],
                     selectScore: [],

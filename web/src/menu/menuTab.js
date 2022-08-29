@@ -46,17 +46,17 @@ export default [
     ],
   },
   {
-    key: "markMonitor",
+    key: "allMarkMonitor",
     userPermission: "组长",
     menu_name: "评卷监控",
-    menu_url: "/home/markMonitor",
+    menu_url: "/home/allMarkMonitor",
     icon: "FormOutlined",
     chidPermissions: [
       {
         key: "teacher",
         userPermission: "组长",
         menu_name: "教师监控",
-        menu_url: "/home/markMonitor/teacher",
+        menu_url: "/home/allMarkMonitor/teacher",
         icon: "",
         chidPermissions: [
         ],
@@ -65,7 +65,7 @@ export default [
         key: "score",
         userPermission: "组长",
         menu_name: "分值分布",
-        menu_url: "/home/markMonitor/score",
+        menu_url: "/home/allMarkMonitor/score",
         icon: "",
         chidPermissions: [
         ],
@@ -74,7 +74,7 @@ export default [
         key: "self",
         userPermission: "组长",
         menu_name: "自评监控",
-        menu_url: "/home/markMonitor/self",
+        menu_url: "/home/allMarkMonitor/self",
         icon: "",
         chidPermissions: [
         ],
@@ -83,7 +83,7 @@ export default [
         key: "average",
         userPermission: "组长",
         menu_name: "平均分监控",
-        menu_url: "/home/markMonitor/average",
+        menu_url: "/home/allMarkMonitor/average",
         icon: "",
         chidPermissions: [
         ],
@@ -92,7 +92,7 @@ export default [
         key: "standard",
         userPermission: "组长",
         menu_name: "标准差监控",
-        menu_url: "/home/markMonitor/standard",
+        menu_url: "/home/allMarkMonitor/standard",
         icon: "",
         chidPermissions: [
         ],
@@ -101,7 +101,7 @@ export default [
         key: "all",
         userPermission: "组长",
         menu_name: "总进度监控",
-        menu_url: "/home/markMonitor/all",
+        menu_url: "/home/allMarkMonitor/all",
         icon: "",
         chidPermissions: [
         ],
