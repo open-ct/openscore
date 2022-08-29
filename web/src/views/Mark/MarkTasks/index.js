@@ -59,7 +59,6 @@ export default class index extends Component {
 
   // 当前试卷
   getCurrentPaper = (testId = this.state.papers[0]) => {
-    console.log(testId);
     Marking.testDisplay({userId: this.userId, testId})
       .then((res) => {
         if (res.data.status === "10000") {
