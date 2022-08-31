@@ -17,6 +17,7 @@ package controllers
 import (
 	_ "embed"
 	"encoding/json"
+	"strconv"
 
 	"github.com/astaxie/beego"
 	auth "github.com/casdoor/casdoor-go-sdk/casdoorsdk"
@@ -55,16 +56,18 @@ func (c *ApiController) UserLogin() {
 		return
 	}
 
-	c.SetSession("userId", u.UserId)
-	c.SetSession("userType", u.UserType)
+	scoreUser := auth.User{
+		Name: u.UserName,
+		Id:   strconv.Itoa(int(u.UserId)),
+		Type: u.UserType,
+		Tag:  u.SubjectName,
+	}
+	claims := &auth.Claims{
+		User: scoreUser,
+	}
+	c.SetSessionClaims(claims)
 
-	resp := struct {
-		UserType    string `json:"user_type"`
-		UserName    string `json:"user_name"`
-		SubjectName string `json:"subject_name"`
-	}{u.UserType, u.UserName, u.SubjectName}
-
-	c.ResponseOk(resp)
+	c.ResponseOk(claims)
 }
 
 /*
