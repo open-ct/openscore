@@ -26,7 +26,7 @@ export default class normalLogin extends Component {
       ).then(res => {
         if (res.data.status === "ok") {
           Settings.showMessage("success", "Logged in successfully");
-          this.props.history.push("/home", {userInfo: res.data.data});
+          window.location.href = `http://${location.host}`;
         }
       });
     };

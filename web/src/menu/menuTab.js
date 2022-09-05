@@ -270,6 +270,42 @@ export default [
       },
     ],
   },
+  {
+    key: "userTrain",
+    userPermission: "管理员",
+    menu_name: "培训功能",
+    menu_url: "/home/userTrain",
+    icon: "UserOutlined",
+    chidPermissions: [
+      {
+        key: "grouping",
+        userPermission: "管理员",
+        menu_name: "试卷分组",
+        menu_url: "/home/userTrain/grouping",
+        icon: "",
+        chidPermissions: [
+        ],
+      },
+      {
+        key: "detail",
+        userPermission: "管理员",
+        menu_name: "分组详情",
+        menu_url: "/home/userTrain/detail",
+        icon: "",
+        chidPermissions: [
+        ],
+      },
+      {
+        key: "evaluate",
+        userPermission: "管理员",
+        menu_name: "评价",
+        menu_url: "/home/userTrain/evaluate",
+        icon: "",
+        chidPermissions: [
+        ],
+      },
+    ],
+  },
 
 ];
 // 生成左边菜单
