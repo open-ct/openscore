@@ -16,7 +16,7 @@ package controllers
 
 import (
 	"encoding/gob"
-	"errors"
+	"strconv"
 
 	"github.com/astaxie/beego"
 	auth "github.com/casdoor/casdoor-go-sdk/casdoorsdk"
@@ -89,9 +89,7 @@ func (c *ApiController) GetSessionUsername() string {
 }
 
 func (c *ApiController) GetSessionUserId() (int64, error) {
-	id, ok := c.Controller.GetSession("userId").(int64)
-	if !ok {
-		return 0, errors.New("not login")
-	}
-	return id, nil
+	user := c.GetSessionUser()
+	id, err := strconv.Atoi(user.Id)
+	return int64(id), err
 }
