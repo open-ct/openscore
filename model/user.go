@@ -19,6 +19,7 @@ type User struct {
 	IsOnlineStatus bool   `json:"is_online_status"`
 	QuestionId     int64  `json:"question_id"`
 	UserType       string `json:"user_type"`
+	IsQualified    bool   `json:"is_qualified"`
 }
 
 func (u *User) Insert() error {

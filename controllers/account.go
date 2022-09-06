@@ -25,7 +25,7 @@ import (
 )
 
 //go:embed token_jwt_key.pem
-var JwtPublicKey string
+var jwtPublicKey string
 
 func init() {
 	InitAuthConfig()
@@ -38,7 +38,7 @@ func InitAuthConfig() {
 	casdoorOrganization := beego.AppConfig.String("casdoorOrganization")
 	casdoorApplication := beego.AppConfig.String("casdoorApplication")
 
-	auth.InitConfig(casdoorEndpoint, clientId, clientSecret, JwtPublicKey, casdoorOrganization, casdoorApplication)
+	auth.InitConfig(casdoorEndpoint, clientId, clientSecret, jwtPublicKey, casdoorOrganization, casdoorApplication)
 }
 
 // UserLogin 用户登录
