@@ -32,6 +32,10 @@ import paperManage from "../Manage/paper_manage/manage";
 import detail from "../Manage/paper_manage/detail";
 import userManage from "../Manage/user_manage/user";
 
+import userDetail from "../Train/detail";
+import evaluate from "../Train/evaluate";
+import grouping from "../Train/grouping";
+
 import menuList from "../../menu/menuTab.js";
 import normalLogin from "../Login/normaluser";
 
@@ -45,7 +49,6 @@ export default class index extends Component {
       account: null,
       openKeys: [],
       selectedKeys: [],
-      userInfo: null,
       role: "",
     };
     permissionList = menuList
@@ -71,45 +74,46 @@ export default class index extends Component {
 
     componentDidUpdate() {
       if (typeof this.props.location.state !== "undefined" && this.state.userInfo === null) {
-        this.setState({userInfo: this.props.location.state.userInfo, role: "user"});
+        this.setState({account: this.props.location.state.userInfo, role: "user"});
       }
     }
+
     getAccount() {
       AccountBackend.getAccount()
         .then((res) => {
           if (res.status === "ok") {
-            this.setState({
-              account: res.data,
-              role: "admin",
-            });
+            if (res.data.type === "normal-user") {
+              this.setState({
+                account: res.data,
+                role: "admin",
+              });
+            } else {
+              this.setState({
+                account: res.data,
+                role: "user",
+              });
+            }
+
           }
         });
     }
 
     logout() {
-      this.setState({
-        expired: false,
-        submitted: false,
-      });
-      if (this.state.role === "admin") {
-        AccountBackend.signout()
-          .then((res) => {
-            if (res.status === "ok") {
-              this.setState({
-                account: null,
-                role: "",
-              });
+      AccountBackend.signout()
+        .then((res) => {
+          if (res.status === "ok") {
+            this.setState({
+              account: null,
+              role: "",
+            });
 
-              Setting.showMessage("success", "Successfully logged out, redirected to homepage");
+            Setting.showMessage("success", "Successfully logged out, redirected to homepage");
 
-              Setting.goToLink("/");
-            } else {
-              Setting.showMessage("error", `Logout failed: ${res.msg}`);
-            }
-          });
-      } else {
-        this.setState({userInfo: null, role: ""});
-      }
+            Setting.goToLink("/");
+          } else {
+            Setting.showMessage("error", `Logout failed: ${res.msg}`);
+          }
+        });
       this.props.history.push("/home");
     }
 
@@ -206,7 +210,7 @@ export default class index extends Component {
           }
         });
       } else if(this.state.role === "user") {
-        if (this.state.userInfo.user_type === "normal") {
+        if (this.state.account.type === "normal") {
           return menulist.filter((item) => {
             return item.userPermission === "阅卷员";
           }).map((item) => {
@@ -263,9 +267,9 @@ export default class index extends Component {
     }
 
     render() {
-      const {openKeys, selectedKeys, role, account, userInfo} = this.state;
+      const {openKeys, selectedKeys, account} = this.state;
       return (
-        <Context.Provider value={role === "admin" ? account : userInfo}>
+        <Context.Provider value={account}>
           <DocumentTitle title="阅卷系统">
             <Layout className="home-page" data-component="home-page">
               <Header>
@@ -343,6 +347,10 @@ export default class index extends Component {
                     <Route path="/home/userManagement/paper_manage" component={paperManage} exact></Route>
                     <Route path="/home/userManagement/detailTable" component={detail} exact></Route>
                     <Route path="/home/userManagement/userManage" component={userManage} exact></Route>
+
+                    <Route path="/home/userTrain/grouping" component={grouping} exact></Route>
+                    <Route path="/home/userTrain/detail" component={userDetail} exact></Route>
+                    <Route path="/home/userTrain/evaluate" component={evaluate} exact></Route>
 
                     <Route path="/home/normaluser" component={normalLogin} exact></Route>
 
