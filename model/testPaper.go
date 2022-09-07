@@ -32,6 +32,7 @@ type TestPaper struct {
 	Tag                     string `json:"tag"`
 	School                  string `json:"school"`
 	TicketId                string `json:"ticket_id"`
+	TeachingScore           int64  `json:"teaching_score"`
 }
 
 func (t *TestPaper) GetTestPaperByQuestionIdAndQuestionStatus(questionId int64, questionStatue int64) error {

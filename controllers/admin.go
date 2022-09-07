@@ -14,6 +14,96 @@ import (
 	"github.com/xuri/excelize/v2"
 )
 
+func (c *ApiController) ListTestPapersByQuestionId() {
+	var req ListTestPapersRequest
+
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &req); err != nil {
+		c.ResponseError("cannot unmarshal", err)
+		return
+	}
+
+	testPapers := make([]model.TestPaper, 0)
+	if err := model.FindTestPaperByQuestionId(req.QuestionId, &testPapers); err != nil {
+		c.ResponseError("FindTestPaperByQuestionId", err)
+		return
+	}
+
+	respTestPapers := testPapers
+
+	if req.School != "" {
+		respTestPapers = nil
+		for _, paper := range testPapers {
+			if paper.School == req.School {
+				respTestPapers = append(respTestPapers, paper)
+			}
+		}
+	}
+
+	if req.TicketId != "" {
+		respTestPapers = nil
+		for _, paper := range testPapers {
+			if paper.TicketId == req.TicketId {
+				respTestPapers = append(respTestPapers, paper)
+			}
+		}
+	}
+
+	c.ResponseOk(respTestPapers)
+}
+
+func (c *ApiController) ListPaperGroups() {
+	groups, err := model.ListPaperGroup()
+	if err != nil {
+		c.ResponseError("cannot ListPaperGroup", err)
+		return
+	}
+
+	c.ResponseOk(groups)
+}
+
+func (c *ApiController) TeachingPaperGrouping() {
+	var req TeachingGroupRequest
+
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &req); err != nil {
+		c.ResponseError("cannot unmarshal", err)
+		return
+	}
+
+	testIds := make([]int64, len(req.Papers))
+
+	for i, paper := range req.Papers {
+		testIds[i] = paper.TestId
+		testPaper := model.TestPaper{}
+		if err := testPaper.GetTestPaperByTestId(paper.TestId); err != nil {
+			c.ResponseError(err.Error())
+			return
+		}
+
+		testPaper.TeachingScore = 0
+		for _, score := range paper.Scores {
+			testPaper.TeachingScore += score
+		}
+
+		if err := testPaper.Update(); err != nil {
+			c.ResponseError("Update testPaper", err)
+			return
+		}
+
+	}
+
+	group := model.PaperGroup{
+		GroupName: req.GroupName,
+		TestIds:   testIds,
+	}
+
+	if err := model.CreatePaperGroup(&group); err != nil {
+		c.ResponseError("CreatePaperGroup", err)
+		return
+	}
+
+	c.ResponseOk()
+}
+
 func (c *ApiController) CreateSmallQuestion() {
 	var req CreateSmallQuestionRequest
 
@@ -305,7 +395,7 @@ func (c *ApiController) WriteUserExcel() {
 			u := model.User{
 				Account:        "s" + subjectName + strconv.Itoa(10000+index),
 				Password:       "123",
-				UserName:       "s" + subjectName + strconv.Itoa(10000+i),
+				UserName:       "s" + subjectName + strconv.Itoa(10000+index),
 				SubjectName:    subjectName,
 				IsOnlineStatus: false,
 				QuestionId:     item.Id,
