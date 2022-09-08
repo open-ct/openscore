@@ -1,17 +1,20 @@
-import {Button, Table} from "antd";
-import React, {useState} from "react";
+import {Select, Table} from "antd";
+import React from "react";
+
+import "./index.less";
+
 const columns = [
   {
-    title: "Name",
-    dataIndex: "name",
+    title: "A组",
+    dataIndex: "group",
   },
   {
-    title: "Age",
-    dataIndex: "age",
+    title: "一致率",
+    dataIndex: "concordance",
   },
   {
-    title: "Address",
-    dataIndex: "address",
+    title: "1",
+    dataIndex: "test_id",
   },
 ];
 const data = [];
@@ -19,57 +22,29 @@ const data = [];
 for (let i = 0; i < 46; i++) {
   data.push({
     key: i,
-    name: `Edward King ${i}`,
-    age: 32,
-    address: `London, Park Lane no. ${i}`,
+    group: `Edward King ${i}`,
+    concordance: 32,
+    test_id: `London, Park Lane no. ${i}`,
   });
 }
 
-const App = () => {
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const [loading, setLoading] = useState(false);
+const Evaluate = () => {
 
-  const start = () => {
-    setLoading(true); // ajax request after empty completing
-
-    setTimeout(() => {
-      setSelectedRowKeys([]);
-      setLoading(false);
-    }, 1000);
-  };
-
-  const onSelectChange = (newSelectedRowKeys) => {
-    console.log("selectedRowKeys changed: ", selectedRowKeys);
-    setSelectedRowKeys(newSelectedRowKeys);
-  };
-
-  const rowSelection = {
-    selectedRowKeys,
-    onChange: onSelectChange,
-  };
-  const hasSelected = selectedRowKeys.length > 0;
   return (
-    <div>
-      <div
-        style={{
-          marginBottom: 16,
-          marginLeft: 50,
-        }}
-      >
-        <Button type="primary" onClick={start} disabled={!hasSelected} loading={loading}>
-          Reload
-        </Button>
-        <span
-          style={{
-            marginLeft: 8,
-          }}
-        >
-          {hasSelected ? `Selected ${selectedRowKeys.length} items` : ""}
-        </span>
+    <div className="evaluate-page">
+      <div className="search-container">
+        <Select placeholder="组别选择"></Select >
       </div>
-      <Table style={{marginLeft: 50}} rowSelection={rowSelection} columns={columns} dataSource={data} />
+
+      <div className="display-container">
+        <Table
+          pagination={{position: ["bottomCenter"]}}
+          columns={columns}
+          dataSource={data}
+        />
+      </div>
     </div>
   );
 };
 
-export default App;
+export default Evaluate;
