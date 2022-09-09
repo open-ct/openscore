@@ -14,6 +14,23 @@ type CreateSmallQuestionRequest struct {
 	ScoreType           string `json:"score_type"`
 }
 
+type TeachingGroupRequest struct {
+	QuestionId int64   `json:"question_id"`
+	GroupName  string  `json:"group_name"`
+	Papers     []Paper `json:"papers"`
+}
+
+type ListTestPapersRequest struct {
+	QuestionId int64  `json:"question_id"`
+	School     string `json:"school"`
+	TicketId   string `json:"ticket_id"`
+}
+
+type Paper struct {
+	TestId int64   `json:"test_id"`
+	Scores []int64 `json:"scores"`
+}
+
 type DeleteSmallQuestionRequest struct {
 	QuestionDetailId int64 `json:"question_detail_id"`
 }

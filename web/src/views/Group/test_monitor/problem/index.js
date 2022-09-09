@@ -45,7 +45,7 @@ export default class index extends Component {
 
     questionList = () => {
       const {userInfo} = this;
-      group.questionList({adminId: "1", subjectName: userInfo.subject_name})
+      group.questionList({adminId: "1", subjectName: userInfo.tag})
         .then((res) => {
           if (res.data.status === "10000") {
             this.setState({
