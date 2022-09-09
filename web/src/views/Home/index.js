@@ -46,7 +46,7 @@ const {SubMenu} = Menu;
 
 export default class index extends Component {
     state = {
-      account: null,
+      account: {},
       openKeys: [],
       selectedKeys: [],
       role: "",
@@ -103,7 +103,7 @@ export default class index extends Component {
         .then((res) => {
           if (res.status === "ok") {
             this.setState({
-              account: null,
+              account: {},
               role: "",
             });
 
@@ -322,7 +322,7 @@ export default class index extends Component {
                 }
                 <Content>
                   <Switch>
-                    {this.openKeys === [] ? <Redirect from="/home" to="/home/mark-tasks" exact></Redirect> : null}
+                    {this.state.account.type === "normal" ? <Redirect from="/" to="/home/mark-tasks" exact></Redirect> : null}
                     <Route path="/home/mark-tasks" component={MarkTasks} exact></Route>
                     <Route path="/home/answer" component={Answer} exact></Route>
                     <Route path="/home/sample" component={Sample} exact></Route>
