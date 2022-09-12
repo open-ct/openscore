@@ -35,6 +35,16 @@ type TestPaper struct {
 	TeachingScore           int64  `json:"teaching_score"`
 }
 
+func GetTestPaperTeachingScoreById(id int64) (int64, error) {
+	var testPaper TestPaper
+	has, err := adapter.engine.Where("test_id = ?", id).Get(&testPaper)
+	if !has || err != nil {
+		log.Println("could not TestPaper test")
+	}
+
+	return testPaper.TeachingScore, err
+}
+
 func (t *TestPaper) GetTestPaperByQuestionIdAndQuestionStatus(questionId int64, questionStatue int64) error {
 	has, err := adapter.engine.Where("question_id = ? and question_status = ?", questionId, questionStatue).Get(t)
 	if !has || err != nil {

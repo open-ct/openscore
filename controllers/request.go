@@ -35,6 +35,31 @@ type DeleteSmallQuestionRequest struct {
 	QuestionDetailId int64 `json:"question_detail_id"`
 }
 
+type DeletePaperFromGroupRequest struct {
+	GroupId int64 `json:"group_id"`
+	TestId  int64 `json:"test_id"`
+}
+
+type ListGroupGradesRequest struct {
+	GroupId int64 `json:"group_id"`
+}
+
+type UpdateUserQualifiedRequest struct {
+	Account string `json:"account"`
+}
+
+type ListGroupGradesResponse struct {
+	GroupName     string         `json:"group_name"`
+	Scores        []int64        `json:"c"`
+	TeacherGrades []TeacherGrade `json:"teacher_grades"`
+}
+
+type TeacherGrade struct {
+	TeacherAccount  string  `json:"teacher_account"`
+	ConcordanceRate float32 `json:"concordance_rate"`
+	Scores          []int64 `json:"scores"`
+}
+
 type DeleteQuestionRequest struct {
 	QuestionId int64 `json:"question_id"`
 }
