@@ -155,3 +155,15 @@ func (t *TestPaper) UpdateCols(columns ...string) error {
 	}
 	return err
 }
+
+func ListSchools() ([]string, error) {
+	var papers []TestPaper
+	err := adapter.engine.Distinct("school").Find(&papers)
+
+	var schools []string
+	for _, paper := range papers {
+		schools = append(schools, paper.School)
+	}
+
+	return schools, err
+}
