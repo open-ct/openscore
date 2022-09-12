@@ -15,6 +15,35 @@ import (
 	"github.com/xuri/excelize/v2"
 )
 
+func (c *ApiController) ListTestPaperInfo() {
+	var req ListTestPaperInfoRequest
+
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &req); err != nil {
+		c.ResponseError("cannot unmarshal", err)
+		return
+	}
+
+	var testPaperInfos []model.TestPaperInfo
+	err := model.GetTestInfoListByTestId(req.TestId, &testPaperInfos)
+	if err != nil {
+		resp := Response{"10006", "get testPaperInfo fail", err}
+		c.Data["json"] = resp
+		return
+	}
+
+	c.ResponseOk(testPaperInfos)
+}
+
+func (c *ApiController) ListSchools() {
+	schools, err := model.ListSchools()
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	c.ResponseOk(schools)
+}
+
 func (c *ApiController) UpdateUserQualified() {
 	var req UpdateUserQualifiedRequest
 

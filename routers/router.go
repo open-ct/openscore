@@ -108,6 +108,8 @@ func init() {
 		beego.NSRouter("/updateUserQualified", api, "post:UpdateUserQualified"),
 		beego.NSRouter("/listGroupGrades", api, "post:ListGroupGrades"),
 		beego.NSRouter("/deletePaperFromGroup", api, "post:DeletePaperFromGroup"),
+		beego.NSRouter("/listSchools", api, "post:ListSchools"),
+		beego.NSRouter("/listTestPaperInfo", api, "post:ListTestPaperInfo"),
 	)
 	beego.AddNamespace(adminNs)
 }

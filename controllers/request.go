@@ -48,6 +48,10 @@ type UpdateUserQualifiedRequest struct {
 	Account string `json:"account"`
 }
 
+type ListTestPaperInfoRequest struct {
+	TestId int64 `json:"test_id"`
+}
+
 type ListGroupGradesResponse struct {
 	GroupName     string         `json:"group_name"`
 	Scores        []int64        `json:"c"`
