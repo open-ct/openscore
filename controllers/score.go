@@ -96,6 +96,53 @@ func (c *ApiController) List() {
 		return
 	}
 
+	if !u.IsQualified { // 培训未合格
+		userPaperGroup, err := model.GetUserPaperGroupByUserId(u.UserId)
+		if err != nil {
+			c.ResponseError(err.Error())
+			return
+		}
+
+		var group *model.PaperGroup
+		if userPaperGroup == nil {
+			group, err = model.GetGroupThanLastId(-1)
+			if err != nil {
+				c.ResponseError(err.Error())
+				return
+			}
+
+		} else {
+			group, err = model.GetGroupThanLastId(userPaperGroup.GroupId)
+			if err != nil {
+				c.ResponseError(err.Error())
+				return
+			}
+		}
+
+		if err := model.CreateUserPaperGroup(u.UserId, group.Id); err != nil {
+			c.ResponseError(err.Error())
+			return
+		}
+
+		for _, testId := range group.TestIds {
+			// 添加试卷未批改记录
+			underCorrectedPaper := model.UnderCorrectedPaper{
+				TestId: testId,
+				// QuestionId:       p.QuestionId,
+				TestQuestionType: 8,
+				UserId:           userId,
+			}
+			if err := underCorrectedPaper.Save(); err != nil {
+				c.ResponseError("无法生成待批改试卷 ", err)
+				return
+			}
+		}
+
+		response.TestIds = group.TestIds
+		c.ResponseOk(response)
+		return
+	}
+
 	// 查询相应试卷
 	papers, err := paper.FindUnDistributeTest(u.QuestionId)
 	if err != nil {

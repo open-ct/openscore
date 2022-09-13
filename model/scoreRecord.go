@@ -259,3 +259,18 @@ func ListScoreRecordByUserId(userId int64) ([]ScoreRecord, error) {
 	err := adapter.engine.Where(builder.Eq{"user_id": userId}).Find(&records)
 	return records, err
 }
+
+func ListTeacherScoreByTestIds(userId int64, testIds []int64) ([]int64, error) {
+	res := make([]int64, len(testIds))
+
+	for i, testId := range testIds {
+		var record ScoreRecord
+		_, err := adapter.engine.Where(builder.Eq{"user_id": userId}).Where(builder.Eq{"test_id": testId}).Where("test_record_type=8").Get(&record) // 培训卷
+		if err != nil {
+			return nil, err
+		}
+		res[i] = record.Score
+	}
+
+	return res, nil
+}

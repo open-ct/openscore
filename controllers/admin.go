@@ -8,11 +8,162 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/open-ct/openscore/model"
 	"github.com/open-ct/openscore/util"
 	"github.com/xuri/excelize/v2"
 )
+
+func (c *ApiController) ListTestPaperInfo() {
+	var req ListTestPaperInfoRequest
+
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &req); err != nil {
+		c.ResponseError("cannot unmarshal", err)
+		return
+	}
+
+	var testPaperInfos []model.TestPaperInfo
+	err := model.GetTestInfoListByTestId(req.TestId, &testPaperInfos)
+	if err != nil {
+		resp := Response{"10006", "get testPaperInfo fail", err}
+		c.Data["json"] = resp
+		return
+	}
+
+	c.ResponseOk(testPaperInfos)
+}
+
+func (c *ApiController) ListSchools() {
+	schools, err := model.ListSchools()
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	c.ResponseOk(schools)
+}
+
+func (c *ApiController) UpdateUserQualified() {
+	var req UpdateUserQualifiedRequest
+
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &req); err != nil {
+		c.ResponseError("cannot unmarshal", err)
+		return
+	}
+
+	user, err := model.GetUserByAccount(req.Account)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	user.IsQualified = true
+	if err := user.UpdateCols("is_qualified"); err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	c.ResponseOk()
+}
+
+func (c *ApiController) ListGroupGrades() {
+	var req ListGroupGradesRequest
+
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &req); err != nil {
+		c.ResponseError("cannot unmarshal", err)
+		return
+	}
+
+	group, err := model.GetGroupByGroupId(req.GroupId)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	resp := ListGroupGradesResponse{
+		GroupName: group.GroupName,
+	}
+
+	for _, id := range group.TestIds {
+		score, err := model.GetTestPaperTeachingScoreById(id)
+		if err != nil {
+			c.ResponseError(err.Error())
+			return
+		}
+
+		resp.Scores = append(resp.Scores, score)
+	}
+
+	userPaperList, err := model.ListUserPaperGroupByGroupId(group.Id)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	for _, userPaper := range userPaperList {
+
+		scores, err := model.ListTeacherScoreByTestIds(userPaper.UserId, group.TestIds)
+		if err != nil {
+			c.ResponseError(err.Error())
+			return
+		}
+
+		var num float32 = 0
+		for i, score := range resp.Scores {
+			if score == scores[i] {
+				num++
+			}
+		}
+
+		var u model.User
+		if err := u.GetUser(userPaper.UserId); err != nil {
+			c.ResponseError(err.Error())
+			return
+		}
+
+		resp.TeacherGrades = append(resp.TeacherGrades, TeacherGrade{
+			TeacherAccount:  u.Account,
+			ConcordanceRate: num / float32(len(group.TestIds)),
+			Scores:          scores,
+		})
+	}
+
+	c.ResponseOk(resp)
+}
+
+func (c *ApiController) DeletePaperFromGroup() {
+	var req DeletePaperFromGroupRequest
+
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &req); err != nil {
+		c.ResponseError("cannot unmarshal", err)
+		return
+	}
+
+	group, err := model.GetGroupByGroupId(req.GroupId)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	fmt.Println("----- 123: ", 123, " -----")
+
+	for i, id := range group.TestIds {
+		if id == req.TestId {
+			group.TestIds = append(group.TestIds[:i], group.TestIds[i+1:]...)
+			break
+		}
+	}
+
+	if err := group.Update(); err != nil {
+		fmt.Println("----- 456: ", 456, " -----")
+
+		c.ResponseError(err.Error())
+		return
+	}
+
+	c.ResponseOk()
+}
 
 func (c *ApiController) ListTestPapersByQuestionId() {
 	var req ListTestPapersRequest
@@ -614,7 +765,8 @@ func (c *ApiController) ReadExcel() {
 					num--
 				}
 
-				src := util.UploadPic(row[0]+rows[0][8+index], content)
+				timestamp := strconv.Itoa(int(time.Now().Unix()))
+				src := util.UploadPic(timestamp+row[0]+rows[0][8+index], content)
 
 				var testPaperInfo model.TestPaperInfo
 				testPaperInfo.TicketId = row[0]
@@ -711,7 +863,9 @@ func (c *ApiController) ReadExampleExcel() {
 				testPaperInfo.QuestionDetailId = questionDetailId
 				s := rows[i][j]
 				// split := strings.Split(s, "\n")
-				src := util.UploadPic(rows[i][0]+rows[0][j], s)
+
+				timestamp := strconv.Itoa(int(time.Now().Unix()))
+				src := util.UploadPic(timestamp+rows[i][0]+rows[0][j], s)
 				testPaperInfo.PicSrc = src
 				// 查看大题试卷是否已经导入
 				has, err := testPaper.GetTestPaper(testId)
@@ -834,7 +988,9 @@ func (c *ApiController) ReadAnswerExcel() {
 				testPaperInfo.QuestionDetailId = questionDetailId
 				s := rows[i][j]
 				// split := strings.Split(s, "\n")
-				src := util.UploadPic(rows[i][0]+rows[0][j], s)
+
+				timestamp := strconv.Itoa(int(time.Now().Unix()))
+				src := util.UploadPic(timestamp+rows[i][0]+rows[0][j], s)
 				testPaperInfo.PicSrc = src
 				// 查看大题试卷是否已经导入
 				has, err := testPaper.GetTestPaper(testId)
