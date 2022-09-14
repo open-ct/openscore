@@ -1,49 +1,63 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {Select, Table} from "antd";
-
+import Manage from "../../../api/manage";
 import "./index.less";
 
-const columns = [
-  {
-    title: "A组",
-    dataIndex: "group",
-  },
-  {
-    title: "操作",
-    dataIndex: "",
-    render: () => <a style={{width: 50}}>删除</a>,
-  },
-];
-const data = [];
-
-for (let i = 0; i < 46; i++) {
-  data.push({
-    key: i,
-    group: `Edward King ${i}`,
-    concordance: 32,
-    test_id: `London, Park Lane no. ${i}`,
-  });
-}
-
 export default function Detail() {
+  const [group, setGroup] = useState([]);
+  const [data, setData] = useState([]);
+  const columns = [
+    {
+      title: "试卷ID",
+      dataIndex: "test_id",
+    },
+    {
+      title: "操作",
+      dataIndex: "",
+      render: (_, record) => <a
+        onClick={() => {
+          Manage.deletePaperFromGroup({...record}).then((res) => {
+            setData(data.filter((d) => d.test_id !== record.test_id));
+          });
+        }}
+        style={{width: 50}}>
+        删除
+      </a>,
+    },
+  ];
+
+  useEffect(() => {
+    Manage.getListPaperGroups().then((res) => {
+      if (res.data.data !== null) {
+        setGroup(res.data.data.groups);
+      }
+    });
+  }, []);
+
+  const handleGroupChange = (e) => {
+
+    group.forEach((g) => {
+      if (g.group_id === e) {
+        const newData = g.papers.map((p) => {
+          return {test_id: p.test_id, group_id: g.group_id};
+        });
+        const newColums = [...columns];
+        newColums[0].title = g.group_name;
+        setData(newData);
+      }
+    });
+  };
+
   return (
     <div className="detail-page">
       <div className="search-container">
-          学科选择：
+          组别选择：
         <Select
           style={{width: 120, marginRight: 50}}
           optionFilterProp="label"
+          onChange={handleGroupChange}
         >
-        </Select>
-          大题选择：
-        <Select
-          style={{width: 120, marginRight: 50}}
-          optionFilterProp="label">
-        </Select>
-          考场选择：
-        <Select
-          style={{width: 120}}
-          optionFilterProp="label">
+          {group.map((g) => <Select.Option key={g.group_id} value={g.group_id}>{g.group_name}</Select.Option>)}
         </Select>
       </div>
       <div className="display-container">
