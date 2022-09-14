@@ -146,8 +146,6 @@ func (c *ApiController) DeletePaperFromGroup() {
 		return
 	}
 
-	fmt.Println("----- 123: ", 123, " -----")
-
 	for i, id := range group.TestIds {
 		if id == req.TestId {
 			group.TestIds = append(group.TestIds[:i], group.TestIds[i+1:]...)
@@ -209,7 +207,27 @@ func (c *ApiController) ListPaperGroups() {
 		return
 	}
 
-	c.ResponseOk(groups)
+	resp := ListPaperGroupsResponse{}
+	for _, group := range groups {
+		groupInfo := PaperGroupInfo{
+			GroupId:   group.Id,
+			GroupName: group.GroupName,
+			Papers:    nil,
+		}
+		for _, id := range group.TestIds {
+			testPaper := model.TestPaper{}
+			if err := testPaper.GetTestPaperByTestId(id); err != nil {
+				c.ResponseError(err.Error())
+				return
+			}
+
+			groupInfo.Papers = append(groupInfo.Papers, testPaper)
+		}
+
+		resp.Groups = append(resp.Groups, groupInfo)
+	}
+
+	c.ResponseOk(resp)
 }
 
 func (c *ApiController) TeachingPaperGrouping() {
