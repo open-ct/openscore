@@ -87,6 +87,29 @@ const Manage = {
       link.remove();
     }).catch(function(e) {Settings.showMessage("error", e);});
   },
-
+  updateUserQualified(data) {
+    return axios.post("/marking/admin/updateUserQualified", data);
+  },
+  getListGroupGrades(data) {
+    return axios.post("/marking/admin/listGroupGrades", data);
+  },
+  deletePaperFromGroup(data) {
+    return axios.post("/marking/admin/deletePaperFromGroup", data);
+  },
+  getListTestPapersByQuestionId(data) {
+    return axios.post("/marking/admin/listTestPapersByQuestionId", data);
+  },
+  getListPaperGroups(data) {
+    return axios.post("/marking/admin/listPaperGroups", data);
+  },
+  teachingPaperGrouping(data) {
+    return axios.post("/marking/admin/teachingPaperGrouping", data);
+  },
+  getSchoolsList(data) {
+    return axios.post("/marking/admin/listSchools", data);
+  },
+  getListTestPaperInfo(data) {
+    return axios.post("/marking/admin/listTestPaperInfo", data);
+  },
 };
 export default Manage;
