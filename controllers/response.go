@@ -48,6 +48,7 @@ type SubTopicVO struct {
 	SubTopicName      string
 	Score             int64
 	ScoreDistribution string
+	IsSecondScore     bool `json:"is_second_score"`
 }
 
 type DistributionRecordVO struct {
