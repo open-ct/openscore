@@ -96,6 +96,35 @@ func (c *ApiController) List() {
 		return
 	}
 
+	// 试评
+	if !u.IsAttempt {
+
+		var testPapers []model.TestPaper
+		if err := model.FindTestPaperByQuestionId(u.QuestionId, &testPapers); err != nil {
+			c.ResponseError("FindTestPaperByQuestionId", err)
+			return
+		}
+
+		if len(testPapers) > 0 {
+			rand.Seed(time.Now().UnixNano())
+			randInt := rand.Intn(len(testPapers))
+
+			underCorrectedPaper := model.UnderCorrectedPaper{
+				TestId: testPapers[randInt].TestId,
+				UserId: userId,
+			}
+			if err := underCorrectedPaper.Save(); err != nil {
+				c.ResponseError("无法生成待批改试卷 ", err)
+				return
+			}
+
+			response.TestIds = []int64{testPapers[randInt].TestId}
+		}
+
+		c.ResponseOk(response)
+		return
+	}
+
 	if !u.IsQualified { // 培训未合格
 		userPaperGroup, err := model.GetUserPaperGroupByUserId(u.UserId)
 		if err != nil {
@@ -245,6 +274,17 @@ func (c *ApiController) Point() {
 	if err != nil || underTest.QuestionId == 0 {
 		resp := Response{"10004", "get underCorrected fail", err}
 		c.Data["json"] = resp
+		return
+	}
+
+	u := model.User{}
+	if err := u.GetUser(userId); err != nil {
+		c.ResponseError("get user info fail", err)
+		return
+	}
+
+	if u.IsAttempt {
+		c.ResponseOk()
 		return
 	}
 

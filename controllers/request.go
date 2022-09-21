@@ -78,6 +78,7 @@ type UpdateUserRequest struct {
 	Password    string `json:"password"`
 	SubjectName string `json:"subject_name"`
 	UserType    string `json:"user_type"`
+	IsAttempt   bool   `json:"is_attempt"`
 }
 
 type DeleteUserRequest struct {

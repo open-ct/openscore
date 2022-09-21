@@ -154,8 +154,6 @@ func (c *ApiController) DeletePaperFromGroup() {
 	}
 
 	if err := group.Update(); err != nil {
-		fmt.Println("----- 456: ", 456, " -----")
-
 		c.ResponseError(err.Error())
 		return
 	}
@@ -481,8 +479,9 @@ func (c *ApiController) UpdateUser() {
 	u.UserName = req.UserName
 	u.SubjectName = req.SubjectName
 	u.Password = req.Password
+	u.IsAttempt = req.IsAttempt
 
-	if err := u.UpdateCols("user_type", "user_name", "subject_name", "password"); err != nil {
+	if err := u.UpdateCols("user_type", "user_name", "subject_name", "password", "is_attempt"); err != nil {
 		c.ResponseError("update user error", err)
 		return
 	}
