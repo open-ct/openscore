@@ -97,7 +97,7 @@ func (c *ApiController) List() {
 	}
 
 	// 试评
-	if !u.IsAttempt {
+	if u.IsAttempt {
 
 		var testPapers []model.TestPaper
 		if err := model.FindTestPaperByQuestionId(u.QuestionId, &testPapers); err != nil {
