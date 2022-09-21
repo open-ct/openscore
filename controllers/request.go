@@ -52,12 +52,6 @@ type ListTestPaperInfoRequest struct {
 	TestId int64 `json:"test_id"`
 }
 
-type ListGroupGradesResponse struct {
-	GroupName     string         `json:"group_name"`
-	Scores        []int64        `json:"c"`
-	TeacherGrades []TeacherGrade `json:"teacher_grades"`
-}
-
 type TeacherGrade struct {
 	TeacherAccount  string  `json:"teacher_account"`
 	ConcordanceRate float32 `json:"concordance_rate"`

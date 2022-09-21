@@ -256,3 +256,19 @@ type ScoreDeviationVO struct {
 	UserName       string
 	DeviationScore float64
 }
+
+type ListGroupGradesResponse struct {
+	GroupName     string         `json:"group_name"`
+	Scores        []int64        `json:"scores"`
+	TeacherGrades []TeacherGrade `json:"teacher_grades"`
+}
+
+type ListPaperGroupsResponse struct {
+	Groups []PaperGroupInfo `json:"groups"`
+}
+
+type PaperGroupInfo struct {
+	GroupId   int64             `json:"group_id"`
+	GroupName string            `json:"group_name"`
+	Papers    []model.TestPaper `json:"papers"`
+}
