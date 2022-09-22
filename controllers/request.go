@@ -5,6 +5,7 @@ type UpdateSmallQuestionRequest struct {
 	QuestionDetailName  string `json:"question_detail_name"`
 	QuestionDetailScore int64  `json:"question_detail_score"`
 	ScoreType           string `json:"score_type"`
+	IsSecondScore       bool   `json:"is_second_score"`
 }
 
 type CreateSmallQuestionRequest struct {
@@ -12,6 +13,7 @@ type CreateSmallQuestionRequest struct {
 	QuestionId          int64  `json:"question_id"`
 	QuestionDetailScore int64  `json:"question_detail_score"`
 	ScoreType           string `json:"score_type"`
+	IsSecondScore       bool   `json:"is_second_score"`
 }
 
 type TeachingGroupRequest struct {
@@ -76,6 +78,7 @@ type UpdateUserRequest struct {
 	Password    string `json:"password"`
 	SubjectName string `json:"subject_name"`
 	UserType    string `json:"user_type"`
+	IsAttempt   bool   `json:"is_attempt"`
 }
 
 type DeleteUserRequest struct {

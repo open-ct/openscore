@@ -20,6 +20,7 @@ type User struct {
 	QuestionId     int64  `json:"question_id"`
 	UserType       string `json:"user_type"`
 	IsQualified    bool   `json:"is_qualified"`
+	IsAttempt      bool   `json:"is_attempt"`
 }
 
 func (u *User) Insert() error {
@@ -70,19 +71,6 @@ func (u *User) Update() error {
 	return err
 }
 
-// func CountOnlineUserNumberByQuestionId(questionId int64) (int64, error) {
-// 	user := new(User)
-// 	count, err := adapter.engine.Where("is_online_status = 1").Where(" user_type = ?", 1).Where("is_distribute = ?", 1).Where("question_id=?", questionId).Count(user)
-// 	if err != nil {
-// 		log.Println("CountOnlineNumber err ")
-// 	}
-// 	return count, err
-// }
-//
-// func FindOnlineUserNumberByQuestionId(users *[]User, questionId int64) error {
-// 	return adapter.engine.Where("is_online_status = ? ", 1).Where(" user_type=?", 1).Where("is_distribute = ?", 1).Where("question_id=?", questionId).Find(users)
-// }
-
 func FindUserNumberByQuestionId(users *[]User, questionId int64) error {
 	return adapter.engine.Where(" user_type=?", 2).Where("question_id=?", questionId).Find(users)
 }
@@ -97,13 +85,6 @@ func FindNewUserId(id1 int64, id2 int64, questionId int64) (newId int64) {
 	k := rand.Intn(len(Ids) - 1)
 	newId = Ids[k]
 	return newId
-}
-
-func (u *User) UpdateOnlineStatus(isOnline bool, time string) error {
-	u.IsOnlineStatus = isOnline
-	u.LoginTime = time
-
-	return u.UpdateCols("is_online_status", "login_time")
 }
 
 func ListUsers() ([]*User, error) {
