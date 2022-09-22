@@ -15,7 +15,7 @@ func FindSubjectList(subjects *[]Subject) error {
 	return err
 }
 
-func InsertSubject(subject *Subject) (err1 error, questionId int64) {
+func InsertSubject(subject *Subject) (error, int64) {
 	_, err := adapter.engine.Insert(subject)
 	if err != nil {
 		log.Println("GetTopicList err ")

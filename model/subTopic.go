@@ -12,6 +12,7 @@ type SubTopic struct {
 	QuestionId          int64  `json:"question_id"`
 	QuestionDetailScore int64  `json:"question_detail_score"`
 	ScoreType           string `json:"score_type"`
+	IsSecondScore       bool   `json:"is_second_score"`
 }
 
 func FindSubTopicsByQuestionId(id int64, st *[]SubTopic) error {

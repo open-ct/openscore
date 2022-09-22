@@ -154,8 +154,6 @@ func (c *ApiController) DeletePaperFromGroup() {
 	}
 
 	if err := group.Update(); err != nil {
-		fmt.Println("----- 456: ", 456, " -----")
-
 		c.ResponseError(err.Error())
 		return
 	}
@@ -286,6 +284,7 @@ func (c *ApiController) CreateSmallQuestion() {
 		QuestionId:          req.QuestionId,
 		QuestionDetailScore: req.QuestionDetailScore,
 		ScoreType:           req.ScoreType,
+		IsSecondScore:       req.IsSecondScore,
 	}
 
 	if err := model.InsertSubTopic(&subTopic); err != nil {
@@ -338,6 +337,7 @@ func (c *ApiController) UpdateSmallQuestion() {
 
 	subTopic.QuestionDetailName = req.QuestionDetailName
 	subTopic.ScoreType = req.ScoreType
+	subTopic.IsSecondScore = req.IsSecondScore
 	subTopic.QuestionDetailScore = req.QuestionDetailScore
 
 	if err := subTopic.Update(); err != nil {
@@ -479,8 +479,9 @@ func (c *ApiController) UpdateUser() {
 	u.UserName = req.UserName
 	u.SubjectName = req.SubjectName
 	u.Password = req.Password
+	u.IsAttempt = req.IsAttempt
 
-	if err := u.UpdateCols("user_type", "user_name", "subject_name", "password"); err != nil {
+	if err := u.UpdateCols("user_type", "user_name", "subject_name", "password", "is_attempt"); err != nil {
 		c.ResponseError("update user error", err)
 		return
 	}
@@ -1538,6 +1539,7 @@ func (c *ApiController) TopicList() {
 			subTopicVOS[j].SubTopicName = subTopics[j].QuestionDetailName
 			subTopicVOS[j].Score = subTopics[j].QuestionDetailScore
 			subTopicVOS[j].ScoreDistribution = subTopics[j].ScoreType
+			subTopicVOS[j].IsSecondScore = subTopics[j].IsSecondScore
 		}
 		topicVOList[i].SubTopicVOList = subTopicVOS
 	}
