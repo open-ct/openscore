@@ -36,14 +36,14 @@ func CreateUserPaperGroup(userId int64, groupId int64) error {
 }
 
 func GetUserPaperGroupByUserId(id int64) (*UserPaperGroup, error) {
-	var group UserPaperGroup
-	get, err := adapter.engine.Where("user_id=?", id).Get(&group)
-	if err != nil || !get {
+	var group *UserPaperGroup
+	_, err := adapter.engine.Where("user_id=?", id).Get(group)
+	if err != nil {
 		log.Println("GetGroupByGroupId err ")
 		return nil, errors.New("GetGroupByGroupId")
 	}
 
-	return &group, nil
+	return group, nil
 }
 
 func ListUserPaperGroupByGroupId(id int64) ([]*UserPaperGroup, error) {
