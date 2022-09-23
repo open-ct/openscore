@@ -126,14 +126,14 @@ func (c *ApiController) List() {
 	}
 
 	if !u.IsQualified { // 培训未合格
-		userPaperGroup, err := model.GetUserPaperGroupByUserId(u.UserId)
+		userPaperGroup, ok, err := model.GetUserPaperGroupByUserId(u.UserId)
 		if err != nil {
 			c.ResponseError(err.Error())
 			return
 		}
 
 		var group *model.PaperGroup
-		if userPaperGroup == nil {
+		if !ok {
 			group, err = model.GetGroupThanLastId(-1)
 			if err != nil {
 				c.ResponseError(err.Error())
