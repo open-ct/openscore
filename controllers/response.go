@@ -258,6 +258,13 @@ type ScoreDeviationVO struct {
 	DeviationScore float64
 }
 
+type TeacherGrade struct {
+	TeacherAccount  string  `json:"teacher_account"`
+	ConcordanceRate float32 `json:"concordance_rate"`
+	IsQualified     bool    `json:"is_qualified"`
+	Scores          []int64 `json:"scores"`
+}
+
 type ListGroupGradesResponse struct {
 	GroupName     string         `json:"group_name"`
 	Scores        []int64        `json:"scores"`
