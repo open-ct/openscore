@@ -126,6 +126,7 @@ func (c *ApiController) ListGroupGrades() {
 			TeacherAccount:  u.Account,
 			ConcordanceRate: num / float32(len(group.TestIds)),
 			Scores:          scores,
+			IsQualified:     u.IsQualified,
 		})
 	}
 
