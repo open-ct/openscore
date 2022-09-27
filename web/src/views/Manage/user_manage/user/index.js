@@ -119,6 +119,11 @@ export default class index extends Component {
         });
       });
     }
+    handleTempRead(record) {
+      Manage.updateUser({...record, is_attempt: !record.is_attempt}).then((res) => {
+        location.reload();
+      });
+    }
     renderTable(users) {
       const columns = [
         {
@@ -151,39 +156,6 @@ export default class index extends Component {
           width: "10px",
           sorter: (a, b) => a.account.localeCompare(b.account),
         },
-        // {
-        //     title: "用户id",
-        //     dataIndex: 'id',
-        //     key: 'id',
-        //     width: '60px',
-        //     sorter: (a, b) => a.id.localeCompare(b.id),
-        //     render: (text, record, index) => {
-        //         return Util.getFormattedDate(text);
-        //     }
-        // },
-        // {
-        //     title: "上次登录",
-        //     dataIndex: 'lastlogin',
-        //     key: 'lastlogin',
-        //     width: '100px',
-        //     sorter: (a, b) => a.lastlogin.localeCompare(b.lastlogin),
-        //     render: (text, record, index) => {
-        //         return Util.getFormattedDate(text);
-        //     }
-        // },
-        // {
-        //     title: "头像",
-        //     dataIndex: 'avatar',
-        //     key: 'avatar',
-        //     width: '100px',
-        //     render: (text, record, index) => {
-        //         return (
-        //             <a target="_blank" rel="noreferrer" href={text}>
-        //                 <img src={text} alt={text} width={50} />
-        //             </a>
-        //         )
-        //     }
-        // },
         {
           title: "密码",
           dataIndex: "password",
@@ -195,7 +167,7 @@ export default class index extends Component {
           title: "操作",
           dataIndex: "",
           key: "op",
-          width: "10px",
+          width: "11px",
           fixed: "right",
           render: (text, record) => {
             return (
@@ -203,10 +175,18 @@ export default class index extends Component {
                 <Button style={{marginTop: "10px", marginBottom: "10px", marginRight: "10px"}} type="primary"
                   onClick={() => this.editUser(record)}>{("编辑")}</Button>
                 <Popconfirm
-                  title={`Sure to delete user: ${record.name} ?`}
+                  title={`Sure to delete user: ${record.account} ?`}
                   onConfirm={() => this.deleteUser(record.account)}
                 >
-                  <Button style={{marginBottom: "10px"}} type="danger">{"删除"}</Button>
+                  <Button style={{marginBottom: "10px", marginRight: "10px"}} type="danger">{"删除"}</Button>
+                </Popconfirm>
+                <Popconfirm
+                  title={record.is_attempt ? "确认取消他的试评资格吗" : "确认要让他参与试评吗"}
+                  onConfirm={() => {this.handleTempRead(record);}}
+                >
+                  <Button style={{marginBottom: "10px"}} type={record.is_attempt ? "" : "primary"}>
+                    {record.is_attempt ? "试评中" : "试评"}
+                  </Button>
                 </Popconfirm>
               </div>
             );
