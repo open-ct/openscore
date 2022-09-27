@@ -54,12 +54,6 @@ type ListTestPaperInfoRequest struct {
 	TestId int64 `json:"test_id"`
 }
 
-type TeacherGrade struct {
-	TeacherAccount  string  `json:"teacher_account"`
-	ConcordanceRate float32 `json:"concordance_rate"`
-	Scores          []int64 `json:"scores"`
-}
-
 type DeleteQuestionRequest struct {
 	QuestionId int64 `json:"question_id"`
 }

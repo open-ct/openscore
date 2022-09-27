@@ -271,7 +271,7 @@ func (c *ApiController) Point() {
 	// 获取试卷未批改表信息（试卷批改状态类型）
 	var underTest model.UnderCorrectedPaper
 	err = underTest.GetUnderCorrectedPaper(userId, testId)
-	if err != nil || underTest.QuestionId == 0 {
+	if err != nil {
 		resp := Response{"10004", "get underCorrected fail", err}
 		c.Data["json"] = resp
 		return
