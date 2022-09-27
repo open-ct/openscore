@@ -24,12 +24,12 @@ export default class index extends Component {
       topicName: undefined,
       score: undefined,
       error: undefined,
-      scoreType: 1,
       topicDetails: [
         {
           topicDetailName: undefined,
           detailScore: undefined,
           DetailScoreTypes: undefined,
+          is_second_score: false,
         },
       ],
       loading: false,
@@ -43,7 +43,7 @@ export default class index extends Component {
       questionList.push(
         <div className="question-input" key={0}>
           <div className="question-item">
-                    小题名：<Input placeholder="请输入小题名" style={{width: 120}} onChange={e => {
+              小题名：<Input placeholder="请输入小题名" style={{width: 120}} onChange={e => {
               let topicDetails = [...this.state.topicDetails];
               topicDetails[0].topicDetailName = e.target.value;
               this.setState({
@@ -53,7 +53,7 @@ export default class index extends Component {
             }} />
           </div>
           <div className="question-item">
-                    小题满分：<Input placeholder="请输入分数" style={{width: 120}} onChange={e => {
+             小题满分：<Input placeholder="请输入分数" style={{width: 120}} onChange={e => {
               let topicDetails = [...this.state.topicDetails];
               topicDetails[0].detailScore = Number(e.target.value);
               this.setState({
@@ -63,7 +63,7 @@ export default class index extends Component {
             }} />
           </div>
           <div className="question-item">
-                    分数分布：<Input placeholder="请输入分布" style={{width: 120}} onChange={e => {
+            分数分布：<Input placeholder="请输入分布" style={{width: 120}} onChange={e => {
               let topicDetails = [...this.state.topicDetails];
               topicDetails[0].DetailScoreTypes = e.target.value;
               this.setState({
@@ -71,6 +71,21 @@ export default class index extends Component {
               });
 
             }} />
+          </div>
+          <div className="question-item">
+              是否需要二次阅卷：
+            <Radio.Group
+              onChange={e => {
+                let topicDetails = [...this.state.topicDetails];
+                topicDetails[0].is_second_score = e.target.value;
+                this.setState({
+                  topicDetails,
+                });
+              }}
+              defaultValue={false}>
+              <Radio value={false}>否</Radio>
+              <Radio value={true}>是</Radio>
+            </Radio.Group>
           </div>
         </div>
       );
@@ -108,7 +123,7 @@ export default class index extends Component {
             }} />
           </div>
           <div className="question-item">
-                    小题满分：<Input placeholder="请输入分数" style={{width: 120}} onChange={e => {
+              小题满分：<Input placeholder="请输入分数" style={{width: 120}} onChange={e => {
               let topicDetails = [...this.state.topicDetails];
               let addNo;
               for (let i = 0; i < this.state.questionList.length; i++) {
@@ -123,7 +138,7 @@ export default class index extends Component {
             }} />
           </div>
           <div className="question-item">
-                    分数分布：<Input placeholder="请输入分布" style={{width: 120}} onChange={e => {
+              分数分布：<Input placeholder="请输入分布" style={{width: 120}} onChange={e => {
               let topicDetails = [...this.state.topicDetails];
               let addNo;
               for (let i = 0; i < this.state.questionList.length; i++) {
@@ -138,6 +153,27 @@ export default class index extends Component {
             }} />
           </div>
           <div className="question-item">
+              是否需要二次阅卷：
+            <Radio.Group
+              onChange={e => {
+                let topicDetails = [...this.state.topicDetails];
+                let addNo;
+                for (let i = 0; i < this.state.questionList.length; i++) {
+                  if (this.state.questionList[i].key === questionNo.toString()) {
+                    addNo = i;
+                  }
+                }
+                topicDetails[addNo]["is_second_score"] = e.target.value;
+                this.setState({
+                  topicDetails,
+                });
+              }}
+              defaultValue={false}>
+              <Radio value={false}>否</Radio>
+              <Radio value={true}>是</Radio>
+            </Radio.Group>
+          </div>
+          <div className="question-item question-delete">
             <DeleteOutlined style={{fontSize: "20px", color: "#1890FF", height: "100%", marginTop: "5px", cursor: "pointer"}} onClick={() => {this.questionDel(questionNo);}} />
           </div>
         </div>
@@ -164,7 +200,7 @@ export default class index extends Component {
     confirmQuestionId = () => {
       let question_flag = true;
       let detail_flag = true;
-      if (this.state.subjectName === undefined || this.state.topicName === undefined || this.state.scoreType === undefined || this.state.score === undefined || this.state.error === undefined) {
+      if (this.state.subjectName === undefined || this.state.topicName === undefined || this.state.score === undefined || this.state.error === undefined) {
         question_flag = false;
       }
       if (!question_flag) {
@@ -310,18 +346,6 @@ export default class index extends Component {
                       });
                     }} />
                   </div>
-                </div>
-                <div className="setting-second">
-                                是否需要二次阅卷：<Radio.Group
-                    onChange={e => {
-                      this.setState({
-                        scoreType: e.target.value,
-                      });
-                    }}
-                    defaultValue={this.state.scoreType}>
-                    <Radio value={1}>否</Radio>
-                    <Radio value={2}>是</Radio>
-                  </Radio.Group>
                 </div>
               </div>
             </div>

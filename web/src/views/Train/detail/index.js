@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Select, Table} from "antd";
+import {Button, Popconfirm, Select, Table} from "antd";
 import Manage from "../../../api/manage";
 import "./index.less";
 
@@ -14,21 +14,23 @@ export default function Detail() {
     {
       title: "操作",
       dataIndex: "",
-      render: (_, record) => <a
-        onClick={() => {
-          Manage.deletePaperFromGroup({...record}).then((res) => {
-            setData(data.filter((d) => d.test_id !== record.test_id));
-          });
-        }}
-        style={{width: 50}}>
-        删除
-      </a>,
+      render: (_, record) =>
+        <Popconfirm
+          title={`Sure to delete user: ${record.account} ?`}
+          onConfirm={() => {
+            Manage.deletePaperFromGroup({...record}).then((res) => {
+              setData(data.filter((d) => d.test_id !== record.test_id));
+            });
+          }}
+        >
+          <Button style={{marginBottom: "10px", marginRight: "10px"}} type="danger">{"删除"}</Button>
+        </Popconfirm>,
     },
   ];
 
   useEffect(() => {
     Manage.getListPaperGroups().then((res) => {
-      if (res.data.data !== null) {
+      if (res.data.data.groups !== null) {
         setGroup(res.data.data.groups);
       }
     });
@@ -47,7 +49,6 @@ export default function Detail() {
       }
     });
   };
-
   return (
     <div className="detail-page">
       <div className="search-container">

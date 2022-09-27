@@ -201,6 +201,7 @@ export default class index extends Component {
 
     return scoreSelect;
   }
+
   select = (item, value) => {
     if (this.state.selectId.length < this.state.testLength) {
       this.setState({
