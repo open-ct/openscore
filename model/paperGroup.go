@@ -7,9 +7,10 @@ import (
 )
 
 type PaperGroup struct {
-	Id        int64   `json:"id" xorm:"pk autoincr"`
-	GroupName string  `json:"group_name"`
-	TestIds   []int64 `json:"test_ids"`
+	Id         int64   `json:"id" xorm:"pk autoincr"`
+	GroupName  string  `json:"group_name"`
+	TestIds    []int64 `json:"test_ids"`
+	QuestionId int64   `json:"question_id"`
 }
 
 func (p *PaperGroup) Update() error {
@@ -42,15 +43,15 @@ func GetGroupByGroupId(id int64) (*PaperGroup, error) {
 	return &group, nil
 }
 
-func GetGroupThanLastId(id int64) (*PaperGroup, error) {
+func GetGroupThanLastId(id int64, questionId int64) (*PaperGroup, bool, error) {
 	var group PaperGroup
-	get, err := adapter.engine.Where("id>?", id).Get(&group)
-	if err != nil || !get {
+	get, err := adapter.engine.Where("id > ?", id).Where("question_id = ?", questionId).Get(&group)
+	if err != nil {
 		log.Println("GetGroupByGroupId err ")
-		return nil, errors.New("GetGroupByGroupId")
+		return nil, false, errors.New("GetGroupByGroupId")
 	}
 
-	return &group, nil
+	return &group, get, nil
 }
 
 func ListPaperGroup() ([]*PaperGroup, error) {
