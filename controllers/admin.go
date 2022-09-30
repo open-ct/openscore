@@ -213,6 +213,7 @@ func (c *ApiController) ListPaperGroups() {
 			GroupName: group.GroupName,
 			Papers:    nil,
 		}
+
 		for _, id := range group.TestIds {
 			testPaper := model.TestPaper{}
 			if err := testPaper.GetTestPaperByTestId(id); err != nil {
@@ -260,8 +261,9 @@ func (c *ApiController) TeachingPaperGrouping() {
 	}
 
 	group := model.PaperGroup{
-		GroupName: req.GroupName,
-		TestIds:   testIds,
+		GroupName:  req.GroupName,
+		TestIds:    testIds,
+		QuestionId: req.QuestionId,
 	}
 
 	if err := model.CreatePaperGroup(&group); err != nil {

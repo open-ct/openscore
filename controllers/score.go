@@ -133,19 +133,19 @@ func (c *ApiController) List() {
 		}
 
 		var group *model.PaperGroup
+		var get bool
 		if !ok {
-			group, err = model.GetGroupThanLastId(-1)
-			if err != nil {
-				c.ResponseError(err.Error())
-				return
-			}
-
+			group, get, err = model.GetGroupThanLastId(-1, u.QuestionId)
 		} else {
-			group, err = model.GetGroupThanLastId(userPaperGroup.GroupId)
-			if err != nil {
-				c.ResponseError(err.Error())
-				return
-			}
+			group, get, err = model.GetGroupThanLastId(userPaperGroup.GroupId, u.QuestionId)
+		}
+		if err != nil {
+			c.ResponseError(err.Error())
+			return
+		}
+
+		if !get {
+			goto Label
 		}
 
 		if err := model.CreateUserPaperGroup(u.UserId, group.Id); err != nil {
@@ -171,6 +171,8 @@ func (c *ApiController) List() {
 		c.ResponseOk(response)
 		return
 	}
+
+Label:
 
 	// 查询相应试卷
 	papers, err := paper.FindUnDistributeTest(u.QuestionId)
