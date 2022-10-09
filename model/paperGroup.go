@@ -45,7 +45,7 @@ func GetGroupByGroupId(id int64) (*PaperGroup, error) {
 
 func GetGroupThanLastId(id int64, questionId int64) (*PaperGroup, bool, error) {
 	var group PaperGroup
-	get, err := adapter.engine.Where("id > ?", id).Where("question_id = ?", questionId).Get(&group)
+	get, err := adapter.engine.Where("id > ? AND question_id = ?", id, questionId).Get(&group)
 	if err != nil {
 		log.Println("GetGroupByGroupId err ")
 		return nil, false, errors.New("GetGroupByGroupId")

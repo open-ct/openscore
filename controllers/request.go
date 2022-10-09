@@ -113,6 +113,10 @@ type AddTopic struct {
 	SelfScoreRate int64            `json:"selfScoreRate"`
 }
 
+type TopicListRequest struct {
+	SubjectName string `json:"subject_name"`
+}
+
 type AddTopicDetail struct {
 	TopicDetailName  string `json:"topicDetailName"`
 	DetailScoreTypes string `json:"DetailScoreTypes"`
