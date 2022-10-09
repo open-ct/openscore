@@ -103,7 +103,7 @@ export default function Grouping(props) {
     }
     switch (e[0].name[0]) {
     case "subject":
-      Manage.questionInfo(e[0].value).then((res) => {
+      Manage.questionInfo({subject_name: e[0].value}).then((res) => {
         if(res.data.data.topicVOList !== null) {
           setQuestionList(res.data.data.topicVOList);
         }

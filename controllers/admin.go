@@ -1504,12 +1504,17 @@ func (c *ApiController) SubjectList() {
 func (c *ApiController) TopicList() {
 	defer c.ServeJSON()
 	var resp Response
-	// supervisorId := req.SupervisorId
+
+	var req TopicListRequest
+
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &req); err != nil {
+		c.ResponseError(err.Error())
+	}
 
 	// ----------------------------------------------------
 	// 获取大题列表
 	topics := make([]model.Topic, 0)
-	err := model.FindTopicList(&topics)
+	err := model.FindTopicBySubNameList(&topics, req.SubjectName)
 	if err != nil {
 		log.Println(err)
 		resp = Response{"30021", "获取大题参数设置记录表失败  ", err}

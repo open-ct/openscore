@@ -37,7 +37,7 @@ func CreateUserPaperGroup(userId int64, groupId int64) error {
 
 func GetUserPaperGroupByUserId(id int64) (*UserPaperGroup, bool, error) {
 	var group UserPaperGroup
-	has, err := adapter.engine.Where("user_id=?", id).Get(&group)
+	has, err := adapter.engine.Where("user_id = ?", id).OrderBy("id DESC").Get(&group)
 	if err != nil {
 		log.Println("GetGroupByGroupId err ")
 		return nil, false, errors.New("GetGroupByGroupId")
