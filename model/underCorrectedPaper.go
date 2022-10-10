@@ -190,9 +190,8 @@ func FindProblemUnderCorrectedList(problemUnderCorrectedPaper *[]UnderCorrectedP
 }
 
 func GetDistributedTestIdPaperByUserId(id int64, up *[]int64) error {
-	err := adapter.engine.Table("under_corrected_paper").Select("test_id").Where("user_id = ?", id).Where(" test_question_type=0 or test_question_type=1 or test_question_type=2 or test_question_type=3").Find(up)
+	err := adapter.engine.Table("under_corrected_paper").Select("test_id").Where("user_id = ?", id).Where(" test_question_type=0 or test_question_type=1 or test_question_type=2 or test_question_type=3 or test_question_type=8").Find(up)
 	if err != nil {
-		log.Panic(err)
 		log.Println("could not find any paper")
 	}
 	return err
