@@ -16,7 +16,7 @@ func FindUnDistributeTest(questionId int64) ([]model.TestPaper, error) {
 		return nil, err
 	}
 
-	if topic.ScoreType == 1 {
+	if topic.ScoreType == 1 || topic.ScoreType == 0 {
 		return model.FindUnDistributeTestLimit1(questionId)
 	}
 
