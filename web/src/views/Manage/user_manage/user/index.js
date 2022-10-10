@@ -200,7 +200,6 @@ export default class index extends Component {
             title={() => (
               <div>
                 {("用户管理")}&nbsp;&nbsp;&nbsp;&nbsp;
-                <Button type="primary" size="small" onClick={this.addUser.bind(this)}>{"添加"}</Button>
               </div>
             )}
             loading={users === null}
