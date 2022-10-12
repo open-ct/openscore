@@ -574,7 +574,7 @@ func (c *ApiController) Point() {
 
 		final := false
 
-		if topic.ScoreType == 1 {
+		if topic.ScoreType == 1 || topic.ScoreType == 0 {
 			test.ExaminerFirstId = userId
 			test.ExaminerFirstScore = sum
 			final = true
@@ -669,7 +669,7 @@ func (c *ApiController) Point() {
 				c.Data["json"] = resp
 				return
 			}
-			if topic.ScoreType == 1 {
+			if topic.ScoreType == 1 || topic.ScoreType == 0 {
 				tempTest.ExaminerFirstId = userId
 				tempTest.ExaminerFirstScore = score
 			} else if topic.ScoreType == 2 && tempTest.ExaminerFirstId == -1 {
