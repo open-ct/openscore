@@ -38,7 +38,13 @@ func GetTopicList(topics *[]Topic) error {
 }
 
 func FindTopicBySubNameList(topics *[]Topic, subjectName string) error {
-	err := adapter.engine.Where("subject_name=?", subjectName).Find(topics)
+	var err error
+
+	if subjectName != "" {
+		err = adapter.engine.Where("subject_name=?", subjectName).Find(topics)
+	} else {
+		err = adapter.engine.Find(topics)
+	}
 	if err != nil {
 		log.Println("FindTopicBySubNameList err ")
 	}
