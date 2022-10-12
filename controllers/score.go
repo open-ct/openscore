@@ -181,7 +181,9 @@ Label:
 		return
 	}
 	if len(papers) == 0 {
-		c.ResponseOk("there is no paper to correct")
+		resp := Response{"10003", "there is no paper to correct", nil}
+		c.Data["json"] = resp
+		c.ServeJSON()
 		return
 	}
 

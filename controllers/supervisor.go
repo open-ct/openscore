@@ -114,18 +114,18 @@ func (c *ApiController) WriteScoreExcel() {
 			f.SetCellValue(subject.SubjectName, "C"+strconv.Itoa(i), subjectTestPapers[(i-2)*len(topics)].School)
 			f.SetCellValue(subject.SubjectName, "D"+strconv.Itoa(i), subjectTestPapers[(i-2)*len(topics)].Mobile)
 			// 获取该用户的小题成绩
-			var infos []*model.TestPaperInfo
-			for _, info := range subjectTestPaperInfos {
-				if info.TicketId == subjectTestPapers[(i-2)*len(topics)].TicketId {
-					infos = append(infos, &info)
-				}
-			}
-			// infos, err := model.FindTestPaperInfoByTicketId(subjectTestPapers[(i-2)*len(topics)].TicketId)
-			// if err != nil {
-			// 	log.Println(err)
-			// 	c.Data["json"] = Response{Status: "30022", Msg: "获取小题参数设置记录表失败  ", Data: err}
-			// 	return
+			// var infos []*model.TestPaperInfo
+			// for _, info := range subjectTestPaperInfos {
+			// 	if info.TicketId == subjectTestPapers[(i-2)*len(topics)].TicketId {
+			// 		infos = append(infos, &info)
+			// 	}
 			// }
+			infos, err := model.FindTestPaperInfoByTicketId(subjectTestPapers[(i-2)*len(topics)].TicketId)
+			if err != nil {
+				log.Println(err)
+				c.Data["json"] = Response{Status: "30022", Msg: "获取小题参数设置记录表失败  ", Data: err}
+				return
+			}
 			var sum int64
 			for j, info := range infos {
 				if j < 22 {
