@@ -96,9 +96,9 @@ func (c *ApiController) WriteScoreExcel() {
 		// Set active sheet of the workbook.
 		f.SetActiveSheet(index)
 
-		var subjectTestPaperInfos []model.TestPaperInfo
+		var subjectTestPaperInfos []*model.TestPaperInfo
 		for i, subTopic := range subjectSubTopics {
-			testPaperInfos := make([]model.TestPaperInfo, 0)
+			testPaperInfos := make([]*model.TestPaperInfo, 0)
 			model.FindTestPaperInfoByQuestionDetailId(subTopic.QuestionDetailId, &testPaperInfos)
 			subjectTestPaperInfos = append(subjectTestPaperInfos, testPaperInfos...)
 
@@ -106,26 +106,21 @@ func (c *ApiController) WriteScoreExcel() {
 		}
 		f.SetCellValue(subject.SubjectName, string(byte(len(subjectSubTopics)+'E'))+"1", "总分")
 
-		fmt.Println("subjectSubTopics: ", subjectSubTopics)
-
 		for i := 2; i <= len(subjectTestPaperInfos)/len(subjectSubTopics)+1; i++ {
 			f.SetCellValue(subject.SubjectName, "A"+strconv.Itoa(i), subjectTestPapers[(i-2)*len(topics)].TicketId)
 			f.SetCellValue(subject.SubjectName, "B"+strconv.Itoa(i), subjectTestPapers[(i-2)*len(topics)].Candidate)
 			f.SetCellValue(subject.SubjectName, "C"+strconv.Itoa(i), subjectTestPapers[(i-2)*len(topics)].School)
 			f.SetCellValue(subject.SubjectName, "D"+strconv.Itoa(i), subjectTestPapers[(i-2)*len(topics)].Mobile)
 			// 获取该用户的小题成绩
-			// var infos []*model.TestPaperInfo
-			// for _, info := range subjectTestPaperInfos {
-			// 	if info.TicketId == subjectTestPapers[(i-2)*len(topics)].TicketId {
-			// 		infos = append(infos, &info)
-			// 	}
-			// }
-			infos, err := model.FindTestPaperInfoByTicketId(subjectTestPapers[(i-2)*len(topics)].TicketId)
-			if err != nil {
-				log.Println(err)
-				c.Data["json"] = Response{Status: "30022", Msg: "获取小题参数设置记录表失败  ", Data: err}
-				return
+			var infos []*model.TestPaperInfo
+
+			for _, info := range subjectTestPaperInfos {
+
+				if info.TicketId == subjectTestPapers[(i-2)*len(topics)].TicketId {
+					infos = append(infos, info)
+				}
 			}
+
 			var sum int64
 			for j, info := range infos {
 				if j < 22 {

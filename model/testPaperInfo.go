@@ -78,7 +78,7 @@ func GetTestInfoPicListByTestId(id int64, as *[]string) error {
 	return err
 }
 
-func FindTestPaperInfoByQuestionDetailId(questionDetailId int64, t *[]TestPaperInfo) error {
+func FindTestPaperInfoByQuestionDetailId(questionDetailId int64, t *[]*TestPaperInfo) error {
 	err := adapter.engine.Where("question_detail_id = ?", questionDetailId).Find(t)
 	if err != nil {
 		log.Println("could not FindTestPaperInfoByQuestionId ")
