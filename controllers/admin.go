@@ -1646,7 +1646,7 @@ func (c *ApiController) DeleteTest() {
 		model.FindSubTopicsByQuestionId(questionId, &subTopics)
 		for j := 0; j < len(subTopics); j++ {
 			subTopic := subTopics[j]
-			testPaperInfos := make([]model.TestPaperInfo, 0)
+			testPaperInfos := make([]*model.TestPaperInfo, 0)
 			model.FindTestPaperInfoByQuestionDetailId(subTopic.QuestionDetailId, &testPaperInfos)
 			for k := 0; k < len(testPaperInfos); k++ {
 				// picName := testPaperInfos[k].PicSrc
