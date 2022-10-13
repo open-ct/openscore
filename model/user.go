@@ -72,7 +72,7 @@ func (u *User) Update() error {
 }
 
 func FindUserNumberByQuestionId(users *[]User, questionId int64) error {
-	return adapter.engine.Where(" user_type=?", 2).Where("question_id=?", questionId).Find(users)
+	return adapter.engine.Where("user_type = ?", "normal").Where("question_id=?", questionId).Find(users)
 }
 
 func FindNewUserId(id1 int64, id2 int64, questionId int64) (newId int64) {
@@ -105,6 +105,6 @@ func GetLastUserBySubject(subject string) *User {
 
 func ListNormalUserByQuestionId(questionId int64) ([]User, error) {
 	var users []User
-	err := adapter.engine.Where("user_type = 2 AND question_id = ?", questionId).Find(&users)
+	err := adapter.engine.Where("user_type = 'normal' AND question_id = ?", questionId).Find(&users)
 	return users, err
 }

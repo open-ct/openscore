@@ -318,7 +318,7 @@ func (c *ApiController) TeacherMonitoring() {
 			onlineTime = user.OnlineTime
 		}
 		// 平均速度  (秒/份)
-		var markingSpeed float64 = 99999999
+		var markingSpeed float64 = 0
 		s1 := strconv.FormatInt(onlineTime, 10)
 		s, _ := strconv.ParseFloat(s1, 64)
 
