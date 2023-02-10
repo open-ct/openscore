@@ -144,6 +144,42 @@ export default [
       },
     ],
   },
+  {
+    key: "userTrain",
+    userPermission: "组长",
+    menu_name: "培训功能",
+    menu_url: "/home/userTrain",
+    icon: "UserOutlined",
+    chidPermissions: [
+      {
+        key: "grouping",
+        userPermission: "组长",
+        menu_name: "挑卷管理",
+        menu_url: "/home/userTrain/grouping",
+        icon: "",
+        chidPermissions: [
+        ],
+      },
+      {
+        key: "detail",
+        userPermission: "组长",
+        menu_name: "分组详情",
+        menu_url: "/home/userTrain/detail",
+        icon: "",
+        chidPermissions: [
+        ],
+      },
+      {
+        key: "evaluate",
+        userPermission: "组长",
+        menu_name: "评价",
+        menu_url: "/home/userTrain/evaluate",
+        icon: "",
+        chidPermissions: [
+        ],
+      },
+    ],
+  },
   // {
   //     key: "group_userManagement",
   //     userPermission: "组长",
@@ -280,7 +316,7 @@ export default [
       {
         key: "grouping",
         userPermission: "管理员",
-        menu_name: "试卷分组",
+        menu_name: "挑卷管理",
         menu_url: "/home/userTrain/grouping",
         icon: "",
         chidPermissions: [
