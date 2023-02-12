@@ -322,7 +322,8 @@ export default class index extends Component {
                 }
                 <Content>
                   <Switch>
-                    {this.state.account.type === "normal" ? <Redirect from="/" to="/home/mark-tasks" exact></Redirect> : null}
+                    <Route path="/home/normaluser" component={normalLogin} exact></Route>
+                    {JSON.stringify(this.state.account) == "{}" ? <Redirect from="/" to="/"></Redirect> : null}
                     <Route path="/home/mark-tasks" component={MarkTasks} exact></Route>
                     <Route path="/home/answer" component={Answer} exact></Route>
                     <Route path="/home/sample" component={Sample} exact></Route>
@@ -351,9 +352,6 @@ export default class index extends Component {
                     <Route path="/home/userTrain/grouping" component={grouping} exact></Route>
                     <Route path="/home/userTrain/detail" component={userDetail} exact></Route>
                     <Route path="/home/userTrain/evaluate" component={evaluate} exact></Route>
-
-                    <Route path="/home/normaluser" component={normalLogin} exact></Route>
-
                   </Switch>
                 </Content>
               </Layout>

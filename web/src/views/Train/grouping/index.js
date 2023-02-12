@@ -191,6 +191,45 @@ export default function Grouping(props) {
     });
   };
 
+  const selectOptions = [
+    {
+      value: "样卷",
+      label: "样卷",
+    },
+    {
+      value: "培训卷A组",
+      label: "培训卷A组",
+    },
+    {
+      value: "培训卷B组",
+      label: "培训卷B组",
+    },
+    {
+      value: "培训卷C组",
+      label: "培训卷C组",
+    },
+    {
+      value: "培训卷D组",
+      label: "培训卷D组",
+    },
+    {
+      value: "培训卷E组",
+      label: "培训卷E组",
+    },
+    {
+      value: "培训卷F组",
+      label: "培训卷F组",
+    },
+    {
+      value: "培训卷G组",
+      label: "培训卷G组",
+    },
+    {
+      value: "培训卷H组",
+      label: "培训卷H组",
+    },
+  ];
+
   return (
     <div className="grouping-page">
       <div className="subject-list">
@@ -243,7 +282,15 @@ export default function Grouping(props) {
             </Select>
           </Form.Item>
           <Form.Item label="分组名称" name="group_name">
-            <Input />
+            <Select
+              showSearch
+              placeholder="请选择分组"
+              optionFilterProp="children"
+              filterOption={(input, option) =>
+                (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
+              }
+              options={selectOptions}
+            />
           </Form.Item>
           <Form.Item label="准考证号" name="ticket_id">
             <Input />
