@@ -1,4 +1,4 @@
-import {Button, Popconfirm, Select, Table} from "antd";
+import {Select, Table} from "antd";
 import React, {useEffect, useState} from "react";
 import Manage from "../../../api/manage";
 
@@ -24,24 +24,24 @@ const Evaluate = () => {
       render: (_, records) => <p dangerouslySetInnerHTML={{__html: records.scores}}></p>
       ,
     },
-    {
-      title: "操作",
-      dataIndex: "",
-      render: (_, record) => {
-        return record.account === "管理员" ? null :
-          record.is_qualified ? <a>已合格</a> :
-            <Popconfirm
-              title={"确认要让他合格吗"}
-              onConfirm={() => {
-                Manage.updateUserQualified({account: record.account}).then(() => {
-                  handleSelectChange(select);
-                });
-              }}
-            >
-              <Button style={{marginBottom: "10px", marginRight: "10px"}} type="primary">合格</Button>
-            </Popconfirm>;
-      },
-    },
+    // {
+    //   title: "操作",
+    //   dataIndex: "",
+    //   render: (_, record) => {
+    //     return record.account === "管理员" ? null :
+    //       record.is_qualified ? <a>已合格</a> :
+    //         <Popconfirm
+    //           title={"确认要让他合格吗"}
+    //           onConfirm={() => {
+    //             Manage.updateUserQualified({account: record.account}).then(() => {
+    //               handleSelectChange(select);
+    //             });
+    //           }}
+    //         >
+    //           <Button style={{marginBottom: "10px", marginRight: "10px"}} type="primary">合格</Button>
+    //         </Popconfirm>;
+    //   },
+    // },
   ];
 
   useEffect(() => {
