@@ -16,6 +16,7 @@ export default class index extends Component {
       this.state = {
         classes: props,
         users: null,
+        subjectList: [],
         organizationName: props.match.params.organizationName,
         form_status: null,
         visible: false,
@@ -51,6 +52,16 @@ export default class index extends Component {
             });
           }
         })
+        .catch((e) => {
+          Settings.showMessage("error", e);
+        });
+      Manage.subjectList().then((res) => {
+        let subject_namet_list = [];
+        res.data.data.subjectVOList.forEach(el => {
+          subject_namet_list.push({"text": el.SubjectName, "value": el.SubjectName});
+        });
+        this.setState({subjectList: subject_namet_list});
+      })
         .catch((e) => {
           Settings.showMessage("error", e);
         });
@@ -130,14 +141,29 @@ export default class index extends Component {
           title: "学科",
           dataIndex: "subject_name",
           key: "subject_name",
-          width: "10px",
+          width: "100px",
+          filters: this.state.subjectList,
+          filterSearch: true,
+          onFilter: (value, record) => record.subject_name.startsWith(value),
           sorter: (a, b) => a.subject_name.localeCompare(b.subject_name),
         },
         {
           title: "用户类型",
           dataIndex: "user_type",
           key: "user_type",
-          width: "10px",
+          width: "100px",
+          filters: [
+            {
+              text: "阅卷员",
+              value: "normal",
+            },
+            {
+              text: "组长",
+              value: "supervisor",
+            },
+          ],
+          filterSearch: true,
+          onFilter: (value, record) => record.user_type.startsWith(value),
           sorter: (a, b) => a.user_type.localeCompare(b.user_type),
           render: (text) => {
             if (text === "normal") {
@@ -153,21 +179,21 @@ export default class index extends Component {
           title: "用户姓名",
           dataIndex: "account",
           key: "account",
-          width: "10px",
+          width: "100px",
           sorter: (a, b) => a.account.localeCompare(b.account),
         },
         {
           title: "密码",
           dataIndex: "password",
           key: "password",
-          width: "20px",
+          width: "100px",
           sorter: (a, b) => a.password.localeCompare(b.password),
         },
         {
           title: "操作",
           dataIndex: "",
           key: "op",
-          width: "11px",
+          width: "110px",
           fixed: "right",
           render: (text, record) => {
             return (
@@ -193,15 +219,28 @@ export default class index extends Component {
           },
         },
       ];
-
+      const rowSelection = {
+        onChange: (selectedRowKeys, selectedRows) => {
+          console.log(`selectedRowKeys: ${selectedRowKeys}`, "selectedRows: ", selectedRows);
+        },
+        getCheckboxProps: (record) => ({
+          disabled: record.name === "Disabled User",
+          // Column configuration not to be checked
+          name: record.name,
+        }),
+      };
       return (
         <div>
-          <Table columns={columns} scroll={{x: 1300}} dataSource={users} rowKey="name" size="middle" bordered pagination={{pageSize: 100}}
+          <Table columns={columns} dataSource={users} rowKey="user_id" size="middle" bordered pagination={{pageSize: 100}}
             title={() => (
               <div>
                 {("用户管理")}&nbsp;&nbsp;&nbsp;&nbsp;
               </div>
             )}
+            rowSelection={{
+              type: "checkbox",
+              ...rowSelection,
+            }}
             loading={users === null}
           />
         </div>
